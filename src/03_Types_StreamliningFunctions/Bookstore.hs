@@ -30,3 +30,14 @@ data Shape = Circle Vector Double
              | Poly [Vector]
              deriving (Show)
 
+
+-- Pattern Matching in Haskell with wildcard for i-dont-cares
+bookID (Book id _ _) = id
+bookTitle (Book _ title _) = title
+bookAuthors (Book _ _ authors) = authors
+-- Haskell's record syntax for record definition and f.o.c getters/setters
+data Customer = Customer {
+        customerID :: CustomerID,
+        customerName :: String,
+        customerAddress :: Address } deriving (Show)
+
