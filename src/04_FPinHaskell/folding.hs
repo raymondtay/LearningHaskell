@@ -39,9 +39,15 @@ product = myfold (*) 1
 -- The pattern xs@(_:xs') is called an as-pattern and it means "bind th variable xs to the value
 -- that matches the right side of the @ symbol." Comment out the line to see how the as-pattern
 -- would work.
+-- There's an additional benefit to using as-patterns, i know its starting to sound like a pun, 
+-- and that is we are saving cycles and ram as allocation is not needed when employing as-patterns
+-- but when applied to regular pattern matching you would notice that an additional node is allocated
+-- during runtime. This runtime allocation may be cheap but it's not free.
 suffixes :: [a] -> [[a]]
 suffixes xs@(_:xs') = xs : suffixes xs'
 --suffixes (x:xs) = (x:xs) : suffixes xs
 suffixes _ = []
 
+compose :: (b -> c) -> (a -> b) -> (a -> c)
+compose f g x = f (g x) 
 
