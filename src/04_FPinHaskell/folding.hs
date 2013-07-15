@@ -18,3 +18,30 @@ myfoldlviafoldr f z xs = myfoldr step id xs z
 
 identity xs = foldr (:) [] xs
 
+-- From the 'A tutorial on the universality and expressiveness of fold'
+myfold f v [] = v
+myfold f v (x:xs) = f x (myfold f v xs)
+
+mysum :: [Int] -> Int
+mysum = myfold (+) 0
+
+myand :: [Bool] -> Bool
+myand = myfold (&&) True
+
+product :: [Int] -> Int
+product = myfold (*) 1
+
+-- Haskell provides a handy notational shoartcut to let us write partially applied function
+-- in infix style. If we enclose an operator in parentheses, we can supply its left or right
+-- argument inside the parentheses to get a partially applied function. This kind of partial
+-- application is called a section.
+
+-- The pattern xs@(_:xs') is called an as-pattern and it means "bind th variable xs to the value
+-- that matches the right side of the @ symbol." Comment out the line to see how the as-pattern
+-- would work.
+suffixes :: [a] -> [[a]]
+suffixes xs@(_:xs') = xs : suffixes xs'
+--suffixes (x:xs) = (x:xs) : suffixes xs
+suffixes _ = []
+
+
