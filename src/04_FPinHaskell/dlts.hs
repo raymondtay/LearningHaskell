@@ -1,6 +1,6 @@
 import Data.List (isPrefixOf)
 
--- We can create new funcitons at any time by writing chains of composed funcitons, 
+-- We can create new functions at any time by writing chains of composed functions, 
 -- stitched together with (.) so long as the result type of the function on the right
 -- of each (.) matches the type of parameter that the function on the left can accept
 
