@@ -59,3 +59,10 @@ strictPair (a,b) = a `seq` b `seq` (a,b)
 strictList (x:xs) = x `seq` x : strictList xs
 strictList []     = []
 
+
+-- IT's important to understand that seq is not free: it has to perofrm a check at runtime 
+-- to see if an expression has bene evaluated. Use it sparingly. For instance, whileour 
+-- strictPair function evaluates the contents of a pair up to the first constructor, it add
+-- the overheads of pattern matching, two applicaitons of seq and the construction of a new tuple.
+-- If we were to measure the performance in the inner loop of a benchmark, we might find that it 
+-- slows down the program.
