@@ -37,3 +37,36 @@ does not depend on the value of a global variable, or the contents of a database
 or the state of a network connection. Pure code is inherently modular: 
 every funciton is self-contained and has a well defined structure.
 
+## About naming types and values
+
+In Haskell, the names of types and values are independent of each other. We
+use a type constructor (i.e. the type's name) only in a type declaration or a t
+ype signature. WE use a value constructor only in actual code. Because these uses
+are distinct, there is no ambiguity if we give a type cosntructor and value constructor
+the same name. If we are writing a type signature, we must be referring to a type constructor.
+If we are writing an expression, we must be using the value constructor.
+
+## About pattern matching in Haskell
+
+Let's use an example, which would be easier 
+```
+myNot True = False
+myNot False = True
+```
+Haskell lets us define a function as a series of equations: these two clauses
+are defining the behavior of the same function for different patterns of input.
+On each line, the patterns are the items following the fucniton name, up untill the = sign.
+
+When we apply myNot, the haskll runtime checks the value we supply aginast the value
+constructor in the first pattern. This does not match, so it tries against the second pattern.
+That match succeeds, so it uses the righthand side of that equation as the result of the funciton
+application.
+
+The order of matching is important as matching proceeds from top to bottom and stops
+at the first success. Equations that are below a successful match have no effect.
+
+```
+mysum (x:xs) = x + mysum xs
+mysum [] = 0
+```
+
