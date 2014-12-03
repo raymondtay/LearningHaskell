@@ -70,3 +70,15 @@ mysum (x:xs) = x + mysum xs
 mysum [] = 0
 ```
 
+### Is List an acceptable list ?
+
+In the book, the authors wrote 
+<pre>
+we can easily prove to ourselves that our `List a` type has the same shape 
+as the List type [a]. To do this, we write a funciton that takes
+any value of type [a] and produces a value of type List a:
+```
+fromList (x:xs) = Cons x (fromList xs)
+fromList []     = Nil
+```
+
