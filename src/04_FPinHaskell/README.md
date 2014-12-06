@@ -53,3 +53,10 @@ foldr (+) 0 [1..5]
 ```
 As in the book, the class of functions that we can express using foldr is called primitive recursive.
 
+### About Sections in Haskell 
+
+Haskell provides a handy notational shortcut to let us write a partially applied
+function to infix style. If we enclose an operator in parentheses, we can supply 
+its left or right argument inside the parentheses to get a partially applied function.
+This is called a Section.
+
