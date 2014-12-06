@@ -60,3 +60,11 @@ function to infix style. If we enclose an operator in parentheses, we can supply
 its left or right argument inside the parentheses to get a partially applied function.
 This is called a Section.
 
+### Developing Haskell Code without Going Nuts
+
+Early on, we we come to grips with Haskell development, we have so many new
+unfamiliar concepts to keep track of at one time that it can be a challenge to 
+write code that compiles at all. 
+
+One useful technique for quickly developing the skeleton of a program is to write
+placeholder, or stub, versions of types and functions.
