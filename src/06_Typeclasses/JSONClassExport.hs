@@ -1,0 +1,3 @@
+module JSONClass (
+    JAry(..)
+) where
