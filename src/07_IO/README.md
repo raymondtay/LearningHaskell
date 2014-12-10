@@ -31,4 +31,22 @@ to think about the program. It also helps the compiler to think about it. Recent
 for instance can provide a level of automatic parallelism for the pure parts of your code - something
 of a holy grail for computing.
 
+### About hGetContents
+
+One novel way to approach I/O is with hGetContents function. hGetContents has
+the type Handle -> IO String. The String it returns represents all of the data in the file
+gtiven by the Handle.
+
+In a strictly evaluated language, using such a funciton is often a bad idea. It may be 
+find to read the entire contents of a 2 KB file but if you try to read the netire contents
+of a 500GB file, you are likely to crash due to lack of RAM to store all that data. In 
+these langauges, you would traditionally use mechanisms such as loops to process the file's
+entire data.
+
+But hGetContents is differnt. The String it returns is evaluated lazily. At the moment
+you call hGetContents, nothing is actually read. Data is only read from the HJandle as the elements
+of the list are processed. As elements of the String are no longer used, Haskell's garbage collector
+automatically frees that memory. all of this happens completely transparently to you
+And sicne you have what looks like (And really is) a pure string, you can pass it to pure Non-IO code.
+
 
