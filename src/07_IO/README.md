@@ -49,4 +49,18 @@ of the list are processed. As elements of the String are no longer used, Haskell
 automatically frees that memory. all of this happens completely transparently to you
 And sicne you have what looks like (And really is) a pure string, you can pass it to pure Non-IO code.
 
+You are not required to ever consume all the data from the input file when using 
+hGetContents. Whenever the Haskell system determines that the entire string
+hGetContents returned can be garbage collected, the file is closed for you automatically.
+The same principle applies to data read from the file. Whenver a piece of data will never again
+be needed, the haskell environment releases the memory it stored within. 
 
+Strictly speaking, we dont really need to call hClose ... but its a good practice anyway.
+
+When using hGetContents, it is important to remember that even though you 
+may never agian explicitly reference Handle directly in the rest of the 
+program, you must not close the Handle untill you have finished consuming 
+its results via hGetContents. Doing so would cause you to 
+miss on some or all of the file's data. Since Haskell is lazy, you 
+generally can assume that you have consumed input only after you have
+output the result of the computaitons involving the input.
