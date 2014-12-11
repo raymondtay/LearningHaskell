@@ -83,4 +83,16 @@ as long as nothing else in the program needs it, the memory can be freed immedia
 In a sense, you can think of the String between readFile and writeFile as a pipe linking 
 the two. Data goes in one end, and flows back out from the other.
 
+### The True Nature of Return
+
+Many languages have a keyword called "return" and aborts the execution of a function
+immediately and returns a value to the caller.
+
+The Haskell return function is quite different. In Haskell, return is used to wrap data
+in a monad. When speaking about I/O, return is used to take pure data and bring it 
+into the I/O monad and the reason for doing this is because of how I/O monad works. Remember
+that anything whose result depends on I/O must be within the IO monad. So if we are writing a
+function that performs I/O, and then a pure computation, we will need to use return to make
+this pure computation the proper return value of the function. Otherwise a type error would
+occurr.
 
