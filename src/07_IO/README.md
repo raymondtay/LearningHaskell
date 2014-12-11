@@ -64,3 +64,23 @@ its results via hGetContents. Doing so would cause you to
 miss on some or all of the file's data. Since Haskell is lazy, you 
 generally can assume that you have consumed input only after you have
 output the result of the computaitons involving the input.
+
+### About Lazy Output
+
+As before, nothing in Haskell is evaluated before its value is needed. Since functions
+such as writeFile and putStr write out the entire String passed to them, that 
+entire String must be evaluated. So you are guaranteed that the argument to putStr will be evaluated
+in full.
+
+But what does that mean for laziness of the input? In the earlier examples, will the
+call to putStr or writeFile force the entire input String to be loaded into memory at once, just to be
+written out?
+
+The answer is no. putStr (and all similar output functions) write out data as it
+becomes available. They also have no need for keeping around data already written, so
+as long as nothing else in the program needs it, the memory can be freed immediately.
+
+In a sense, you can think of the String between readFile and writeFile as a pipe linking 
+the two. Data goes in one end, and flows back out from the other.
+
+
