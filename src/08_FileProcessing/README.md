@@ -55,3 +55,16 @@ to us, rather than follow an order that makes the compiler writer's life easiest
 Module writers often use this flexibility to pur more important code earlier in a 
 source file, relegating the plumbing work to a later time.
 
+
+### About Handling Errors Through API Design
+
+It's not necessarily a disaster if our globToRegex is passed a malformed pattern.
+Perhaps a user mistype a pattern, in which case, we like to be able to report a meaningful error message.
+
+Calling the 'error' function when this kind of problem occurs can be a drastic response. The error 
+throws an exception. Pure Haslell code cannot deal with exceptions so control is going to 
+rocket out of our pure code into the nearest caller that lives in IO and has an appropriate 
+exception handler installed. If no such handler is installed, the Haskell runtime will default to terminating
+our program (or print a nasty error message, in ghci)
+
+
