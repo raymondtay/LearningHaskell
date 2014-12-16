@@ -43,3 +43,28 @@ saferFileSize path = handle (\_ -> return Nothing) $ do
     hClose h
     return (Just size)
 
+{-
+    The bracket function takes three actions as arguments. The first action acquires a 
+    resource. The second releases the source. The third runs in between, while the resource
+    is acquired; let's call this the "use" action. If the "acquire" action succeeds, the 
+    "release" action is always called. This guarantees that the resource will always be released.
+    The "use" and "release" actions are each passed the resource acquired by the "acquire" action.
+-}
+getFileSize path = handle (\_ -> return Nothing) $
+    bracket (openFile path ReadMode) hClose $ \h -> do
+        size <- hFileSize h
+        return (Just size)
+
+type InfoP a = FilePath
+        -> Permissions
+        -> Maybe Integer
+        -> ClockTime
+        -> a
+
+pathP :: InfoP FilePath
+pathP path _ _ _ = path
+
+sizeP :: InfoP Integer
+sizeP _ _ (Just size) _ = size
+sizeP _ _ Nothing     _ = -1
+
