@@ -1,5 +1,6 @@
-{- import qualified Data.ByteString.Lazy.Char8 as L8 -}
+import qualified Data.ByteString.Lazy.Char8 as L8 
 import qualified Data.ByteString.Lazy as L
+import Data.Word
 import Data.Int 
 
 data ParseState = ParseState {
@@ -31,4 +32,20 @@ parse parser initState
     = case runParse parser (ParseState initState 0) of
         Left err -> Left err
         Right (result, _) -> Right result
+
+modifyOffset :: ParseState -> Int64 -> ParseState
+modifyOffset initState newOffset = initState { offset = newOffset } 
+
+-- the following parses a single byte; the intention is aligned in the book
+-- i.e. we are doing this over here..
+parseByte :: Parse Word8
+parseByte = 
+    getState ==> \initState -> 
+    case L.uncons (string initState) of 
+        Nothing ->
+            bail "end of input"
+        Just (byte, remainder) ->
+            putState newState ==> \_ -> identity byte
+            where newState = initState { string = remainder, offset = newOffset }
+                  newOffset = offset initState + 1
 

@@ -36,3 +36,19 @@ niceDrop :: (Ord a, Num a) => a -> [t] -> [t]
 niceDrop n xs | n <= 0 = xs
 niceDrop _ [] = []
 niceDrop n (_:xs) = niceDrop (n -1 ) xs
+
+
+{-
+    'let' expressions cannot span across 'guards' in haskell
+    attempting to run this would throw an error:
+    Not in scope: ‘xs’
+    Perhaps you meant one of these: ‘x’ (line 44), ‘ys’ (line 46)
+-}
+
+canyouseeit x y
+    | x < y = let xs = [1..10] in xs
+    | x >= y = let 
+        -- xs = [1..10]
+        ys = [y | y <- [1,3..10], elem y xs] in ys
+    | otherwise = []
+
