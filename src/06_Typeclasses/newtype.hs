@@ -64,3 +64,13 @@ so it does look like the Enumeration we've defined in "Day" is such that Monday 
 as "monotically increasing" but does not cycle through....i wonder how to solve this?
 -}
 
+infixr 5 :-: -- personally, this consumes too much keystrokes...
+data List a = Empty
+    | a :-: (List a ) deriving (Show, Read, Eq, Ord)
+
+infixr 5 -|
+(-|) :: List a -> List a -> List a
+Empty -| xs = xs
+(x :-: xs) -| ys = x :-: (xs -| ys)
+
+
