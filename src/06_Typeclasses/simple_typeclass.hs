@@ -54,6 +54,7 @@ instance (Eq a, Num [a]) => YesNo [a] where
     yesno _  = True
 
 -- this one declares what it means when "yesno" is applied to a list of a's.
+{-
 instance Num a => Maybe a where
     Just a = a
     Nothing = 0
@@ -62,6 +63,7 @@ instance YesNo (Maybe a) where
     yesno (Just _) = True
     yesno Nothing  = False
 
+-}
 -- the above definition allows the following expressions to work:
 -- *Main Map> yesno $ Just 333
 -- True
@@ -70,4 +72,51 @@ instance YesNo (Maybe a) where
 -- *Main Map> yesno (Just 4)
 -- True
 -- 
+
+data Foo = F Int | G Char
+
+instance Eq Foo where
+    (F i) == (F j) = i == j
+    (G a) == (G b) = a == b
+    _ == _ = False
+
+class Listable a where
+    toList :: a -> [Int] 
+instance Listable Int where
+-- toList :: Int -> [Int]
+    toList x = [x]
+instance Listable Bool where
+-- toList :: Bool -> [Int]
+    toList True = [1]
+    toList False = [0]
+instance Listable [Int] where
+-- toList :: [Int] -> [Int]
+    toList = id
+
+data Tree a = Empty | Node a (Tree a) (Tree a)
+
+instance Listable (Tree Int) where
+    toList Empty = []
+    toList (Node x l r) = toList l ++ [x] ++ toList r
+
+instance (Listable a, Listable b) => Listable (a,b) where
+    toList (a,b) = toList a ++ toList b
+
+class Tofu t where
+    tofu :: j a -> t a j
+{-
+    'j' takes in 1 type 'a' => kind of 'j' is * -> *
+    't' takes in 2 types, 'a' which is kind '*' and we know 'j' is (* -> *)
+    therefore, 't''s kind is * -> (* -> *) 
+    combinating both 'j a -> t a j' (* -> *) -> (* -> (* -> *)) -> *
+                                    |<--j-->|   |<--- t ----->|
+    but we can collapse this further by recognizing that 'j a' produces * on the LHS of ->
+    and 't a j' produces '*' on the RHS
+    which gives us the kind-expression: * -> (* -> *) -> *
+-}
+
+data Frank a b = Frank { field :: b a } deriving (Show)
+
+instance Tofu Frank where
+    tofu x = Frank x
 
