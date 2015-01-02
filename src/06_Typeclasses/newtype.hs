@@ -73,4 +73,20 @@ infixr 5 -|
 Empty -| xs = xs
 (x :-: xs) -| ys = x :-: (xs -| ys)
 
+{-
+To make this type a part of Functor, we have to partially apply the 
+first two type parameters so that we are left with * -> *. That means that 
+the start of the instance declaration will be :
+
+instance Functor (Barry a b) where
+
+If we look at fmap as if it was made specifically for Barry, it would 
+have a type of fmap :: (a -> b) -> Barry e f a -> Barry e f b
+where we've replaced 'Barry e f' for Functor's f
+-}
+
+data Barry t k p = Barry { yabba :: p, dabba :: t k }
+instance Functor (Barry dontcare dontcare2) where
+    fmap f (Barry {yabba = a, dabba = b}) = Barry {yabba = f a, dabba = b } 
+
 
