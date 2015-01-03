@@ -1,7 +1,69 @@
+module MyPrelude where
+
 -- Start the ghci using this "ghci -v -XFlexibleInstances -XUndecidableInstances"
 -- alternatively, whilst in the ghci enter the following :
 -- :set -XFlexibleInstances
 -- :set -XUndecidableInstances
+import GHC.Show hiding(show)
+
+-- import Prelude hiding(show, (+), sum) -- hiding the default i.e. Prelude.show, Prelude.sum and Prelude.+
+
+class Show a where
+    show :: a -> String
+
+instance Show Bool where
+    show True = "True"
+    show False = "Flask"
+
+instance Show Int where
+    show x = Prelude.show x
+
+instance Show a => Show [a] where
+    show xs = "[" ++ go True xs
+        where 
+            go _ [] = "]"
+            go x (h:t) = if x then "" else ", " ++ show h ++ go False t
+
+print :: Show a => a -> IO ()
+print x = putStrLn $ show x
+
+class MNum a where
+    fromInt :: Int -> a
+    (+)     :: a -> a -> a
+
+instance MNum Int where
+    fromInt i = id i
+    (+) a b = a + b
+
+print_incr :: (Show a, MNum a) => a -> IO ()
+print_incr x = print $ x + fromInt 1
+
+print_incr_int :: Int -> IO ()
+print_incr_int x = print_incr x
+
+sum :: MNum a => [a] -> a -- hide Prelude.sum or else ...
+sum xs = foldr (+) (fromInt 0) xs -- hide Prelude.+ or else GHC will frown at u
+
+
+
+
+
+
+
+
+
+
+
+
+{- 
+Here's an example how to use it:
+*Main> let xs = show True
+*Main> xs
+"True"
+*Main> let ys = show False
+*Main> ys
+"Flask"
+-}
 
 class (Eq a, Num a) => YesNo a where
     yesno :: a -> Bool
