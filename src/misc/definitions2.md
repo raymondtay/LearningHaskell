@@ -20,4 +20,10 @@ type Name = String
 -- type String *not* a data declaration.
 --- just a type alias declaration
 ```
++ `Arity`
+```
+Arity is the number of arguments a funciton accepts. This notion is a little
+slippery in Haskell, as due to currying, all functions are 1-arity
+and we handle accepting multiple arguments by nesting functions.
+```
 
