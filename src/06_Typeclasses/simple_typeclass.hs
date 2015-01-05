@@ -44,17 +44,6 @@ print_incr_int x = print_incr x
 sum :: MNum a => [a] -> a -- hide Prelude.sum or else ...
 sum xs = foldr (+) (fromInt 0) xs -- hide Prelude.+ or else GHC will frown at u
 
-
-
-
-
-
-
-
-
-
-
-
 {- 
 Here's an example how to use it:
 *Main> let xs = show True
