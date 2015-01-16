@@ -4,28 +4,27 @@ module MyPrelude where
 -- alternatively, whilst in the ghci enter the following :
 -- :set -XFlexibleInstances
 -- :set -XUndecidableInstances
-import GHC.Show hiding(show)
 
--- import Prelude hiding(show, (+), sum) -- hiding the default i.e. Prelude.show, Prelude.sum and Prelude.+
+import Prelude hiding((+), sum) -- hiding the default i.e. Prelude.show, Prelude.sum and Prelude.+
 
-class Show a where
-    show :: a -> String
+class MShow a where
+    mshow :: a -> String
 
-instance Show Bool where
-    show True = "True"
-    show False = "Flask"
+instance MShow Bool where
+    mshow True = "True"
+    mshow False = "Flask"
 
-instance Show Int where
-    show x = Prelude.show x
+instance MShow Int where
+    mshow x = Prelude.show x
 
-instance Show a => Show [a] where
-    show xs = "[" ++ go True xs
+instance MShow a => MShow [a] where
+    mshow xs = "[" ++ go True xs
         where 
             go _ [] = "]"
-            go x (h:t) = if x then "" else ", " ++ show h ++ go False t
+            go x (h:t) = if x then "" else ", " ++ mshow h ++ go False t
 
-print :: Show a => a -> IO ()
-print x = putStrLn $ show x
+print :: MShow a => a -> IO ()
+print x = putStrLn $ mshow x
 
 class MNum a where
     fromInt :: Int -> a
@@ -35,8 +34,8 @@ instance MNum Int where
     fromInt i = id i
     (+) a b = a + b
 
-print_incr :: (Show a, MNum a) => a -> IO ()
-print_incr x = print $ x + fromInt 1
+print_incr :: (MShow a, MNum a) => a -> IO ()
+print_incr x = MyPrelude.print $ x + fromInt 1
 
 print_incr_int :: Int -> IO ()
 print_incr_int x = print_incr x
@@ -170,4 +169,18 @@ data Frank a b = Frank { field :: b a } deriving (Show)
 
 instance Tofu Frank where
     tofu x = Frank x
+
+data CMaybe a = 
+    CNothing | 
+    CJust Int a deriving (Show)
+
+instance Functor CMaybe where
+    fmap f CNothing = CNothing
+    fmap f (CJust counter x) = CJust (counter + 1) (f x)
+
+{-
+fmap id (CJust 0 "hey")
+fmap \s -> s ++ s (CJust 0 "hey")
+-}
+
 
