@@ -37,9 +37,22 @@ by trying things out !
 > Prelude Control.Applicative> :t pure (++)
 > pure (++) :: Applicative f => f ([a] -> [a] -> [a])
 > Prelude Control.Applicative> :i pure
+=======
+Take a look at this example and it should be clear what does the applicatives style
+mean when applied to lists
+> filter (>50) ( (*) <$> [4,55] <*> [44,22])
+> [176,88,2420,1210]
+> filter (>50) $ (*) <$> [4,55] <*> [44,22]
+> [176,88,2420,1210]
 
+-}
+import Control.Applicative
 
+sequenceR :: (Applicative f) => [f a] -> f [a]
+sequenceR [] = pure []
+sequenceR (x:xs) = (:) <$> x <*> sequenceR xs
 
+{-
 > class Functor f => Applicative f where
 >   pure :: a -> f a
 >   ...
@@ -102,4 +115,36 @@ instance Functor IO where
     fmap f action = do
         result <- action
         return (f result)
+    Applying a similar approach but this time from the right 
+    and starting with a `pure []`
 -}
+sequenceRViaFoldr :: (Applicative f) => [f a] -> f [a]
+sequenceRViaFoldr = foldr (liftA2 (:)) (pure [])
+
+{-
+    If we wanted to make the tuple an instance of `Functor`
+    in such a way that when we `fmap` a function over an
+    tuple, it gets applied to the first component of the tuple?
+    e.g. `fmap (+3) (1,1)` should return `(4,1)` and turns out
+    its rather *difficult* to do that with conventional methods.
+    Turns out the `newtype` keyword allows us to circumvent this 
+    and this reminds me of the `Type Lambdas` in Scala
+-}
+
+newtype Pair b a = Pair { getPair :: (a,b) }
+
+instance Functor (Pair a) where
+    fmap f (Pair (x,y)) = Pair(f x, y)
+
+
+class MonoidT a where
+    mempty :: a
+    mappend :: a -> a -> a
+    mconcat :: [a] -> a
+    mconcat = foldr mappend mempty
+
+instance (MonoidT a) => MonoidT (Maybe a) where
+    mempty = Nothing
+    Nothing `mappend` m = m
+    Just a `mappend` Just b = Just (a `mappend` b)
+
