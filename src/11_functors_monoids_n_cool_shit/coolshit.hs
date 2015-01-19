@@ -11,8 +11,8 @@ class Functor f => Applicative (f :: * -> *) where
 infixl 4 <*>
 
 
--- Turns out that <*> is left-associative ! cool !
--- So let's use the following example to understand what <*> actually does ?
+Turns out that <*> is left-associative ! cool !
+So let's use the following example to understand what <*> actually does ?
 when we say pure (+) <*> Just 3 <*> Just 5
 what actually happens is that <*> is actually left-associative which means the above
 expression becomes 
@@ -28,6 +28,22 @@ allows us to take a function that expects parametrs that aren't necessarily
 wrapped in functors and use that function to operate on several values
 that are in functor contexts. The function can take as many parameters as we want,
 because it's always partially applied step by step between occurences of <*>
+
+It would be easier to understand how Haskell's type system works
+by trying things out !
+
+> Prelude Control.Applicative> :t (++)
+> (++) :: [a] -> [a] -> [a]
+> Prelude Control.Applicative> :t pure (++)
+> pure (++) :: Applicative f => f ([a] -> [a] -> [a])
+> Prelude Control.Applicative> :i pure
+
+
+
+> class Functor f => Applicative f where
+>   pure :: a -> f a
+>   ...
+>     -- Defined in `Control.Applicative'
 
 "pure" puts a value into a default context and if we just put a function in a
 default context and then extract and apply it to a value inside another applicative functor,
@@ -53,6 +69,21 @@ of those doesn't mean that they somehow represent the same thing .
 Using <$>, the applicative style shines through because if we want to apply a function "f" between 
 three applicative functors, we can write f <$> x <*> y <*> z. If the parameters were not applicative
 functors but normal values, we would write "f x y z".
+
+For-comprehensions like the following 
+> [x*y | x <- [1..10], y <- [1..10]]
+can be replaced by applicatives like the following
+> (*) <$> [1..10] <*> [1..10]
+
+=> (+) <$> (+3) <*> (*100) $ 5
+=> ((+3) + ) <*> (*100) $ 5
+=> ((+3) + (*100)) $ 5
+=> ((5+4) + (5*100))
+
+=> (\x y z -> [x,y,z]) <$> (+3) <*> (*2) <*> (/2) $ 5 
+=> (\x y z -> [(+3), y, z]) <*> (*2) <*> (/2) $ 5
+=> (\x y z -> [(+3), (*2), z]) <*> (/2) $ 5
+=> fmap (\x y z -> [(+3), (*2), (/2)]) 5
 
 Turns out that there are other applicative functos and one of them is the list type constructor
 > instance Applicative [] where
