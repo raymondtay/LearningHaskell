@@ -148,3 +148,15 @@ instance (MonoidT a) => MonoidT (Maybe a) where
     Nothing `mappend` m = m
     Just a `mappend` Just b = Just (a `mappend` b)
 
+{-
+How does `sequenceR [[1,2], [3,4]]` work?
+=> sequenceR [[1,2], [3,4]]
+=> (:) <$> [1,2] <*> sequenceR [[3,4]]
+=> (:) <$> [1,2] <*> ( (:) <$> [3,4] <*> sequenceR [] )
+=> (:) <$> [1,2] <*> ( (:) <$> [3,4] <*> [[]] )
+=> (:) <$> [1,2] <*> ( [ [3], [4] ] )
+=> (:) <$> [1,2] <*> [ [3], [4] ]
+=> [ 1:[3], 1:[4], 2:[3], 2:[4] ]
+=> [[1,3], [1,4], [2,3], [2,4]]
+-}
+ 
