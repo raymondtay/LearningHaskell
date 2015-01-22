@@ -131,10 +131,56 @@ sequenceRViaFoldr = foldr (liftA2 (:)) (pure [])
     and this reminds me of the `Type Lambdas` in Scala
 -}
 
-newtype Pair b a = Pair { getPair :: (a,b) }
+newtype Pair b a = Pair { getPair :: (a,b) } deriving (Eq, Show) -- the type of this type is (a,b) -> Pair b a
 
-instance Functor (Pair a) where
+instance Functor (Pair h) where
     fmap f (Pair (x,y)) = Pair(f x, y)
+
+{-
+    An example of using `Pair b a` would be the following:
+    > fmap (*100) (Pair(2,3))
+    > fmap ( Pair( (*100) 2, 3) ) 
+    > Pair( 200, 3 )
+    then to extract it, we would use the `getPair`
+    > getPair Pair(200,3)
+    and another way to do this is the following
+    > getPair $ fmap (*100) (Pair(2,3))
+
+
+    ---------------------------------------------------------
+    newtype's laziness
+    ---------------------------------------------------------
+    data Cool = Cool { getcool :: Bool } ----- (1)
+    newtype Cool = Cool { getcool :: Bool } -- (2)
+
+    helloMe :: Cool -> String
+    helloMe (Cool _ ) = "helo"
+
+    there's something interesting about the differences of using `newtype`
+    and turns out that its got something to do with the fact that laziness
+    is built into it rather than the usual data constructors
+    
+    Assuming you have loaded expression (1) (note that (1) & (2) cannot be loaded at the same time)
+    and then we say
+    > helloMe undefined
+    ## This would throw a bomb ! because the `undefined` is evaluated
+    but when you throw away expression (2) and load expression (1) it allows laziness to be
+    exhibited 
+    > helloMe "whatever"
+    > "helo"
+    the expression "whatever" is never evaluated, per say. 
+
+    Note: But whatever it is, we need to use the `$` to deriving the result of the computation lazily
+
+    Reason for this behavior:
+    
+        Internally, Haskell can represent the values of the new type in the same way 
+        as the original values. It doesn't have to add another box around them, it just
+        has to be aware of the values being of different type. And because Haskell knows that
+        types made with the newtype keyword can only have 1 constructor, it doesn't have to evaluate
+        the value passed to the function to make sure that it conforms to the signature
+
+-}
 
 class MonoidT a where
     mempty :: a
