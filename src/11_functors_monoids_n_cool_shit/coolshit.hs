@@ -207,3 +207,36 @@ How does `sequenceR [[1,2], [3,4]]` work?
 
 -- new type with only one value constructor 
 newtype CharList = CharList { getCharList :: [Char] } deriving (Eq, Show) 
+
+--
+-- This typeclass is modeled after Haskell's own typeclass `Product`.
+-- The purpose of this repeating the cycle is because poor me thought i understood
+-- something and then to discover that i did not understand anything at all.
+-- The following code piece is more of a reminder for me on how to create typeclasses
+-- in Haskell.
+--
+newtype SuperProduct a = SuperProduct { getSupProd :: a } deriving (Eq, Show)
+instance Num a => MonoidT (SuperProduct a) where
+    mempty = SuperProduct 1
+    SuperProduct x `mappend` SuperProduct y = SuperProduct (x*y)
+
+--
+-- with the following declaration, we can now do
+--
+-- > fmap (\x -> x) [SuperProduct(4)]
+-- > [SuperProduct { getSupProd = 4 }]
+--
+-- and also the following:
+--
+-- > fmap getSupProd $ fmap (\x -> x) [SuperProduct(2), SuperProduct(5), SuperProduct(8)]
+-- > [2,5,8]
+-- 
+-- and the following :
+-- > map (\x -> SuperProduct(getSupProd x * 7)) $ map SuperProduct $ [1,2,3]
+-- > [SuperProduct {getSupProd = 7},SuperProduct {getSupProd = 14},SuperProduct {getSupProd = 21}]
+--
+instance Functor SuperProduct where
+    fmap f (SuperProduct a) = SuperProduct (f a)
+    
+
+
