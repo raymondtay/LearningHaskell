@@ -136,7 +136,6 @@ newtype Pair b a = Pair { getPair :: (a,b) }
 instance Functor (Pair a) where
     fmap f (Pair (x,y)) = Pair(f x, y)
 
-
 class MonoidT a where
     mempty :: a
     mappend :: a -> a -> a
@@ -159,4 +158,6 @@ How does `sequenceR [[1,2], [3,4]]` work?
 => [ 1:[3], 1:[4], 2:[3], 2:[4] ]
 => [[1,3], [1,4], [2,3], [2,4]]
 -}
- 
+
+-- new type with only one value constructor 
+newtype CharList = CharList { getCharList :: [Char] } deriving (Eq, Show) 
