@@ -1,3 +1,5 @@
+import qualified Data.Monoid as M
+import qualified Control.Monad as Ma
 {-
     When we first talked about functors, we say that they were a useful concept for values that
     can be mapped over. Then, we took that concept one step further by introducing applicative functors, 
@@ -72,5 +74,14 @@ instance MonadT Option where
 -- > NothingO
 -- > JustO 4 =>> JustO 5
 -- > JustO 5
+-- > JustO 212 =>>= \x -> returnT (x*10)
+-- > JustO 2120
 --
+
+
+newtype WriterT w a = WriterT { runWriterT :: (a, w) }
+
+instance (M.Monoid w) => Ma.Monad (WriterT w) where
+    return x = WriterT (x, M.mempty)
+    (WriterT (x, v)) >>= f = let (WriterT (y, v')) = f x in WriterT (y, v `M.mappend` v')
 
