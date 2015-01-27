@@ -1,3 +1,4 @@
+import Control.Monad.Writer
 {-
     When we first talked about functors, we say that they were a useful concept for values that
     can be mapped over. Then, we took that concept one step further by introducing applicative functors, 
@@ -48,6 +49,8 @@ applyM (Just x) f = Just (f x)
 -- Just like functions have the `Functor` type class and applicative functors have the `Applicative`
 -- type class, monads comes with their own types
 -- 
+
+
 class MonadT m where
     returnT :: a -> m a  -- looks a lot like `pure` in Applicatives
     (=>>=) :: m a -> (a -> m b) -> m b
@@ -73,4 +76,23 @@ instance MonadT Option where
 -- > JustO 4 =>> JustO 5
 -- > JustO 5
 --
+
+
+logNumber :: Int -> Writer [String] Int
+logNumber x = Writer (x, ["Got number: " ++ show x])
+
+multWithLog :: Writer [String] Int 
+multWithLog = do
+    x <- logNumber 3
+    y <- logNumber 4
+    return (x * y)
+
+gcd' :: Int -> Int -> Writer [String] Int  
+gcd' a b  
+    | b == 0 = do  
+        tell ["Finished with " ++ show a]  
+        return a  
+    | otherwise = do  
+        tell [show a ++ " mod " ++ show b ++ " = " ++ show (a `mod` b)]  
+        gcd' b (a `mod` b)  
 

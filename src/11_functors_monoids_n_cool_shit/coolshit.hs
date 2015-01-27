@@ -278,4 +278,4 @@ instance (Num a) => MonoidT (M.Sum a) where
 addFood :: Food -> (Food, Price)
 addFood "chicken" = ("fried chicken", M.Sum 10)
 addFood "duck" = ("roast duck", M.Sum 15) -- roast duck is normally more expensive than fried chicken 
-
+addFood otherwise = ("i_dont_know_what_you_ordered", M.Sum 0)
