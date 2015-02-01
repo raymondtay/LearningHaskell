@@ -130,6 +130,17 @@ multWithLogTell = do
 -- `W.tell` ... the only concern i have is whether its dependent on the computation
 -- having a deterministic nature to it. Since the `computation` and the `logs` are 
 -- pretty intertwined with one another.
+-- An example would be the following:
+-- > gcd' 1212 773
+-- > (1,["1212 mod 773 = 439",
+-- >      "773 mod 439 = 334",
+-- >      "439 mod 334 = 105",
+-- >      "334 mod 105 = 19",
+-- >       "105 mod 19 = 10",
+-- >        "19 mod 10 = 9",
+-- >         "10 mod 9 = 1",
+-- >          "9 mod 1 = 0",
+-- >     "Finished with 1"])
 
 gcd' :: Int -> Int -> W.Writer [String] Int  
 gcd' a b  
