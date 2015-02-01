@@ -10,6 +10,7 @@ Environment
 ================
 - Haskell Platform for OSX 
 
+```
 Raymonds-MacBook-Pro:LearningHaskell raymondtay$ ghci
 GHCi, version 7.4.2: http://www.haskell.org/ghc/  :? for help
 Loading package ghc-prim ... linking ... done.
@@ -17,6 +18,7 @@ Loading package integer-gmp ... linking ... done.
 Loading package base ... linking ... done.
 Prelude>
 Leaving GHCi.
+```
 
 Source Code
 ===============
