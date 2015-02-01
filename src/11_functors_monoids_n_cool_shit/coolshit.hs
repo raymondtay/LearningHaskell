@@ -1,6 +1,7 @@
 
 module CoolShit where -- frankly, since when is shit EVER ever cool? 
 
+import qualified Data.Monoid as M
 {-
 
 class Functor f => Applicative (f :: * -> *) where
@@ -237,6 +238,44 @@ instance Num a => MonoidT (SuperProduct a) where
 --
 instance Functor SuperProduct where
     fmap f (SuperProduct a) = SuperProduct (f a)
-    
 
+{-
 
+Starting off from the following expression:
+
+> applyLog (a, String) -> (a -> (b, String)) -> (b,String)
+> applyLog (x, log) f = let (y, newLog) = f x in (y, log ++ newLog)
+
+Discovered that we can actually generate new information i.e. `y & newLog` from the passed-in values  
+i.e. `x, log & f` and allowed values to be concat-ed. A few things pop out almost immediately and they
+are the fact that instead of `++` is actually a Monoid in addition to being a Monad (of course i realized 
+that, later ;=) ) and so if we replaced `++` with `mappend` it works too, like the following::
+
+> applyLog (a, [x]) -> (a -> (b, [x])) -> (b, [x])
+> applyLog (x, log) f = let (y, newLog) = f x in (y, log `mappend` newLog)
+
+The final realization is the fact that `[x]` is actually a Monoid ! and we can now add a class constraint
+
+> applyLog :: (Monoid m) => (a, m) -> (a -> (b, m)) -> (b, m)
+> applyLog (x, log) f = let (y, newLog) = f x in (y, log `mappend` newLog)
+
+Now, we can finally test-drive our new revelation and write shit like the following:
+
+> ("chicken", M.Sum 10) `applyLog` addFood
+> ("fried chicken",Sum {getSum = 20})
+
+-}
+
+applyLog :: (MonoidT m) => (a, m) -> (a -> (b, m)) -> (b,m)
+applyLog (x, log) f = let (y, newLog) = f x in (y, log `mappend` newLog)
+type Food = String
+type Price = M.Sum Int
+
+instance (Num a) => MonoidT (M.Sum a) where
+    mempty = M.Sum 0
+    M.Sum x `mappend` M.Sum y = M.Sum (x + y)
+
+addFood :: Food -> (Food, Price)
+addFood "chicken" = ("fried chicken", M.Sum 10)
+addFood "duck" = ("roast duck", M.Sum 15) -- roast duck is normally more expensive than fried chicken 
+addFood otherwise = ("i_dont_know_what_you_ordered", M.Sum 0)
