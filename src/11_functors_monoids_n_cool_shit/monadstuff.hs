@@ -1,4 +1,5 @@
-import Control.Monad.Writer
+import qualified Control.Monad.Writer as W
+import Data.Monoid
 {-
     When we first talked about functors, we say that they were a useful concept for values that
     can be mapped over. Then, we took that concept one step further by introducing applicative functors, 
@@ -51,23 +52,23 @@ applyM (Just x) f = Just (f x)
 -- 
 
 
-class MonadT m where
-    returnT :: a -> m a  -- looks a lot like `pure` in Applicatives
+class MonadA m where
+    returnA :: a -> m a  -- looks a lot like `pure` in Applicatives
     (=>>=) :: m a -> (a -> m b) -> m b
 
     (=>>) :: m a -> m b -> m b
     x =>> y = x =>>= \_ -> y 
 
-    failT :: String -> m a
-    failT msg = error msg
+    failA :: String -> m a
+    failA msg = error msg
 
 data Option a = JustO a | NothingO deriving (Eq, Show)
 
-instance MonadT Option where
-    returnT x = JustO x
+instance MonadA Option where
+    returnA x = JustO x
     NothingO =>>= f = NothingO
     (JustO a) =>>= f = f a
-    failT _ = NothingO
+    failA _ = NothingO
 
 -- 
 -- The following can be achieved now :
@@ -77,22 +78,65 @@ instance MonadT Option where
 -- > JustO 5
 --
 
+{-
+ Let's create a writer following up the previous idea.
+ Don't fear iteration because it's a good thing :-) and so...
+ the general idea is to transform the `applyLog` idea into a Monad-ic like structure
+ and we have the following 
+ where we declare a new type called `WriterA` which takes in a `w` and `a` 
+ where `w` is actually a Monoid and `a` represents the type of the value which we wish to extract
+ and bind to.
+ 
+ The `runWriterA` is there to replace the behavior of deriving from `Show`.
+-}
 
-logNumber :: Int -> Writer [String] Int
-logNumber x = Writer (x, ["Got number: " ++ show x])
+newtype WriterA w a = WriterA { runWriterA :: (a, w) }
+instance (Monoid w) => MonadA (WriterA w) where
+    returnA x = WriterA (x, mempty)
+    (WriterA (x, y)) =>>= f = let (WriterA (y'', y')) = f x in WriterA (y'', y `mappend` y')
 
-multWithLog :: Writer [String] Int 
+-- with the new defn of `logNumber` we can accomplish something like this
+-- > runWriter $ logNumber 5
+-- > (5, "Got number: 5")
+--
+logNumber x = W.writer (x, ["Got number: " ++ show x])
+
+-- With the following `do` notation, we can write an expression like this 
+-- > runWriter $ multWithLog
+-- > (12, ["Got number: 3", "Got number: 4"])
+-- and we noticed that the 
+multWithLog :: W.Writer [String] Int
 multWithLog = do
     x <- logNumber 3
     y <- logNumber 4
+    W.tell ["going to multiply two numbers"]
     return (x * y)
 
-gcd' :: Int -> Int -> Writer [String] Int  
+-- With the following `do` notation, we can write an expression like this 
+-- > runWriter $ multWithLogTell
+-- > (12,["Got number: 3","Got number: 4","going to multiply two numbers"])
+
+multWithLogTell :: W.Writer [String] Int
+multWithLogTell = do
+    x <- logNumber 3
+    y <- logNumber 4
+    W.tell ["going to multiply two numbers"]
+    return (x * y)
+
+
+-- If we take the idea a little further and attempt to understand 
+-- how the greatest-common-divisor algorithm worked, we can use the Writer Monad
+-- and uncover its darkest secret by tracing every step of the algorithm via the
+-- `W.tell` ... the only concern i have is whether its dependent on the computation
+-- having a deterministic nature to it. Since the `computation` and the `logs` are 
+-- pretty intertwined with one another.
+
+gcd' :: Int -> Int -> W.Writer [String] Int  
 gcd' a b  
     | b == 0 = do  
-        tell ["Finished with " ++ show a]  
+        W.tell ["Finished with " ++ show a]  
         return a  
     | otherwise = do  
-        tell [show a ++ " mod " ++ show b ++ " = " ++ show (a `mod` b)]  
+        W.tell [show a ++ " mod " ++ show b ++ " = " ++ show (a `mod` b)]  
         gcd' b (a `mod` b)  
 
