@@ -170,3 +170,55 @@ gcd' a b
 -- > 4 mod 1 = 0
 -- > Finished with 1
 -- 
+
+
+{-
+ The interesting fact coming up next, accoridng to the book, is the fact that
+ list creation in certain use cases are bound to be slower and there's a way to fix
+ that.
+-}
+
+gcdReverse :: Int -> Int -> W.Writer [String] Int
+gcdReverse a b 
+    | b  == 0 = do
+        W.tell ["Finished with " ++ show a]
+        return a
+    | otherwise = do
+        result <- gcdReverse b (a `mod` b)
+        W.tell [show a ++ " mod " ++ show b ++ " = " ++ show (a `mod` b)]
+        return result
+
+{- Difference List -}
+{-
+ The following definitions allows me to define 
+ > fromDiffList $ toDiffList [1..10] `mappend` toDiffList [11..15]
+ > [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+ and finally the expression like the following
+ > mapM_ putStrLn $ fromDiffList $ snd $ runWriter $ gcdDiffList' 888 13
+ > 888 mod 13 = 4
+ > 13 mod 4 = 1
+ > 4 mod 1 = 0
+ > Finished with 1
+-}
+
+newtype DiffList a = DiffList { getDiffList :: [a] -> [a] }
+toDiffList :: [a] -> DiffList a
+toDiffList xs = DiffList (xs++)
+
+fromDiffList :: DiffList a -> [a]
+fromDiffList (DiffList f) = f []
+
+instance Monoid (DiffList a) where
+    mempty = DiffList (\xs -> [] ++ xs)
+    (DiffList l) `mappend` (DiffList r) = DiffList (\xs -> l (r xs))
+
+gcdDiffList' :: Int -> Int -> W.Writer (DiffList String) Int  
+gcdDiffList' a b  
+    | b == 0 = do  
+        W.tell (toDiffList ["Finished with " ++ show a])
+        return a  
+    | otherwise = do  
+        W.tell (toDiffList [show a ++ " mod " ++ show b ++ " = " ++ show (a `mod` b)])
+        gcdDiffList' b (a `mod` b)  
+
+
