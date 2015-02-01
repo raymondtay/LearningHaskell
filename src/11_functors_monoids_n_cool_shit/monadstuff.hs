@@ -151,3 +151,22 @@ gcd' a b
         W.tell [show a ++ " mod " ++ show b ++ " = " ++ show (a `mod` b)]  
         gcd' b (a `mod` b)  
 
+-- With the above expression, we can actually put the `logs` 
+-- by the following machination like
+-- > snd $ runWriter (gcd' 888 13)
+-- which would return us 
+-- > ["888 mod 13 = 4","13 mod 4 = 1","4 mod 1 = 0","Finished with 1"]
+-- but that's really a type of 
+-- > snd $ runWriter (gcd' 888 13) :: [String]
+-- and i thought i could lift out the data in the list by using 
+-- > map putStrLn $ snd $ runWriter (gcd' 888 13) 
+-- but that turns out to be of type [IO ()] <- Voila !!!! its a IO Monad !
+-- > :t map putStrLn $ snd $ runWriter (gcd' 888 13) :: [IO ()]
+-- So we revert to using `mapM_` instead and we lift out the expression 
+-- > :t mapM_ putStrLn $ snd $ runWriter (gcd' 888 13) :: IO ()
+-- and we have the lovely printout :
+-- > 888 mod 13 = 4
+-- > 13 mod 4 = 1
+-- > 4 mod 1 = 0
+-- > Finished with 1
+-- 
