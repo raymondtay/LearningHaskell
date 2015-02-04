@@ -130,15 +130,6 @@ keepSmall x
  > 4 is too large, throwing it away
 -}
 
-keepSmall :: Int -> Writer [String] Bool
-keepSmall x 
-    | x < 4 = do
-        tell ["Keeping " ++ show x]
-        return True
-    | otherwise = do
-        tell [show x ++ " is too large, throwing it away"]
-        return False
-
 {- let's do a powerset function -}
 powerset xs = filterM (\x -> [True, False]) xs
 
