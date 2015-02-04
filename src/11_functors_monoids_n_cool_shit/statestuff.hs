@@ -1,4 +1,5 @@
 import Control.Monad.State
+import Control.Monad.Writer
 import System.Random
 import Control.Monad.Writer
 
@@ -115,4 +116,42 @@ keepSmall x
  *Main>
  ```
 -}
+
+
+
+
+
+{-
+ With the following definition, we can write an expression like
+ > mapM_ putStrLn $ snd $ runWriter $ filterM keepSmall [1,2,3,4]
+ > Keeping 1
+ > Keeping 2
+ > Keeping 3
+ > 4 is too large, throwing it away
+-}
+
+keepSmall :: Int -> Writer [String] Bool
+keepSmall x 
+    | x < 4 = do
+        tell ["Keeping " ++ show x]
+        return True
+    | otherwise = do
+        tell [show x ++ " is too large, throwing it away"]
+        return False
+
+{- let's do a powerset function -}
+powerset xs = filterM (\x -> [True, False]) xs
+
+{-
+ With the following, we can write something like
+ > foldM aSmall 0 [1,2,3,121]
+ > Nothing -- that's because 121 is > 9
+ but however, we can do this
+ > foldM aSmall 0 [1,2,3,2]
+ > Just 8
+-}
+aSmall :: Int -> Int -> Maybe Int
+aSmall acc x
+    | x > 9 = Nothing
+    | otherwise = Just (acc + x)
 
