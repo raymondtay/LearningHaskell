@@ -1,5 +1,6 @@
 import Control.Monad.State
 import System.Random
+import Control.Monad.Writer
 
 type Stack = [Int]
 
@@ -76,5 +77,42 @@ instance of `Functor` before we can make it an instance of `Applicative'. But ev
 though `Monad` should have the same constraint for `Applicative`, as every monad is an applicative
 functor, it doesn't, because the Monad tpe class was introduced to haskell way before `Applicative`.
 
+But even though every monad is a functor, we don't have to rely on it having a `Functor` instance because of the `liftM`
+function. `liftM` takes a function and a monadic value and maps it over the monadic value. 
+-}
+
+keepSmall :: Int -> Writer [String] Bool
+keepSmall x
+    | x < 4 = do
+    tell ["Keeping " ++ show x]
+    return True
+    | otherwise = do
+    tell [show x ++ " is too large, throwing it away"]
+    return False
+
+{-
+ Now we can write something like 
+ ```
+ runWriter (keepSmall 3)
+ Loading package array-0.5.0.0 ... linking ... done.
+ Loading package deepseq-1.3.0.2 ... linking ... done.
+ Loading package old-locale-1.0.0.6 ... linking ... done.
+ Loading package time-1.4.2 ... linking ... done.
+ Loading package random-1.0.1.1 ... linking ... done.
+ Loading package transformers-0.3.0.0 ... linking ... done.
+ Loading package mtl-2.1.3.1 ... linking ... done.
+ (True,["Keeping 3"])
+ *Main> runWriter (keepSmall 3)
+ ```
+ Or we can write something like
+ ```
+ *Main> mapM_ putStrLn $ snd $ runWriter $ filterM keepSmall [1,2,12,13,14]
+ Keeping 1
+ Keeping 2
+ 12 is too large, throwing it away
+ 13 is too large, throwing it away
+ 14 is too large, throwing it away
+ *Main>
+ ```
 -}
 
