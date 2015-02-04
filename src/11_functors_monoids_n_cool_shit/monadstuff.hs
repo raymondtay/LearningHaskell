@@ -228,3 +228,25 @@ finalCountDown x = do
     finalCountDown (x - 1)
     W.tell (toDiffList [show x])
 
+{-
+ Composing Monadic Functions
+ 
+ Like any kind of functions in haskell, we can compose two (or more) functions together to reach 
+ a new kind of functionality
+ > let f = (+1) . (*100)
+ and we can do the same with monads too. here's how:
+ > let g = (\x -> return (x+1)) <=< (\x -> return (x*100))
+ when we run the two functions like this:
+ > g(3) or f(3)
+ they all return the same result which is 301
+
+ Here's another great way to compose monads 
+ *Main> let h = foldr (.) id [(+1), (*100), (+1)]
+ *Main> h(1)
+ 201
+ *Main> let i = (\x -> return (x+1)) <=< (\x -> return (x*100)) <=< (\x -> return (x+1))
+ *Main> i(1)
+ 201
+
+-}
+
