@@ -1,3 +1,4 @@
+import Data.List (all)
 import Data.Ratio
 import Control.Monad
 
@@ -15,6 +16,33 @@ instance Functor Probability where
 -}
 
 instance Monad Probability where
-    return x = Probability [(x,1)]
+    return x = Probability [(x,1%1)]
     (Probability xs) >>= f = join (fmap f (Probability xs))
+    -- (Probability xs) >>= f = flatten (fmap f (Probability xs)) -- works the same !
+    fail _ = Probability []
+
+thisSituation :: Probability (Probability Char)
+thisSituation = Probability [( Probability [('a',1%2),('b',1%2)], 1%4 ),
+                             ( Probability [('c',1%2),('d',1%2)], 3%4 )]
+
+
+flatten :: Probability (Probability a) -> Probability a
+flatten (Probability xs) = Probability $ concat $ map multAll xs
+    where multAll (Probability innerxs, p) = map (\(x,r) -> (x, p*r)) innerxs
+
+data Coin = Heads | Tails deriving (Show, Eq)
+
+coin :: Probability Coin 
+coin = Probability [(Heads, 1%2), (Tails, 1%2)]
+
+loadedCoin :: Probability Coin 
+loadedCoin = Probability [(Heads, 1%10), (Tails, 9%10)]
+
+
+flipThree :: Probability Bool
+flipThree = do
+    a <- coin
+    b <- coin 
+    c <- loadedCoin
+    return (all (==Tails) [a,b,c])
 
