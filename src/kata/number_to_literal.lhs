@@ -24,4 +24,32 @@ now we can define
 >   | 2 <= t && u == 0 = tens !! (t -2 )
 >   | 2 <= t && u /= 0 = tens !! (t -2 ) ++ "-" ++ units !! u
 
+another way to write `combine2`
+
+> convert2_1 :: Int -> String
+> convert2_1 n 
+>   | t == 0 = units !! u
+>   | t == 1 = teens !! u
+>   | u == 0 = tens !! (t -2)
+>   | otherwise = tens !! (t -2) ++ "-" ++ units !! u
+>   where (t, u) = (div n 10, mod n 10)
+
+now, we can write another function to decipher 3-digit numbers
+
+> convert3 :: Int -> String
+> convert3 n
+>   | h == 0    = convert2 t
+>   | n == 0    = units!!h ++ " hundred"
+>   | otherwise = units !! h ++ " hundred and " ++ convert2 t
+>   where (h, t) = (div n 100, mod n 100)
+
+> convert6 :: Int -> String
+> convert6 n
+>   | h == 0    = convert3 t
+>   | t == 0    = convert3 h ++ " thousand"
+>   | otherwise = convert3 h ++ " thousand" ++ link h ++ convert3 t
+>   where (h, t) = (div n 1000, mod n 1000)
+
+> link :: Int -> String
+> link h = if h < 100 then " and " else " "
 
