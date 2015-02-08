@@ -62,4 +62,16 @@ now, we can write another function to decipher 3-digit numbers
 
 > showDate :: Date -> String
 > showDate (d, m, y) = show d ++ suffix d ++ " " ++ months !! (m-1) ++ ", " ++ show y
+
+> type CIN = [Int]
+> addSum :: CIN -> CIN
+> addSum cin = cin ++ show (div n 10) ++ show (mod n 10) 
+>     where n = sum (map fromDigit cin)
+
+> fromDigit :: Char -> Int
+> fromDigit c = read [c]
+
+> valid :: CIN -> Bool
+> valid cin = cin == addSum (take 8 cin)
+
  
