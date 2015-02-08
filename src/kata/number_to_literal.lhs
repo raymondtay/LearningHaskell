@@ -53,3 +53,13 @@ now, we can write another function to decipher 3-digit numbers
 > link :: Int -> String
 > link h = if h < 100 then " and " else " "
 
+> roots :: (Float, Float, Float) -> (Float, Float)
+> roots (a, b, c)
+>   | a == 0    = error "not quadratic"
+>   | disc < 0  = error "complex roots"
+>   | otherwise = ((-b -r)/e, (-b+r)/e)
+>   where { disc = b*b - 4*a*c; r = sqrt disc; e = 2*a }
+
+> showDate :: Date -> String
+> showDate (d, m, y) = show d ++ suffix d ++ " " ++ months !! (m-1) ++ ", " ++ show y
+ 
