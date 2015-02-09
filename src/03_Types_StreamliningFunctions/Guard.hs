@@ -25,4 +25,8 @@ nicerDrop n xs | n <= 0 = xs
 nicerDrop _ []          = []
 nicerDrop n (x:xs)      = nicerDrop (n - 1) xs
 
+test xs ys
+    | [] _ = False
+    | _ [] = False
+    | otherwise = True
 
