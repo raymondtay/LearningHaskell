@@ -248,5 +248,17 @@ finalCountDown x = do
  *Main> i(1)
  201
 
+ Another way to compose monads is thru the "convenience" function '<=<'
+ below is an example of how we can possibly use this.
+ Prelude Control.Monad> :t (<=<)
+ (<=<) :: Monad m => (b -> m c) -> (a -> m b) -> a -> m c
+ Prelude Control.Monad> let f x = [x,-x]
+ Prelude Control.Monad> let g x = [x*3, x+4]
+ Prelude Control.Monad> :t f
+ f :: Num t => t -> [t]
+ Prelude Control.Monad> f <=< g $ 5
+ [15,-15,9,-9]
+ Prelude Control.Monad>
+
 -}
 
