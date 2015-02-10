@@ -109,7 +109,6 @@ multWithLog :: W.Writer [String] Int
 multWithLog = do
     x <- logNumber 3
     y <- logNumber 4
-    W.tell ["going to multiply two numbers"]
     return (x * y)
 
 -- With the following `do` notation, we can write an expression like this 
