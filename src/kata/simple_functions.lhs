@@ -44,3 +44,24 @@ the list, `xs`.
 > position :: (Eq a) => a -> [a] -> Int
 > position x xs = head ([a | (a, b) <- zip [0..] xs, x == b] ++ [-1])
 
+classic divide-and-conquer approach to devising a sorting algorithm
+
+> sort :: (Ord a) => [a] -> [a]
+> sort [] = [] 
+> sort [x] = [x]
+> sort xs = merge (sort ys) (sort zs) where (ys, zs) = halve (xs)
+> halve xs = (take n xs, drop n xs) where n = length xs `div` 2
+> merge [] ys = ys
+> merge xs [] = xs
+> merge (x:xs) (y:ys)
+>     | x <= y = x : merge xs (y:ys)
+>     | otherwise = y : merge (x:xs) ys
+
+a more efficient `merge` function can be written as follows
+
+> merge2 [] ys' = ys'
+> merge2 xs' [] = xs'
+> merge2 xs'@(x:xs) ys'@(y:ys)
+>     | x <= y = x : merge xs ys'
+>     | otherwise = y : merge xs' ys
+   
