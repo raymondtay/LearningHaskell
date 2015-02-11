@@ -65,3 +65,25 @@ a more efficient `merge` function can be written as follows
 >     | x <= y = x : merge xs ys'
 >     | otherwise = y : merge xs' ys
    
+You want to produce an infinite list of all distinct pairs (x, y) of natural 
+numbers. It does matter in which order the pairs are enumerated, as long as they are all here. 
+
+> allPairs = [(x, y) | x <- [0..], y <- [0..]]
+
+The pairs (0,0) (1,1) ... where (x, x) are not filtered, so a better solution looks to be
+
+> allPairs2 = [(x, y) | x <- [0..], y <- [0..] , x /= y]
+
+Another problem presents itself here. Notice that [0..] produces an infinite list 
+and that means that there is not going to be any chance in hell that we'll see pairs that 
+don't begin with 0. The crux is recognizing that if the list-comprehension for `y` doesn't 
+end, neither does `x`.
+
+> allPairs3 = [(x, y) | x <- [0..], y <- [0..x], x /= y]
+
+Another interesting problem is to find the solution to 
+a^3 + b^3 = c^3 + d^3. An example would be 1729 = 1^3 + 12^3 = 9^3 + 10^3
+
+> quads n = [(x,y) | x <- [1..n] , y <- [1..n],x^3 + y^3 == n]
+
+
