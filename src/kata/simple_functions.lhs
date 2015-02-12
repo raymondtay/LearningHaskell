@@ -87,3 +87,6 @@ a^3 + b^3 = c^3 + d^3. An example would be 1729 = 1^3 + 12^3 = 9^3 + 10^3
 > quads n = [(x,y) | x <- [1..n] , y <- [1..n],x^3 + y^3 == n]
 
 
+> inits [] = [[]]
+> inits (x:xs) = [] : map (x:) (inits xs)
+
