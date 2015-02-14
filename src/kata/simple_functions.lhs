@@ -1,3 +1,4 @@
+> import Control.Monad.Writer
 
 Here's 1 way to write infinite lists
 
@@ -89,4 +90,41 @@ a^3 + b^3 = c^3 + d^3. An example would be 1729 = 1^3 + 12^3 = 9^3 + 10^3
 
 > inits [] = [[]]
 > inits (x:xs) = [] : map (x:) (inits xs)
+
+The expression `myscanl (+) 0 [1..10]` computes the running sums of the
+first ten positive numbers but there's a problem and that is the computation
+process involves evaluating `f` a total of 
+
+0 + 1 + 2 + ... + n = n(n + 1) / 2 times.
+
+> myscanl :: (b -> a -> b) -> b -> [a] -> [b]
+> myscanl f e = map (foldl f e) . inits
+
+Another way to do this is 
+
+> myscanl2 f e []     = [e]
+> myscanl2 f e (x:xs) = e : myscanl f (f e x) xs
+
+Maximum segment sum, which is the maximum sum of all segments in the sequence. 
+A segment is also called a contiguous subsequence. For example, the sequence 
+
+[-1, 2, -3, 5, -2, 1, 3, -2, -2, -3, 6]
+
+has maximum sum 7 given by the sum of the segment [5, -2, 1, 3]. OTOH 
+the sequence [-1, -2, -3] has a maximum segment sum of zero since the
+empty sequence is a segment of every list and its sum is zero.
+It follows that the maximum segment is always nonnegative.
+
+> mss :: [Int] -> Int
+> mss = maximum . map sum . segments
+
+where segments returns a list of all segments of a list.We can define like
+the following
+
+> segments :: (Num a) => [a] -> [[a]]
+> segments = concat . map inits . tails
+
+> tails :: (Num a) => [a] -> [[a]]
+> tails []     = [[]]
+> tails (x:xs) = (x:xs) : tails xs
 
