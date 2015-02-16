@@ -7,6 +7,11 @@ module MyPrelude where
 
 import Prelude hiding((+), sum) -- hiding the default i.e. Prelude.show, Prelude.sum and Prelude.+
 
+data AnotherFoo = AnotherFoo { x:: Integer, str :: String } deriving (Read, Show)
+
+instance Eq AnotherFoo where
+    (AnotherFoo i1 s1) == (AnotherFoo i2 s2) = (i1 == i2) && (s1 == s2)
+
 class MShow a where
     mshow :: a -> String
 
@@ -143,7 +148,7 @@ instance Listable [Int] where
 -- toList :: [Int] -> [Int]
     toList = id
 
-data Tree a = Empty | Node a (Tree a) (Tree a)
+data Tree a = Empty | Node a (Tree a) (Tree a) deriving (Show)
 
 instance Listable (Tree Int) where
     toList Empty = []
@@ -151,6 +156,14 @@ instance Listable (Tree Int) where
 
 instance (Listable a, Listable b) => Listable (a,b) where
     toList (a,b) = toList a ++ toList b
+
+-- with the functor defined below, we can write something like
+-- fmap (\e -> show e) (Node 4 (Node 45 Empty Empty) Empty)
+-- Node "4" (Node "45" Empty Empty) Empty
+
+instance Functor Tree  where
+    fmap f Empty    = Empty
+    fmap f (Node x left right) = (Node (f x) (fmap f left) (fmap f right))
 
 class Tofu t where
     tofu :: j a -> t a j
