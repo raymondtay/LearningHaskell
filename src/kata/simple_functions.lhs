@@ -87,6 +87,30 @@ a^3 + b^3 = c^3 + d^3. An example would be 1729 = 1^3 + 12^3 = 9^3 + 10^3
 
 > quads n = [(x,y) | x <- [1..n] , y <- [1..n],x^3 + y^3 == n]
 
+When you give an idx that is too large for the list `l`, 
+then it'll trigger the `fail` fn in the Monad since `l` is a Monad too
+
+> fn :: Int -> Maybe [Int]
+> fn idx = do
+>   let l = [Just [1,2,3], Nothing, Just [], Just [7..20]]
+>   (x:xs) <- l !! idx
+>   return xs
+
+the function `>>` is quite interesting and is defined like this 
+(>>) :: m a -> m b -> m b
+m >> k = m >>= (\_ -> k)
+
+when used in the following way, it behaves like `snd`
+
+> return 4 >> [1..2] -- returns [1,2]
+
+> [1..10] >> [1..2] -- returns [1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2]
+
+we can understand the latter expression by the following 
+where [1..10] >> [1..2] becomes [1..10] >>= (\_ -> [1..2])
+and we can write the above using the following 
+concat $map (\_ -> [1..2]) [1..10]
+
 
 > inits [] = [[]]
 > inits (x:xs) = [] : map (x:) (inits xs)
