@@ -72,5 +72,21 @@ which gives us Just 9. Voila.
 note: when i say "remembered" what i mean is that i ran ":i Maybe" which 
       returns a host of information and reminded me of what Maybe values are part of.
 
+Here's another way to do the same thing and followed from my realization that
+Maybe values are Monads. Drats, wished i could "Get it" like the big boys ... but i 
+guess it'll come with practice.
+
+Coming back to our original expression i.e. Just(Just(*3))
+we could apply the following 
+
+(Just(Just(*3))) >>= (\f -> f >>= (\g -> Just(g 4)))
+
+which returns
+
+Just 12
+
+and notice that we didn't have to apply "join" to the nested-Maybe values
+in the previous way, so from that perspective its better.
+
 -}
 
