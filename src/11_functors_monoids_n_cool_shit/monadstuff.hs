@@ -261,3 +261,24 @@ finalCountDown x = do
 
 -}
 
+{-
+Based on the Monadic Laws, 
+m a >>= f = concat (map f m a)
+where `m a` is a Monad of `a`
+
+The following expression (on ghci) should be able to demonstrate why
+Prelude> [1,2,3] >>= (\f -> return f)
+[1,2,3]
+
+is the same as the following:
+
+Prelude> let x = map (\f -> return f) [1,2,3]
+Prelude> :t x
+x :: (Num a, Monad m) => [m a]
+Prelude> concat x
+[1,2,3]
+Prelude> :t x
+x :: (Num a, Monad m) => [m a]
+
+-}
+
