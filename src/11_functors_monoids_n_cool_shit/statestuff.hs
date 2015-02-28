@@ -73,6 +73,21 @@ throw3 = do
     return (a,b,c)
 
 {-
+ Here's another way to re-write the above `throw3`
+ via monad-chaining 
+ and we can check that it works by executing the former
+ and the latter in succession like this:
+
+  *Main Control.Monad.State> runState throw3Verbose (mkStdGen 33)
+  ((True,False,True),680029187 2103410263)
+  *Main Control.Monad.State> runState throw3 (mkStdGen 33)
+  ((True,False,True),680029187 2103410263)
+  *Main Control.Monad.State>
+
+-}
+throw3Verbose = (randomCoinThrow >>= (\r1 -> randomCoinThrow >>= (\r2 -> randomCoinThrow >>= (\r3 -> return (r1, r2, r3)))))
+
+{-
 Some useful monadic functions
 
 When we started our journey to the top of Monad mountian,
