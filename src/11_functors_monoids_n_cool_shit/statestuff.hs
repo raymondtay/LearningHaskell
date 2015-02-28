@@ -17,6 +17,17 @@ stackManip = do
   a <- pop
   pop
 
+{- 
+  Another way to write `stackManip` in the above 
+  is to make use of the monad-chaining function (>>=)
+  which allows us to chain computations, literally.
+  However, to run this brand new function is the same as 
+  running `stackManip` which is
+  runState stackManipVerbose [1,2,3] --- new function
+  runState stackManip [1,2,3] ---------- old function
+-}
+stackManipVerbose = push 3 >>= (\_ -> pop) >>= (\_ -> pop)
+
 stackStuff :: State Stack ()
 stackStuff = do
   a <- pop
