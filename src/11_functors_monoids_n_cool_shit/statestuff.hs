@@ -143,9 +143,10 @@ keepSmall x
  ```
 -}
 
-
-
-
+dummy = let 
+  f = (+2)
+  g = (*5)
+  h = (*3) in fmap f (\x -> fmap g h x) 5
 
 {-
  With the following definition, we can write an expression like
