@@ -156,6 +156,12 @@ keepSmall x
  > 4 is too large, throwing it away
 -}
 
+ff :: Int -> Writer [String] (Int,Int)
+ff = (\x -> 
+  do
+  tell ["tuple: " ++ show(x,x)]
+  return (x,x))
+
 {- let's do a powerset function -}
 powerset xs = filterM (\x -> [True, False]) xs
 
@@ -171,4 +177,18 @@ aSmall :: Int -> Int -> Maybe Int
 aSmall acc x
     | x > 9 = Nothing
     | otherwise = Just (acc + x)
+
+{-
+
+MonadWriter is defined as follows:
+
+class (Monoid w, Monad m) =>
+      MonadWriter w (m :: * -> *)
+      | m -> w where
+  writer :: (a, w) -> m a
+  tell :: w -> m ()
+  listen :: m a -> m (a, w)
+  pass :: m (a, w -> w) -> m a
+
+-}
 
