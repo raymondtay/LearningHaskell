@@ -166,6 +166,20 @@ ff = (\x ->
 {- let's do a powerset function -}
 powerset xs = filterM (\x -> [True, False]) xs
 
+{- 
+1 thing i learnt from monads in haskell is that the function-composition
+names actually do tell you the direction of application and this is evident
+from the following expressions involving 'gg', 'hh', 'ii', 'jj'
+and their applications in 'result_1' and 'result_2'.
+-}
+
+gg = (\x -> return (x+10))
+hh = (\x -> return (x*2))
+ii = gg <=< hh
+jj = gg >=> hh
+result_1 = Just 4 >>= ii
+result_2 = Just 4 >>= jj
+
 {-
  With the following, we can write something like
  > foldM aSmall 0 [1,2,3,121]
