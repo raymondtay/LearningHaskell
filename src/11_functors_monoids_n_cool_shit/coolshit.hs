@@ -279,3 +279,28 @@ addFood :: Food -> (Food, Price)
 addFood "chicken" = ("fried chicken", M.Sum 10)
 addFood "duck" = ("roast duck", M.Sum 15) -- roast duck is normally more expensive than fried chicken 
 addFood otherwise = ("i_dont_know_what_you_ordered", M.Sum 0)
+
+cp [] = [[]]
+cp (xs:xss) = [x:ys | x <- xs, ys <- cp xss]
+
+cp' = foldr op [[]]
+    where op xs yss = [x:ys | x <- xs, ys <- yss]
+
+{-
+ When we run the benchmarks, the following came up
+ and it is interesting to understand why we are seeing this =)
+ The first definition of "cp" uses direct-recursion in the 
+ list comprehension and the "cp" is called as many times
+ as there are lists in "xss".
+ 
+ The second definition of "cp" known as "cp'" avoids 
+ direct-recursion by using "foldr"  
+ *CoolShit> sum $ map sum $ cp' [[1..10] | j <- [1..6]]
+ 33000000
+ it :: (Num a, Enum a) => a
+ (1.62 secs, 725474272 bytes)
+ *CoolShit> sum $ map sum $ cp [[1..10] | j <- [1..6]]
+ 33000000
+ it :: (Num a, Enum a) => a
+ (4.84 secs, 1606023016 bytes)
+-}
