@@ -129,4 +129,17 @@ Howdy! there, raymond
 hi
 there raymond~
 ```
+### How to retrieve system environment key and values 
 
+```
+import System.getEnvironment
+*Main System.IO Data.Char System.Environment> getEnvironment >>= (\p -> mapM_ putStrLn $ map fst p)
+MANPATH
+NVIDIA_HOME
+TERM_PROGRAM
+CLOJURE_HOME
+TERM
+SHELL
+CLICOLOR
+...
+```
