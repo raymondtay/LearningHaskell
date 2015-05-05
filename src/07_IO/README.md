@@ -96,3 +96,37 @@ function that performs I/O, and then a pure computation, we will need to use ret
 this pure computation the proper return value of the function. Otherwise a type error would
 occurr.
 
+### What's the difference of mapM and mapM_ 
+
+The ghci session belows highlights a subtle difference when employing 
+either `mapM` or `mapM_` . The last expression should be clear that when
+output strings to the I/O we need to place the `putStrLn` as the last in the 
+order of execution.
+```
+*Main System.IO Data.Char> mapM_ (\f -> putStrLn ((++) "Data: " f)) ["1","2"]
+Data: 1
+Data: 2
+*Main System.IO Data.Char> mapM (\f -> putStrLn ((++) "Data: " f)) ["1","2"]
+Data: 1
+Data: 2
+[(),()]
+*Main System.IO Data.Char> mapM (putStrLn . (++) "Data: ") ["1","2"]
+Data: 1
+Data: 2
+[(),()]
+```
+
+### How to use >>= and >> in IO Monad
+
+The below illustrates how to use `>>` and `>>=` where the former is mostly used
+for chaining actions whereas the latter is for injecting the value by the first function
+to the second function.
+
+```
+*Main System.IO Data.Char> return "raymond" >>= (\name -> putStrLn ("Howdy! there, " ++ name))
+Howdy! there, raymond
+*Main System.IO Data.Char> putStrLn "hi " >> putStrLn "there raymond~"
+hi
+there raymond~
+```
+
