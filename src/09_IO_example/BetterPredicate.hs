@@ -79,6 +79,12 @@ equalP' f k w x y z = f w x y z == k
 liftP :: (a -> b -> c) -> InfoP a -> b -> InfoP c
 liftP q f k w x y z = f w x y z `q` k
 
+greaterP, lesserP :: (Ord a) => InfoP a -> a -> InfoP Bool
+greaterP = liftP (>) 
+lesserP  = liftP (<)
+
+-- we can combine predicates by applying the concept of `lifting`
+-- 
 simpleAndP :: InfoP Bool -> InfoP Bool -> InfoP Bool
 simpleAndP f g w x y z = f w x y z && g w x y z
 
@@ -96,9 +102,20 @@ constP k _ _ _ _ = k
 
 liftP' q f k w x y z = f w x y z `q` constP k w x y z
 
-myTest path _ (Just size) = takeExtension path = ".cpp" && size > 131072
+myTest path _ (Just size) _ = takeExtension path == ".cpp" && size > 131072
 myTest _ _ _ _ = False
 
 liftPath :: (FilePath -> a) -> InfoP a
 liftPath f w _ _ _ = f w
+
+-- more combinators using lifting
+--
+(==?) = equalP
+(&&?) = andP
+(||?) = orP
+(>?)  = greaterP
+(<?)  = lesserP
+
+-- example
+myTest3 = (liftPath takeExtension ==? ".cpp") &&? (sizeP >? 131072)
 
