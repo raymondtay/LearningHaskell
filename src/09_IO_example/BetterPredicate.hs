@@ -109,12 +109,19 @@ liftPath :: (FilePath -> a) -> InfoP a
 liftPath f w _ _ _ = f w
 
 -- more combinators using lifting
---
+-- question: how do you decide the precedence? based on page 225-226 of the book
+--           we can discover the precedence level by uncovering the precedence level of the 
+--           existing operators (if any) and apply; of course its largely dependent on whether 
+--           the new operators( defined via lifting) makes sense in the targeted expressions
 (==?) = equalP
 (&&?) = andP
 (||?) = orP
 (>?)  = greaterP
 (<?)  = lesserP
+infix 4 ==?
+infixr 3 &&?
+infixr 3 ||?
+infix 4 >?
 
 -- example
 myTest3 = (liftPath takeExtension ==? ".cpp") &&? (sizeP >? 131072)
