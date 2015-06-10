@@ -1,12 +1,13 @@
 
 import Control.Monad (filterM)
 import System.Directory (Permissions(..), getModificationTime, getPermissions)
-import System.Time (ClockTime(..))
+import Data.Time.Clock
 import System.FilePath (takeExtension)
 import Control.Exception (bracket, handle)
 import System.IO (IOMode(..), hClose, hFileSize, openFile)
 
 import RecursiveContents (getRecursiveContents)
+type ClockTime = UTCTime
 
 type Predicate = FilePath -- path to directory entry
         -> Permissions    -- permissions

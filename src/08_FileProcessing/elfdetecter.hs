@@ -24,4 +24,18 @@ isElfFile path = do
     content <- L.readFile path
     return (hasElfMagic content)
 
-The L.readFile function is the lazy ByteString equivalent of readFile. IOt
+-- The L.readFile function is the lazy ByteString equivalent of readFile. It operates lazily,
+-- reading the files as data is demanded. It is also efficient, reading chunks of up to 64KB 
+-- at once. The lazy ByteString is a good choice for our task; since we only need to read 
+-- at most the first four bytes of the file, we can safely use this function on a file of any size.
+
+
+
+
+
+
+
+
+
+
+
