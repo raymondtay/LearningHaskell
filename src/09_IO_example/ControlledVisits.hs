@@ -1,11 +1,13 @@
 
 import System.Directory (Permissions(..))
-import System.Time (ClockTime(..))
+import Data.Time.Clock
 import System.FilePath ((</>))
 import Control.Monad
 import System.Directory
 import System.IO
 import Control.Exception
+
+type ClockTime = UTCTime
 
 data Info = Info {
     infoPath :: FilePath,
