@@ -16,8 +16,14 @@ instance Functor (Either Int) where
   Two basic rules about functors and they are:
   + functors must preserve identity. That is, applying `fmap id` to a value 
     should give us back an identical value.
+    An example is :
+    fmap id (Node (Leaf "a") (Leaf "b")) 
+    (Node (Leaf "a") (Leaf "b"))
   + functors must be composable. That is, composing two uses of
     fmap should give the same result as one fmap with the same functions composed
-
+      + (fmap even . fmap length)["a"]
+      + [False]
+      + (fmap even . fmap length)["ab"]
+      + [True]
 -}
 
