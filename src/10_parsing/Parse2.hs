@@ -7,6 +7,7 @@
 -}
 import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Data.ByteString.Lazy as L
+import Data.Word8
 import Control.Applicative -- for the `<$>`
 import Data.Char           -- for the `chr`
 import Data.Int            -- for the `Int64`
@@ -51,14 +52,33 @@ parse parser initState =
 modifyOffset :: ParseState -> Int64 -> ParseState
 modifyOffset initState newOffset = initState { offset = newOffset }
 
+-- A closure is simply the pairing of a funciton with its environment, 
+-- the bound variables it can see. Closures are commonplace in Haskell.
+-- In this case, the closure is not ujnwrapped till we apply `parse`
+-- and our combinator here would stop on the first failure it sees. Neat!
+(==>) :: Parse a -> (a -> Parse b) -> Parse b
+firstParser ==> secondParser = Parse chainedParser
+  where chainedParser initState = 
+          case runParse firstParser initState of
+            Left errMsg -> Left errMsg
+            Right (firstResult, newState) -> runParse (secondParser firstResult) newState
+
+-- Here's how you might possibly use 
+-- ghci> let initState = ParseState (L8.pack "start") 0
+-- ghci> runParse (bail "it fucking failed") initState
+-- Left "byte offset 0: it fucking failed"
+
+bail :: String -> Parse a
+bail err = Parse $ \s -> Left $ "byte offset " ++ show (offset s) ++ ": " ++ err
+
 {-
-instance Functor Parse where
-  fmap f parser = parser ==> \result -> identity (f result)
-
-w2c :: Word8 -> Char
-w2c = chr . fromIntegral
-
-parseChar :: Parse Char 
-parseChar = w2c <$> parseByte
-
--}
+parseByte :: Parse Word8
+parseByte = 
+  getState ==> \initSTate ->
+  case L.uncons (string initState) of
+    Nothing -> bail "no more input"
+    Just (byte, remainder) ->
+      putState newState ==> \_ -> identity byte
+      where newState = initState { string  = remainder, offset = newOffset }
+            newOffset = offset initState + 1
+-} 
