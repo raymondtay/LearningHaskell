@@ -71,14 +71,18 @@ firstParser ==> secondParser = Parse chainedParser
 bail :: String -> Parse a
 bail err = Parse $ \s -> Left $ "byte offset " ++ show (offset s) ++ ": " ++ err
 
-{-
+getState :: Parse ParseState
+getState = Parse (\s -> Right (s, s))
+
+putState :: ParseState -> Parse()
+putState s = Parse(\_ -> Right((), s))
+
 parseByte :: Parse Word8
 parseByte = 
-  getState ==> \initSTate ->
+  getState ==> \initState ->
   case L.uncons (string initState) of
     Nothing -> bail "no more input"
     Just (byte, remainder) ->
       putState newState ==> \_ -> identity byte
       where newState = initState { string  = remainder, offset = newOffset }
             newOffset = offset initState + 1
--} 
