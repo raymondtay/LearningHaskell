@@ -27,6 +27,8 @@ parse parser initState =
     Left  err         -> Left err
     Right (result, _) -> Right result
 
+instance Functor Parse where
+  fmap f parser = parser ==> \result -> identity (f result)
 {-
   accessor functions can be used to alter state of data type (see below for illustration):
   ==========================================================================================
@@ -86,3 +88,23 @@ parseByte =
       putState newState ==> \_ -> identity byte
       where newState = initState { string  = remainder, offset = newOffset }
             newOffset = offset initState + 1
+
+{-
+
+  To test whether Parse is truly a Functor, we need to provide two kinds of tests
+  (a) identity
+  (b) composability
+
+  For (a), here's an expression that will take care of that
+  > let input = L8.pack "hello there"
+  > parse (id <$> parseByte) input (should return `Right 104`)
+ 
+  For (b), here's an expression that will take care of that
+  > parse ((chr . fromIntegral) <$> parseByte) input (should return `Right 'h'`) 
+
+-}
+
+w2c :: Word8 -> Char
+w2c = chr . fromIntegral
+
+
