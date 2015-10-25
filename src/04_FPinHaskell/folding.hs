@@ -48,6 +48,11 @@ suffixes xs@(_:xs') = xs : suffixes xs'
 --suffixes (x:xs) = (x:xs) : suffixes xs
 suffixes _ = []
 
+-- the equivalent of the above but without no-as pattern 
+noaspattern :: [a] -> [[a]]
+noaspattern (x:xs) = (x:xs) : noaspattern xs
+noaspattern _     = []
+
 compose :: (b -> c) -> (a -> b) -> (a -> c)
 compose f g x = f (g x) 
 
