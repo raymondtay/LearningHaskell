@@ -1,10 +1,8 @@
 #include <iostream>
 #include <vector>
-#include <type_traits>
-using namespace std;
+#include <boost/any.hpp>
 
-template<typename T>
-using Any = typename decay<T>::type;
+using namespace std;
 
 template<typename T>
 class List {
@@ -23,7 +21,7 @@ struct Cons : public List<T> {
   }
 };
 
-//class Nil : public List<Any> {};
+class Nil : public List<boost::any> {};
 
 int main() {
   Cons<int> is;
