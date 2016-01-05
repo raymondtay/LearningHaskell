@@ -9,3 +9,13 @@ both (String, String) or (Integer, String). Tuples in Haskell are
 the usual means of expressing an anonymoud product.
 ```
 
++ A `typeclass`
+```
+A typeclass is a set of operations defined with respect to a polymorphic
+type. When a type is instance of a typeclass, values of that type can be 
+used in the standard operations defined for that typeclass. In 
+Haskell type classes are unique pairings of class and concrete instance.
+This means that if a given type a has an instance of Eq, it has only
+one instance of Eq.
+```
+
