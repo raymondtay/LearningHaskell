@@ -28,3 +28,7 @@ data Identity a = Identity a
 instance (Eq a) => Eq (Identity a) where
   (==) (Identity x) (Identity y) = x == y
 
+
+instance Show a => Show (Identity a) where
+  show (Identity a) = show a
+
