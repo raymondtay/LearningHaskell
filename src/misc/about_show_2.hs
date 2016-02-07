@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 data DayOfWeek = Mon| Tue | Wed | Thur | Fri | Sat | Sun
 data Date = Date DayOfWeek Int
 
@@ -28,3 +30,6 @@ instance (Eq a) => Eq (Identity a) where
 -- Identity 2 >= Identity 2
 instance Ord a => Ord (Identity a) where
   compare (Identity a) (Identity b) = compare a b 
+
+
+
