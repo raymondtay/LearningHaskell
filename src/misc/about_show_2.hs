@@ -16,3 +16,15 @@ instance Eq Date where
         (Date weekday' numberOfMonth') = 
     weekday == weekday' && numberOfMonth == numberOfMonth'
 
+data Identity a = Identity a
+
+-- Allows us to compare 
+-- Identity 1 == Identity 1
+instance (Eq a) => Eq (Identity a) where
+  (==) (Identity a) (Identity b) = a == b
+
+-- Allows us to make comparisons like
+-- Identity 1 < Identity 2
+-- Identity 2 >= Identity 2
+instance Ord a => Ord (Identity a) where
+  compare (Identity a) (Identity b) = compare a b 
