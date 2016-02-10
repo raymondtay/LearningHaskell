@@ -20,3 +20,8 @@ sum = foldr (+) 0
 roundtrip :: (Read a, Show a) => a -> a
 roundtrip a = read (show a)
 
+{- another example of pointfree style -}
+
+inc = (1+)
+three = inc . inc . inc
+
