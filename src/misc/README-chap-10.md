@@ -22,3 +22,13 @@ It provides a fallback value for the empty list case and a second arugment to be
 our fold with. The accumulator is often the identity for whatever function we are folding
 such as 0 for (+) for 1 for (*).
 
+Here's a nice trick to impress your friends with:
+
+```haskell
+foldr (\x y -> concat ["(", x, "+", y, ")"]) "0" $ map show [1...5]
+```
+produces the following 
+```
+"(1+(2+(3+(4+(5+0)))))"
+```
+
