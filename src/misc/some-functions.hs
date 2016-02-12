@@ -18,9 +18,34 @@ myReverse :: [a] -> [a]
 myReverse [] = []
 myReverse (x:xs) = myReverse xs ++ [x]
 
-- a mapping function
--
+-- a mapping function
 myMap :: (a->b) -> [a] -> [b]
 myMap f [] = []
 myMap f (x:xs) = f x : myMap f xs
+
+-- filtering functionality
+myFilter :: (a -> Bool) -> [a] -> [a]
+myFilter f [] = []
+myFilter f (x:xs) 
+  | f x = [x] ++ myFilter f xs
+  | otherwise = myFilter f xs
+
+-- squish flattens nested lists
+squish :: [[a]] -> [a]
+squish [[]] = []
+squish ([]:xs) = [] ++ squish xs
+squish [(x:xs)] = [x] ++ squish [xs]
+squish ((x:xs):ys) = [x] ++ squish [xs] ++ squish ys
+
+-- squishMap maps a function over a list and concatenates the results
+squishMap :: (a->[b]) -> [a] -> [b]
+squishMap f [] = []
+squishMap f (x:xs) = f x ++ squishMap f xs
+
+-- squishAgain re-uses squishMap 
+squishAgain :: [[a]] -> [a]
+squishAgain [[]] = []
+squishAgain ([]:xs) = [] ++ squishAgain xs
+squishAgain [(x:xs)] = [x] ++ (squishMap (\t -> [t]) xs)
+squishAgain ((x:xs):ys) = [x] ++ squishAgain [xs] ++ squishAgain ys
 
