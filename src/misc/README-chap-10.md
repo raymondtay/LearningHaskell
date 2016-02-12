@@ -4,6 +4,39 @@ Folding is a concept that extends in usefulness and importance beyond lists,
 but lists are often how they are introduced. Folds as a general concept
 are called catamorphism.
 
+## About Folds
+
+A fold is a higher order function which, given a function to accumulate
+the results and a recursive data structure, returns the built up value.
+Usually, a start value for the accumulation is provided along 
+with a function that can combine the type of values in the data
+structure with the accumulation. The term fold is typically usd with 
+reference to collections of values references by a recursive datatype.
+For a generalization of breaking down structure, see catamorphism.
+
+## About Catamorphism
+
+A catamorphism is a generalization of folds to arbitrary datatypes where a fold
+allows you to break down a list into an arbitrary dataytpe, a catamorphism 
+is a means of breaking down the structure of any dataytype. The bool :: a -> a -> Bool -> a
+function in Data.Bool is an example of a simple catamorphism for a simple non-colection
+data type. Similarly, maybe :: b -> (a -> b) -> Maybe a -> b is 
+the catamorphism for Maybe. 
+
+```haskell
+
+data Bool = True | False
+bool :: a -> a -> Bool -> a
+
+data Maybe a = Nothing | Just a
+maybe :: b -> (a -> b) -> Maybe a -> b
+
+data Either a b = Left a | Right b
+either :: (a -> c) -> (b -> c) -> Either a b  -> c
+
+```
+
+
 ## Fold right
 
 We call `foldr` the right fold because the fold is right associative, that is
