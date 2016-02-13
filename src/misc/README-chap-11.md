@@ -29,3 +29,18 @@ Because types can be generically polymorphic by taking type arguments, they
 can be applied at the type level.
 
 
+## Infix type and data constructors
+
+When we give an operator a non-alphanumeric name, it is infix by default. 
+For example, all non-alphanumeric arithmetic functions are infix operators, 
+while we have some alphanumeric arithmetic functions, such as div and mod 
+that are prefix by default. So far, we have only seen alphanumeric 
+data constructors, except for this constructor in the list type, but the same
+rule applies to them.
+
+Any operator that starts with a colon (:) must be an infix type or 
+data constructor. All infix data constructors must start with a colon. The
+type constructor of functions, (->), is the only infix type constructor
+that doesn't start with a colon. Another exception is that they cannot be ::
+as this syntax is reserved for type assertions.
+
