@@ -61,4 +61,16 @@ mapTree _ Leaf = Leaf
 mapTree f (Node left a right) = Node (mapTree f left) (f a) (mapTree f right)
 
 
+-- Test and fixtures to be sure the map function 
+-- `mapTree` works as expected
+--
+testTree' :: BinaryTree Integer
+testTree' = Node (Node Leaf 3 Leaf) 1 (Node Leaf 4 Leaf)
+
+mapExpected = Node (Node Leaf 4 Leaf) 2 (Node Leaf 5 Leaf) 
+
+mapOkay = 
+  if mapTree (+1) testTree' == mapExpected
+  then print "Yup okay!" 
+  else error "test failed"
 
