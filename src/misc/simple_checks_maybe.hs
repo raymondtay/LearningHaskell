@@ -30,3 +30,6 @@ catMaybes [] = []
 catMaybes (Nothing:xs) = [] ++ catMaybes xs
 catMaybes ((Just a):xs) = a : catMaybes xs
 
+flipMaybe :: [Maybe a] -> Maybe [a]
+flipMaybe as@(x:xs) = sequence as
+
