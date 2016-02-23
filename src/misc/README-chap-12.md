@@ -20,3 +20,13 @@ they returna  value of the appropriate type. In other words, data
 constructors really are functions. Hence, they behave like Haskell
 functions in that they are curried as well. 
 
+# Unfolds
+
+While the idea of catamorphisms is still relatively fresh in our minds, let's 
+turn our attention to their dual: anamorphisms. If folds, or catamorphisms,
+let us break data structures down then unfolds let us build them up. There are
+just as with folds, a few different ways to unfold a data structure. We can
+use them to create finite and infinite data structures alike.
+
+
+
