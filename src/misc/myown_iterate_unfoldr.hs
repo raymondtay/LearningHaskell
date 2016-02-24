@@ -22,4 +22,9 @@ myUnfoldr f x =
     Nothing     -> []
     Just (a, b) -> [a] ++ myUnfoldr f b
 
+-- Rewrite myIterate into betterIterate using myUnfoldr. A hint
+-- we used unfoldr to produce the same results as iterate earlier.
+--
+betterIterate :: (a -> a) -> a -> [a]
+betterIterate f x = myUnfoldr (\e -> Just(e,f e)) x
 
