@@ -17,7 +17,7 @@ version = Version [0,1,0,0] []
 bindir, libdir, datadir, libexecdir, sysconfdir :: FilePath
 
 bindir     = "/Users/raymondtay/LearningHaskell/src/misc/hello-world/.cabal-sandbox/bin"
-libdir     = "/Users/raymondtay/LearningHaskell/src/misc/hello-world/.cabal-sandbox/lib/x86_64-osx-ghc-7.10.3/hello-world-0.1.0.0-8KiVObsurkt5Lizzs5lAqO"
+libdir     = "/Users/raymondtay/LearningHaskell/src/misc/hello-world/.cabal-sandbox/lib/x86_64-osx-ghc-7.10.3/hello-world-0.1.0.0-89Y0ZoeBBun7kwBDkmsKTi"
 datadir    = "/Users/raymondtay/LearningHaskell/src/misc/hello-world/.cabal-sandbox/share/x86_64-osx-ghc-7.10.3/hello-world-0.1.0.0"
 libexecdir = "/Users/raymondtay/LearningHaskell/src/misc/hello-world/.cabal-sandbox/libexec"
 sysconfdir = "/Users/raymondtay/LearningHaskell/src/misc/hello-world/.cabal-sandbox/etc"
