@@ -8,6 +8,7 @@ import System.Exit (exitSuccess)
 import System.Random (randomRIO)
 
 import Hello
+import System.Random (randomRIO)
 
 type WordList = [String] 
 
@@ -29,6 +30,16 @@ gameWords = do
   where gameLength w = 
           let l = length (w:: String)
           in l > minWordLength && l < maxWordLength
+
+randomWord :: WordList -> IO String
+randomWord wl = do
+  randomIndex <- randomRIO $ (,) 1 100
+  return $ wl !! randomIndex
+
+-- remember what it means to be Monad
+-- by reading this signature (>>=) :: Monad m => m a -> (a -> m b) -> m b
+randomWord' :: IO String
+randomWord' = gameWords >>= randomWord
 
 main :: IO ()
 main = do
