@@ -45,6 +45,12 @@ Just (Product {getProduct = 90})
 > mempty :: Maybe (Sum Integer)
 Nothing
 
+> foldr mappend mempty ([2,4,5]::[Product Int])
+Product { getProduct = 40 }
+
+> foldr mappend mempty ["blah", "blah"]
+"blahblah"
+
 ```
 
 ## Why Integer doesn't have a Monoid
@@ -72,4 +78,25 @@ two (one instance for a sum, one for a product)
 
 - Add different typeclass instances to a type that is otherwise
   unchanged representationally.
+
+# Laws 
+
+Laws dictates what constitutes a valid instance or concrete instance of 
+the algebra or set of operations we are working with. We care about the laws a 
+Monoid must adhere to because mathematicians care about the laws. That matters
+because mathematicians often want the same things programmers
+want ! A proof that is inelegant, a proof term that doesn't compose well
+or that cannot be understood is not very good or useful to a mathematician.
+
+`Monoid` instances must abide by the following laws:
+
+```haskell
+mappend mempty x = x
+
+mappend x mempty = x
+
+mappend x (mappend y z) = mappend (mappend x y) z
+
+mconcat = foldr mappend mempty
+```
 
