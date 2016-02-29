@@ -100,3 +100,39 @@ mappend x (mappend y z) = mappend (mappend x y) z
 mconcat = foldr mappend mempty
 ```
 
+# The problem of orphan instances
+
+We have said both in this chapter and in the earlier chapter devoted
+to Typeclasses that typeclasses have unique pairings of the class and the
+instance for a particular type.
+
+We do sometimes end up with multiple instances for a single type when
+orphan instances are written. But writing orphan instances should be avoided 
+at all costs. Do not be lazy about this! if you get an orphan instance warning 
+from GHC, fix it.
+
+An orphan instance is when an instance is defined for a datatype and typeclass
+but not in the same module as either the declaration of the typeclass
+or the datatype. If you don't own the typeclass or the datatype, newtype it!
+
+If you want an orphan instance so that you can have multiple instances for
+the same type, you still want to use newtype. We saw this earlier with Sum
+and Product which let us have notionally two Monoids for numbers without 
+resorting to orphans or messing up typeclass instance uniqueness.
+
+## Dealing with orphan issues
+
+- You defined the type but not the typeclass ? Put the instance in the 
+  same module as the type so that the type cannot be imported without 
+  its instances.
+
+- You defined the typeclass but not the type? Put the instance in the 
+  same module as the typeclass definition so that the typeclass cannot
+  be imported w/o its instances.
+
+- Neither the type nor the typeclass are yours? Define your own newtype
+  wrapping the original type and now you've got a type that
+  "belongs" to you for which you can rightly define typeclass instances. 
+  There are means of making this less annoying which we'll discuss later.
+
+
