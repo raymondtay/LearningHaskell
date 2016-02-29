@@ -60,3 +60,16 @@ are monoidal (binary, associative and having an identity value) but
 each type should only have one unique instance for a given typeclass, not 
 two (one instance for a sum, one for a product)
 
+# Why you might use newtype
+
+- Signal intent: using `newtype` makes it clear that you only intend for
+  it to be wrapper for the underlying type. The newtype cannot eventually
+  grow into a more complicated sum or product type, while a normal
+  datatype can.
+
+- Improve type safety: avoid mixing up many values of the same representation
+  such as `Text` and `Integer`.
+
+- Add different typeclass instances to a type that is otherwise
+  unchanged representationally.
+
