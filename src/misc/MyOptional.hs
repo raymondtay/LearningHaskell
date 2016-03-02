@@ -7,7 +7,7 @@ import Data.Monoid
 data Optional a =
   Nada
   | Only a 
-  deriving Show
+  deriving (Eq, Show)
 
 instance Monoid a => Monoid (Optional a) where
   mempty = Nada
