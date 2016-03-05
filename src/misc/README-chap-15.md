@@ -135,4 +135,28 @@ resorting to orphans or messing up typeclass instance uniqueness.
   "belongs" to you for which you can rightly define typeclass instances. 
   There are means of making this less annoying which we'll discuss later.
 
+# Definitions
+
++ A monoid is a set that is closed under an associative binary operation
+  and has an identity element. Closed is the posh mathematical way of saying it's
+  type is :
+```haskell
+mappend :: Monoid m => m -> m -> m
+```
+such that your arguments and output will always inhabit the same type (set).
+
++ A semigroup is a set that is closed under an associative binary operation - and 
+  nothing else.
+
++ Laws are rules about how an algebra or structure should behave. These are needed 
+  in part to make abstraction over the commonalities of different instantiations of 
+  the same sort of algeberate possible and practical. This is critical to having 
+  abstractions which are not unpleasantly surprising.
+
++ When haskellers refer to algebras, they are usually talking abotu a somewhat
+  informal notion of operations over a type and its laws, such as with semigroups
+  monoids, groups, semirings, and rings.
+
+
+
 
