@@ -1,5 +1,5 @@
 import Semigroup
 
 main :: IO ()
-main = undefined
+main = monoidAssoc trivialSmush
 
