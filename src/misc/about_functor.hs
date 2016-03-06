@@ -12,3 +12,14 @@ b = fmap (+1) $ read "[23]" :: [Int]
 c = fmap (*2) (\x -> x -2 ) $ 1
 d = fmap ((return '1' ++ ) . show) (\x -> [x,1..3]) $ 0
 
+data Two a b = Two a b deriving (Show,Eq)
+
+data Or' a b = First a | Second b deriving (Show, Eq)
+
+instance Functor (Two a) where
+  fmap f (Two a b) = Two a (f b)
+
+instance Functor (Or' a) where
+  fmap _ (First  a ) = First a
+  fmap f (Second b) = Second (f b)
+
