@@ -93,4 +93,38 @@ data Four' a b = Four' a a a b
 instance Functor (Four' a) where
   fmap f (Four' a b c d) = Four' a b c (f d)
 
+data Possibly a = LolNope | Yeppers a deriving (Eq, Show)
+instance Functor Possibly where
+  fmap _ LolNope = LolNope
+  fmap f (Yeppers a) = Yeppers (f a)
+
+-- need to declare this generator to allow quickcheck
+-- know how to generate 'Int' in its tests.
+instance (Arbitrary a) => Arbitrary (Possibly a) where
+  arbitrary = Yeppers <$> arbitrary
+possibly_id_f x = (fmap id x) == x
+possibly_check = quickCheck (possibly_id_f :: Possibly Int -> Bool)
+possibly_compose_f x = functorCompose (\a -> a + 1) (\b -> b + 1) x 
+possibly_compose_check = quickCheck (possibly_compose_f :: Possibly Int -> Bool)
+
+newtype Constant a b = Constant { getConstant :: a } deriving (Show) -- 'b' is a phantom type
+instance Functor (Constant a) where
+  fmap f (Constant a) = Constant a
+
+
+-- IO Functor
+-- we have seen the IO type in the modules and testing chapters already, 
+-- but we were not doing much with it save to print text or ask for string
+-- input from the user. The IO type will get a full chapter of its own later in the 
+-- book. It is an abstract data type; there are not data constructors that oyu are 
+-- permitted to pattern-match on, so the typeclasses IO provides are the only 
+-- way you can work with value sof type IO a. 
+--
+-- In case you were wondering how the types are generated, the following
+-- illutrates how:
+-- fmap :: Functor f => (a -> b) -> f a -> f b
+-- read :: Read a => String -> a
+-- fmap read :: (Functor f, Read b) => f String -> f b
+-- getLine :: IO String
+-- fmap read getLine :: (Read b) => IO String -> IO b
 
