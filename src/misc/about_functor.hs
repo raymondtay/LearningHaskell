@@ -128,3 +128,11 @@ instance Functor (Constant a) where
 -- getLine :: IO String
 -- fmap read getLine :: (Read b) => IO String -> IO b
 
+getInt :: IO Int
+getInt = fmap read getLine
+
+-- interesting functionality we can obtain from the `()` which is of type `()`
+--
+result = fmap (const ()) getInt
+
+
