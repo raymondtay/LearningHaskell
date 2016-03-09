@@ -30,6 +30,8 @@ idCheck x = (fmap id x) == x
 composeCheck f g x = fmap (f . g) x == (fmap f (fmap g x))
 
 data Bool = False | True -- invalid functor
+-- instance Functor FlipFunctor.Bool where -- invalid functor declaration since the kinds do not qualify
+--   fmap _ FlipFunctor.True = FlipFunctor.True
 
 data BoolAndSomethingElse a = False' a | True' a
 instance Functor BoolAndSomethingElse where
