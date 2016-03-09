@@ -2,6 +2,9 @@
 
 module FlipFunctor where
 
+import GHC.Arr
+import Test.QuickCheck
+
 -- Functors in Haskell are unique for a 
 -- given datatype
 --
@@ -20,17 +23,42 @@ newtype Flip f a b = Flip (f b a) deriving (Eq, Show)
 instance Functor (Flip Tuple a) where
   fmap f (Flip (Tuple a b)) = Flip $ Tuple (f a) b
 
-data Bool = False | True
+-- two helper functions to help us 
+-- conduct the id and composition checks
+--
+idCheck x = (fmap id x) == x 
+composeCheck f g x = fmap (f . g) x == (fmap f (fmap g x))
+
+data Bool = False | True -- invalid functor
 
 data BoolAndSomethingElse a = False' a | True' a
+instance Functor BoolAndSomethingElse where
+  fmap f (False' a) = False' (f a)
+  fmap f (True' a) = True' (f a)
+
+-- idCheck' = quickCheck (idCheck :: BoolAndSomethingElse Int -> Prelude.Bool)
+-- compositionCheck' = quickCheck (idCheck :: BoolAndSomethingElse Int -> Prelude.Bool)
 
 data BoolAndMaybeSomethingElse a = Falsish | Truish a
+instance Functor BoolAndMaybeSomethingElse where
+  fmap f Falsish = Falsish
+  fmap f (Truish a) = Truish (f a)
 
 -- Use thekinds to guide u on this one, dont get too hung up on the
 -- details.
+--
 newtype Mu f = InF { outF :: f (Mu f) }
 
-import GHC.Arr
-data D = D (Array Word Word) Int Int
+newtype Mu' f = InF' { outF' :: f }
+instance Functor Mu' where
+  fmap f (InF' a) = InF' (f a)
 
+-- It's important to differentiate between type- and data-constructors
+-- in Haskell.
+--
+newtype Constant a b = Constant' { getConstant :: a } deriving (Show) -- 'b' is a phantom type
+instance Functor (Constant a) where
+  fmap f (Constant' a) = Constant' a
+
+data D = D (Array Word Word) Int Int -- not possible since :k D is *
 
