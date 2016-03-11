@@ -38,3 +38,21 @@ b = lookup 2 $ zip xs ys
 summed :: Maybe [Integer]
 summed = Just $ (map $ uncurry (+)) $ maybeToList $ (pure (,) <*> a <*> b)
 
+newtype Identity a = Identity a deriving (Eq, Ord, Show)
+
+instance Functor Identity where
+  fmap f (Identity a) = Identity (f a)
+
+instance Applicative Identity where
+  pure = Identity 
+  (Identity f) <*> (Identity x) = Identity (f x)
+
+newtype Constant a b = Constant { getConstant :: a } deriving (Eq, Ord, Show)
+
+instance Functor (Constant a) where
+  fmap f (Constant a) = Constant a
+{- WIP 11 mar 2016
+instance Monoid a => Applicative (Constant a) where
+  pure a = Constant a 
+  (Constant a) <*> (Constant b) = Constant (mappend a b)
+-} 

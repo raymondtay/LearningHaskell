@@ -114,5 +114,90 @@ Prelude> [(+1) . (*2)] <*> [1..4]
 [3,5,7,9]
 
 ```
+# Identity 
+
+The `Identity` type here is a way to introduce structure w/o changing the
+semantics of what you are doing. We will see it used with these typesclasses
+that involve function application around and over structure, but this type
+itself isn't very interesting, as it has no semantic flavour.
+
+##  Specializing the types
+
+Here is what the type will look like when our structure is Identity:
+
+```haskell
+-- f -Identity
+-- Applicative f =>
+
+(<*>) :: f (a -> b ) -> f a -> f b
+(<*>) :: Identity (a -> b) -> Identity a -> Identity b
+```
+The first question i would ask is why are we using Identity to introduce some structure?
+What is the meaning of this ?
+
+Let me try to answer this by writing instances of typeclasses 
+so that we can make the expression 
+```haskell
+const <$> Identity [1,2,3] <*> Identity [1,2,2]
+```
+typecheck.
+```haskell
+newtype Identity a = Identity deriving (Eq, Show, Ord)
+
+instance Functor Identity where
+  fmap f (Identity a) = Identity (f a)
+
+instance Applicative Identity where
+  pure = Identity
+  (Identity f) <*> (Identity g) = Identity (f g)
+
+```
+
+# Constant
+
+This is not so different from the Identity type, except this not only 
+provides structure it also acts like the `const` function. It sort of 
+throws away a function application. If this seems confusing, it's because it is ;).
+However, it is also something that, like Identity has real-life use cases, and you will see
+it in other people's code. It can be difficult to get used to using it yourself
+but we just keep trying.
+
+This datatype is like the `const` function in that it takes two arguments
+but one of them just gets discarded. In the case of the datatype, we have to 
+map our function over the argument that gets discarded. So there is no 
+value to map over, and the function application just doesn't happen.
+
+## Specializing the types
+
+All right, so here is what the types will look like:
+```haskell
+
+-- f - Constant a
+(<*>) :: f ( a -> b ) -> f a -> f b
+(<*>) :: Constant e (a -> b) -> Constant e a -> Constant e b
+
+
+pure :: a -> f a
+pure :: a -> Constant e a
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
