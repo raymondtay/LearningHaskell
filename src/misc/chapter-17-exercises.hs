@@ -35,6 +35,6 @@ a = lookup 3 $ zip xs ys
 b :: Maybe Integer
 b = lookup 2 $ zip xs ys
 
-summed :: Maybe Integer
-summed = sum $ (,) a b
+summed :: Maybe [Integer]
+summed = Just $ (map $ uncurry (+)) $ maybeToList $ (pure (,) <*> a <*> b)
 
