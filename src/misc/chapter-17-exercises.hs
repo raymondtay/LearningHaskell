@@ -51,8 +51,8 @@ newtype Constant a b = Constant { getConstant :: a } deriving (Eq, Ord, Show)
 
 instance Functor (Constant a) where
   fmap f (Constant a) = Constant a
-{- WIP 11 mar 2016
+
+-- pure a :: Applicative f => a -> f a
 instance Monoid a => Applicative (Constant a) where
-  pure a = Constant a 
+  pure = undefined
   (Constant a) <*> (Constant b) = Constant (mappend a b)
--} 
