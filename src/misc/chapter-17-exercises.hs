@@ -53,8 +53,13 @@ instance Functor (Constant a) where
   fmap f (Constant a) = Constant a
 
 -- pure a :: Applicative f => a -> f a
+-- 
+-- the definition of `pure` was a little tricky
+-- for me to recognize the pattern, but turns out 
+-- that the type constraint of `Monoid a` was the giveaway
+-- and it already is a Monoid so it should be as simple as `mempty`
 instance Monoid a => Applicative (Constant a) where
-  pure = undefined
+  pure a = Constant (mempty a)
   (Constant a) <*> (Constant b) = Constant (mappend a b)
 
 -- 12 March 2016
@@ -68,4 +73,19 @@ instance Monoid a => Applicative (Constant a) where
 -- (,,,) Just 90 <*> Just 10 Just "Tierness" [1,2,3]
 -- we could write 
 -- (,,,) <$> Just 90 <*> Just 10 <*> Just "Tierness" <*> Just [1,2,3]
+
+validateLength :: Int -> String -> Maybe String
+validateLength maxLen s = 
+  if (length s) > maxLen 
+  then Nothing
+  else Just s
+
+newtype Name = Name String deriving (Eq, Show)
+newtype Address = Address String deriving (Eq, Show)
+
+mkName :: String -> Maybe Name
+mkName s = fmap Name $ validateLength 25 s
+
+mkAddress :: String -> Maybe Address
+mkAddress a = fmap Address $ validateLength 100 a
 
