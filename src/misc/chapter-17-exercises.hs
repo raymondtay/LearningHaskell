@@ -56,3 +56,16 @@ instance Functor (Constant a) where
 instance Monoid a => Applicative (Constant a) where
   pure = undefined
   (Constant a) <*> (Constant b) = Constant (mappend a b)
+
+-- 12 March 2016
+--
+-- instead of writing 
+-- const <$> Just "Hello" <*> "World"
+-- we could write :
+-- const <$> Just "Hello" <*> Just "World"
+
+-- similarly, instead of writing
+-- (,,,) Just 90 <*> Just 10 Just "Tierness" [1,2,3]
+-- we could write 
+-- (,,,) <$> Just 90 <*> Just 10 <*> Just "Tierness" <*> Just [1,2,3]
+
