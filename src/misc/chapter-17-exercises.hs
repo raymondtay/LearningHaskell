@@ -1,6 +1,8 @@
+module Chap17 where
 
 import Data.List (elemIndex) 
 import Data.Maybe 
+import Test.QuickCheck
 
 added :: Maybe Integer
 added = (+3) <$> (lookup 3 $ zip [1..3] [4..6])
@@ -88,4 +90,77 @@ mkName s = fmap Name $ validateLength 25 s
 
 mkAddress :: String -> Maybe Address
 mkAddress a = fmap Address $ validateLength 100 a
+
+data List a = Nil | Cons a (List a) deriving (Eq, Show)
+
+instance Functor List where
+  fmap f Nil = Nil
+  fmap f (Cons x xs) = Cons (f x) $ fmap f xs
+
+-- This is trickier than most (the reason why is probably because i'm not used to 
+-- programming in Haskell as well as i have thought ;) )
+-- and i think i should document the thinking process
+-- before it gets lost into the infinite space of the Internet
+-- Rationale:
+-- Applicatives basically take 1 or more functions that's on the LHS 
+-- and applies it to every single element on the RHS.
+-- what happens from this function application, in our case is that 
+-- it would create a list of lists and we need to flatten this double-list
+-- structure and we can do that by utilizing the function `append`
+-- so you see that i have 
+-- append (LHS) (RHS)
+-- the (RHS) is the first application of the function on the LHS
+-- and we use fmap since `List a` are functors and it produces `List a`
+-- the (LHS) is (xs <*> Cons g ys) which forces the compiler to use the
+-- applicative again in a recursive manner. 
+-- So... what happens from this recursive evaluation is that each application is
+-- appended to the previous computation s.t. the results are built up from the 
+-- other "end". 
+instance Applicative List where
+  pure x = Cons x Nil
+  (Cons f xs) <*> (Cons g ys) =  append (xs <*> (Cons g ys))  (f <$> (Cons g ys))
+  Nil <*> _ = Nil
+
+functions = Cons (+1) (Cons (*2) Nil)
+functions' = Cons (*4) Nil
+values = Cons 1 (Cons 2 Nil)
+
+append :: List a -> List a -> List a
+append Nil ys = ys 
+append (Cons x xs) ys = Cons x $ xs `append` ys
+
+fold :: (a -> b -> b) -> b -> List a -> b
+fold _ b Nil = b
+fold f b (Cons h t) = f h (fold f b t)
+
+concat' :: List (List a) -> List a
+concat' = fold append Nil
+
+flatMap :: (a -> List b) -> List a -> List b
+flatMap f as =  concat' $ fmap f as  
+
+-- same behavior as the GHC.List.take function
+take' :: Int -> List a -> List a
+take' 0 _   = Nil
+take' i Nil = Nil
+take' i (Cons h t) = Cons h (take' (i - 1) t)
+
+newtype ZipList' a = ZipList' (List a) deriving (Eq, Show)
+
+{-
+instance Eq a => EqProp (ZipList' a) where
+  xs =-= ys = xs' `eq` ys'
+    where xs' = let (ZipList' l) = xs in take' 3000 l
+          ys' = let (ZipList' l) = ys in take' 3000 l
+-}
+
+repeat' :: a -> List a
+repeat' a = Cons a (repeat' a)
+
+instance Functor ZipList' where
+  fmap f (ZipList' xs) = ZipList' $ fmap f xs
+
+instance Applicative ZipList' where
+  pure x = ZipList' (repeat' x)
+  (ZipList' a) <*> (ZipList' b) =  undefined 
 
