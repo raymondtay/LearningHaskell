@@ -2,7 +2,6 @@ module Chap17 where
 
 import Data.List (elemIndex) 
 import Data.Maybe 
-import Test.QuickCheck
 
 added :: Maybe Integer
 added = (+3) <$> (lookup 3 $ zip [1..3] [4..6])
@@ -154,6 +153,8 @@ instance Eq a => EqProp (ZipList' a) where
           ys' = let (ZipList' l) = ys in take' 3000 l
 -}
 
+-- The behavior appears to be the same as GHC.List.repeat
+--
 repeat' :: a -> List a
 repeat' a = Cons a (repeat' a)
 
@@ -163,4 +164,70 @@ instance Functor ZipList' where
 instance Applicative ZipList' where
   pure x = ZipList' (repeat' x)
   (ZipList' a) <*> (ZipList' b) =  undefined 
+
+data Validation err a = 
+  Failure err | Success a deriving (Eq, Show)
+
+-- One thing to realize is that this is identical to the
+-- Either datatype and there is even a pair of total functions which can go 
+-- between Validation and Either values interchangeably
+--
+
+validToEither :: Validation e a -> Either e a
+validToEither (Failure err) = Left err
+validToEither (Success a)   = Right a
+
+eitherToValid :: Either e a -> Validation e a
+eitherToValid (Left err) = Failure err
+eitherToValid (Right a)  = Success a
+
+{-
+ - Identity laws for `Validation e a`
+ -
+eitherToValid . validToEither == id
+validToEither . eitherToValid == id
+
+-}
+
+data Errors = 
+  DividedByZero | StackOverflow | MooglesChewedWires deriving (Eq, Show)
+
+data Sum a b = First a | Second b deriving (Eq, Show)
+instance Functor (Sum a) where
+  fmap f (Second x) = Second (f x)
+
+instance Applicative (Sum a ) where
+  pure x = Second x
+  (Second x) <*> (Second y) = x <$> Second(y)
+
+-- the above applicative allows me to write expressions like
+-- (Second (+1)) <*> Second 22 => returns me Second 23
+--
+
+instance Functor (Validation e) where
+  fmap f (Success a) = Success (f a)
+
+-- This equation is more interesting than the previous ones i've tried
+-- from the perspective that the type `e` is of Monoid but nothing is said
+-- of type `a`.
+-- Hence, from the equations i've formulated before ... it turns out 
+-- there seems like a different strategy when working out which function 
+-- to apply when using applicatives. For example, in the case where we detect
+-- the presence of Failure types, then we need to use mappend since its already
+-- clear from the type signature that e is of type Monoid
+-- whereas in the other case, where success types are detected and we see another trend
+-- where we would apply <$> instead since the presumption has already been established
+-- that all validation types are functors.
+instance Monoid e => Applicative (Validation e) where
+  pure x = Success x 
+  (Success x) <*> (Success y) = x <$> Success(y)
+  (Failure e) <*> (Failure f) = Failure (mappend e f)
+  (Failure e) <*> (Success _) = Failure e
+  (Success _) <*> (Failure e) = Failure e
+
+applyIfBothSecond :: (Sum e) (a -> b) -> (Sum e) a -> (Sum e) b
+applyIfBothSecond = undefined
+
+applyMappendError :: Monoid e => (Validation e)(a -> b) -> (Validation e) a -> (Validation e) b
+applyMappendError = undefined 
 
