@@ -33,17 +33,45 @@ fmap f xs = xs >>= return . f
 [2,3,4,5]
 
 ```
+An interesting thing about Monads is the ability to order (i.e. chain) executions
+together but before we go about doing that, let's understand how we think it _should_
+work and then we'll take it from there ...
 
+If we try to `fmap putStrLn` over `getLine`, it won't do anything and its instructive 
+to understand why this is the case; once again, we invoke our type-hat and based on our
+understanding on how things worked back then to try to see what's going on...
 
+```haskell
 
+getLine:: IO String
+putStrLn :: String -> IO ()
+-- the type we start with 
+<$> :: Functor f => (a -> b) -> f a -> f b
+-- our (a -> b) is putStrLn
+            (a     -> b)
+putStrLn :: String -> IO ()
 
+```
+So, `b` is specialized to `IO ()` which is going to jam another
+IO action inside of the IO that getLine performs. What we need to do
+is to order the executions using another mechanism and the question is
+which function can we use ? Turns out the answer is `Control.Monad.join`
 
+```haskell
+> import Control.Monad (join)
+> join $ putStrLn <$> getLine
+blah 
+blah
+> :t join $ putStrLn <$> getLine
+join $ putStrLn <$> getLine :: IO ()
+```
 
-
-
-
-
-
+As quoted in the book, 
+<pre>
+As it happens, the cleanest way to express "ordering" in a lambda 
+calculus without bolting on something unpleasant is through nesting
+of expressions or lambdas.
+</pre>
 
 
 
