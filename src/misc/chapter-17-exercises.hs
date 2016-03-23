@@ -231,3 +231,8 @@ applyIfBothSecond = undefined
 applyMappendError :: Monoid e => (Validation e)(a -> b) -> (Validation e) a -> (Validation e) b
 applyMappendError = undefined 
 
+instance Monad (Sum a) where
+  return = pure
+  (Second a) >>= f = f a
+
+

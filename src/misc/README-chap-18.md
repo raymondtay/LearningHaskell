@@ -74,4 +74,33 @@ of expressions or lambdas.
 </pre>
 
 
+# Monadic Laws
+
+The Monad typeclass has laws, just as the other datatypes do.
+These laws exist, as with all the other typeclass laws, to ensure
+that your code does nothing surprising or harmful. If the Monad
+isntance you write for your type abides by these laws, then your monads
+should work as you want them to. To write your own instance, you only
+have to define a `>>=` operation but you want your binding to be 
+as predictable as possible.
+
+## Identity Laws
+
+Monad has two identity laws:
+
+```haskell
+m        >>= return = m   -- right identity
+return x >>= f      = f x -- left identity
+```
+
+## Associativity
+
+The law of associativity is not so different from other laws of associativity
+we have seen. It does look a bit different beacuse of the nature of `>>=`:
+```haskell
+(m >>= f) >>= g = m >>= (\x -> f x >>= g)
+```
+
+That is, re-grouping the functions should not have any impact on the final
+result, same as the associativity of Monoid. 
 
