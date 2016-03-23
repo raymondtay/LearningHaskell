@@ -24,6 +24,23 @@ instance Functor CountMe where
   -- fmap f (CountMe i a) = CountMe (i+1) (f a)
   -- violates the laws of identity since i =!= i+1
 
+{-
+ - There's something interesting about this exercise and it
+ - is related to the fact what it means to be 0 i.e. zero
+ - w.r.t "pure" because what pure really does
+ - is to wrap "some value" in a structure which happens
+ - to be an Applicative
+ -
+ - Now, notice both "pure" and "return" in Applicative and Monad
+ - and you'll see why it matters...the point being that 
+ - identity laws in Applicatives and Monads require the use of 
+ - "pure" and "return" respectively and its a problem
+ - when the binary-op doesn't make any sense.
+ - i.e. (+) 0 x == x
+ -      (*) 1 x == x
+ -      fails to be correct when the identity values aren't present
+ -}
+
 instance Applicative CountMe where
   pure = CountMe 0
   CountMe n f <*> CountMe n' a = CountMe (n+n') (f a)
