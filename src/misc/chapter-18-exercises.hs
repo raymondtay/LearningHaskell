@@ -1,9 +1,11 @@
 
 module Chap18 where
 
-import Control.Monad (join, liftM, liftM2)
-
+import Control.Monad
 import Control.Applicative
+import Test.QuickCheck
+import Test.QuickCheck.Checkers
+import Test.QuickCheck.Classes
 
 {--
  - To understand how (>>=) works in monads
@@ -188,5 +190,89 @@ mkSphericalCow'' name' age' weight' =
         \a -> 
           nonNegative weight' >>=
             \w -> weightCheck (Cow n a w)
+
+-- 
+-- Composing monads
+--
+monad_comp :: Monad m => (b -> m c) -> (a -> m b) -> a -> m c
+monad_comp f g a = g a >>= f -- equivalent to (g a) >>= f i.e. eval (g a) and the resulting monad is passed to f
+
+-- 
+-- In ordinary function composition and >>=
+-- (.) :: (b -> c) -> (a -> b) -> a -> c
+--
+-- (>>=) :: Monad m => m a -> (a -> m b) -> m b
+--
+-- To get Kleisli composition off the ground, we have to flip 
+-- some arguments around to make the types work:
+--
+-- (>=>) :: Monad m => (a -> m b) -> (b -> m c) -> a -> m c
+-- flip (.) 
+--
+
+sayHi :: String -> IO String
+sayHi greeting = do
+  putStrLn greeting
+  getLine
+
+--
+-- basically, its lifting the read function to
+-- a monad 
+--
+readM :: Read a => String -> IO a
+readM = return . read
+
+getAge :: String -> IO Int
+getAge = sayHi >=> readM
+
+askForAge :: IO Int
+askForAge = getAge "Hello! How old are you?" 
+
+--
+-- The following code below demonstrates hw
+-- Monads are constructed and validated 
+-- as part of the chapter's exercises
+--
+data Nope a = NopeDotJpg
+instance Functor Nope where
+  fmap f _ = NopeDotJpg
+
+instance Applicative Nope where
+  pure _ = NopeDotJpg
+  _ <*> _ = NopeDotJpg
+
+instance Monad Nope where
+  return = pure
+  l >>= f = NopeDotJpg
+
+-- instance Arbitrary (Nope a) where
+
+data ButEither b a = 
+  Left a
+  | Right b
+
+instance Functor (ButEither b) where
+  fmap f (Chap18.Left a) = Chap18.Left (f a)
+
+instance Arbitrary a => Arbitrary (ButEither a) where
+  arbitrary = Chap18.ButEither <$> arbitrary
+
+main = do
+  let trigger = undefined :: ButEither (Int,Int)
+  quickBatch $ functor trigger
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

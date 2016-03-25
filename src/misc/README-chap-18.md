@@ -104,3 +104,90 @@ we have seen. It does look a bit different beacuse of the nature of `>>=`:
 That is, re-grouping the functions should not have any impact on the final
 result, same as the associativity of Monoid. 
 
+# Notes
+
+## What is a Monad ?
+
+A monad is a typeclass reifying an abstraction that is commonly
+used in Haskell. Instead of an ordinary function of type a to b
+you are functorially applying a function which produces more 
+structure itself an dusing join to reduce the nested structure that
+results.
+```haskell
+fmap :: (a -> b ) -> f a  -> f b
+(<*>) :: f (a -> b) -> f a -> f b
+(=<<) :: (a -> f b) -> f a -> f b
+```
+
+## What is a Monadic function?
+
+A monadic function is one which generates more structure after having
+been lifted over monadic structure. Contrast the function arguments to 
+`fmap` and `(>>=)` in:
+```haskell
+fmap :: (a -> b) -> f a -> f b
+(>>=) :: m a -> (a -> m b) -> m b
+```
+The significant difference is that the result is `m b` and requires
+`join`-ing the result after lifting the function over `m`. What does this mean?
+That depends on the Monad instance.
+The distinction can be seen as ordinary function composition and kleisli
+composition as well:
+```haskell
+(.) :: (b -> c) -> (a -> b) -> a -> c
+(>=>) :: Monad m => (a -> m b) -> (b -> m c) -> a -> mc
+```
+
+## What is _bind_ ? 
+
+`bind` is unfortunately a somewhat overloaded term. You first saw it used early
+in the book with respect to binding variables to values, such as with the
+following:
+
+```haskell
+let x = 2 in x + 1
+```
+where x is a variable bound to 2. However, when we are talking about
+a Monad instance typically bind will refer to having
+used >>= to lift a monadic function over the structure.
+The distinction being:
+```haskell
+-- lifting (a -> b) over f in f a
+fmap :: (a -> b) -> f a -> f b
+
+-- binding (a -> m b) over m in m a
+(>>=) :: m a -> (a -> m b) -> m b
+```
+
+You will sometimes see "us" talk about the use of the bind
+do-notation `<-` or `(>>=)` as _binding over_. When we do, we just mean that
+we lifted a monadic function and we will eventually `join` or smush
+the structure back down when we ar edone monkeying around in the Monad.
+_Don't panic_ if we are a little casual about describing the use of `<-` as having
+bound over/out some `a` out of `m a`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
