@@ -254,25 +254,5 @@ data ButEither b a =
 instance Functor (ButEither b) where
   fmap f (Chap18.Left a) = Chap18.Left (f a)
 
-instance Arbitrary a => Arbitrary (ButEither a) where
-  arbitrary = Chap18.ButEither <$> arbitrary
-
-main = do
-  let trigger = undefined :: ButEither (Int,Int)
-  quickBatch $ functor trigger
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
