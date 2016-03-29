@@ -38,3 +38,48 @@ instance Foldable Optional where
   foldMap _ Nada = mempty
   foldMap f (Only x) = f x
 
+-- 
+-- implement the following functions interms of foldMap or foldr
+-- from Foldable, then try them out with multiple types that have Foldable instances.
+--
+sum :: (Foldable t, Monoid a) => t a -> a
+sum = foldr mappend mempty
+
+-- 
+-- the standard implementation found in GHC 7.10.3
+-- for "sum" and "product" are:
+-- getSum . foldMap Sum
+-- getProduct . foldMap Product
+--
+product :: (Foldable t, Monoid a) => t a -> a
+product = foldr mappend mempty
+
+elem :: (Foldable t, Eq a) => a -> t a -> Bool
+elem = any . ( == ) 
+
+newtype Max a = Max { getMax :: Maybe a} deriving (Eq,Ord)
+newtype Min a = Min { getMin :: Maybe a} deriving (Eq,Ord)
+ 
+instance Ord a => Monoid (Max a) where
+  mempty = Max Nothing
+  mappend l (Max Nothing) = l
+  mappend (Max Nothing) r = r
+  mappend (Max a@(Just x)) (Max b@(Just y)) 
+    | x >= y = Max a
+    | otherwise = Max b
+
+instance Ord a => Monoid (Min a) where
+  mempty = Min Nothing
+  mappend l (Min Nothing) = l
+  mappend (Min Nothing) r = r
+  mappend (Min a@(Just x)) (Min b@(Just y)) 
+    | x <= y = Min a
+    | otherwise = Min b
+ 
+minimum :: (Foldable t, Ord a) => t a -> Maybe a
+minimum = undefined 
+-- minimum = Just . (foldr min 0) 
+
+maximum :: (Foldable t, Num a, Ord a) => t a -> Maybe a
+maximum = Just . (foldr max 0)
+
