@@ -83,3 +83,10 @@ minimum = undefined
 maximum :: (Foldable t, Num a, Ord a) => t a -> Maybe a
 maximum = Just . (foldr max 0)
 
+-- filter function for Foldable types. It is a bit silly, but it does
+-- technically work. We need the Applicative so we have minimal 
+-- structure to put a value into, then mappend with the rest of the structure.
+--
+filterF p = foldMap (\x -> if p x then pure x else mempty)
+
+
