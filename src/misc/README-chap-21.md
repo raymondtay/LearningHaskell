@@ -80,4 +80,65 @@ $> fmap product $ sequenceA [Nothing, Just 2, Just 3]
 Nothing
 ```
 
+##  Understanding traverse and mapM
+
+Based on the typeclass definition we saw earlier, we know that
+`traverse` is basically `fmap` composed with `sequenceA` and 
+that is :
+`traverse f = sequenceA . fmap f`
+
+and it is helpful to understand how things work by examining examples:
+```haskell
+$> fmap Just [1,2,3]
+[Just 1, Just 2, Just 3]
+$> sequenceA $ fmap Just [1,2,3]
+Just [1,2,3]
+$> sequenceA . fmap Just [1,2,3]
+Just [1,2,3]
+$> traverse Just [1,2,3]
+Just [1,2,3]
+```
+
+with `traverse`, you won't have to change your code
+because the primary Vector datatype has a Traversable instance
+and so should work fine.
+
+Similarly, the type for `sequence` in GHC versions prior to 7.10
+is just a less useful `sequenceA`.
+```haskell
+sequence :: Monad m =>
+  [ m a ]
+->  m [a]
+
+-- contrast the above with this 
+sequenceA :: (Applicative f, Traversable t) =>
+    t (f a)
+->  f (t a)
+
+```
+Again, we are generalizing the list to any Traversable and weakening the Monad
+requirement to just Applicative.
+
+# So what is traversable for?
+
+In a literal sense, anytime you need to flip two type constructors
+around, or map something and then flip them around, that's probably
+Traversable.
+```haskell
+traverse :: Applicative f => (a -> f b) -> t a -> f (t b)
+sequenceA :: Applicative f => t (f a) -> f (t a)
+```
+
+Before, i said that `traverse` is like `sequenceA` and here's how they are alike
+```haskell
+$> let f = undefined :: a -> Maybe b
+$> let xs = undefined :: [a]
+$> :t map f xs 
+map f xs :: [Maybe b]
+$> :t sequenceA $ map f xs
+sequenceA $ map f xs :: Maybe [a]
+$> :t traverse f xs
+traverse f xs :: Maybe [b]
+```
+
 
