@@ -141,4 +141,24 @@ $> :t traverse f xs
 traverse f xs :: Maybe [b]
 ```
 
+If you go see `using_wreq.hs`, we could understand that `Traversable` is stronger
+than `Functor` and `Foldable`. Because of this, we can recover the functor and
+foldable instance for a type from the Traversable, just as we can recover the Functor
+and Applicative from the Monad. Here we can use the Identity type to get something
+that is essentially just fmap all over again.
+
+```haskell
+
+$> import Data.Functor.Identity
+$> traverse (Identity . (+1)) [1,2]
+Identity [2,3]
+$> runIdentity $ traverse (Identity . (+1)) [1,2]
+[2,3] 
+$> let edgelordMap f t = runIdentity $ traverse (Identity . f ) t
+$> :t edgelordMap
+edgelordMap :: Traversable t => (a -> b) -> t a -> t b
+$> edgelordMap (+1) [1..5] -- which is the same as (+1) <$> [1..5]
+[2,3,4,5,6]
+
+```
 
