@@ -118,6 +118,22 @@ instance Functor (Or a) where
 
 + A higher-kinded type is a type which itself takes types as arguments
   and potentially mentions them in the definition of the datatype.
+  Functor is an example of higher kinded polymorphism because the kind
+  of the `f` parameter to Functor is `* -> *`. Another example of higher
+  kinded polymorphism would be a datatype having a parameter to the type
+  constructor which is of a higher kind, such as 
+  ```haskell
+  data Weird f a = Weird (f a)
+  ```
+  Where the kinds of the types involved are:
+  ```
+  a :: *
+  f :: * -> *
+  Weird :: (* -> *) -> * -> *
+  ```
+  Here both `Weird` and `f` are higher-kinded, with 
+  `Weird` being an example of higher-kinded polymorphism.
+
 
 + Functor is a mapping between categories. In Haskell, this manifests as
   a typeclass which lifts a function between two types over two new types.
