@@ -39,3 +39,33 @@ data Four' a b = Four' a a a b
 instance Functor (Four' a) where
   fmap f (Four' a b c d) = Four' a b c (f d)
 
+-- 
+-- Section 16.11's short exercise
+--
+data Sum a b = 
+  First a
+  | Second b
+  deriving (Eq, Show)
+
+instance Functor (Sum a) where
+  fmap _ (First a) = First a
+  fmap f (Second b) = Second (f b)
+
+-- 
+-- This is special in the sense that the type parameter `b`
+-- is a phantom-type which means that there is no corresponding
+-- value/term on the RHS of the "="
+-- 
+newtype Constant a b = Constant { getConstant :: a } deriving (Eq, Show)
+
+-- 
+-- For the Constant to be a valid Functor, it has to be
+-- Constant a instead of Constant a b since the former is * -> * 
+-- and the latter is *.
+instance Functor (Constant a) where
+  fmap f (Constant a) = Constant a
+
+data Wrap f a = Wrap (f a) deriving (Show, Eq)
+instance Functor f => Functor (Wrap f) where
+  fmap f (Wrap fa) = Wrap (fmap f fa)
+
