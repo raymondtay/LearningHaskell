@@ -68,12 +68,12 @@ instance Monoid a => Applicative (Constant a) where
 -- instead of writing 
 -- const <$> Just "Hello" <*> "World"
 -- we could write :
--- const <$> Just "Hello" <*> Just "World"
+-- const <$> Just "Hello" <*> (pure "World":: Maybe String)
 
 -- similarly, instead of writing
 -- (,,,) Just 90 <*> Just 10 Just "Tierness" [1,2,3]
 -- we could write 
--- (,,,) <$> Just 90 <*> Just 10 <*> Just "Tierness" <*> Just [1,2,3]
+-- (,,,) <$> Just 90 <*> Just 10 <*> (pure "Tierness" :: Maybe String) <*> (pure [1,2,3]:: Maybe [Int])
 
 validateLength :: Int -> String -> Maybe String
 validateLength maxLen s = 
