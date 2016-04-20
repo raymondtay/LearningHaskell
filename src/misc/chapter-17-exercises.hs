@@ -235,4 +235,25 @@ instance Monad (Sum a) where
   return = pure
   (Second a) >>= f = f a
 
+-- 
+-- flip back to see how `Address` and `Name` 
+-- are defined.
+--
+data Person = 
+  Person Name Address deriving (Eq, Show)
+
+--
+-- `something` is of type Maybe Person
+-- for the reason that `Person <$> Just (Name "Ray")` is of type Maybe(Address -> Person)
+-- and when we apply with `Just (Address "Somewhere in Singapore")` which is of type Maybe Address
+-- and hence `Maybe (Address -> Person) . Maybe Address` which produces `Maybe Person`
+--
+something = Person <$> Just (Name "Ray") <*> Just (Address "Somewhere in Singapore")
+
+
+
+
+
+
+
 
