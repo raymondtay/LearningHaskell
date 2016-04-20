@@ -250,10 +250,3 @@ data Person =
 --
 something = Person <$> Just (Name "Ray") <*> Just (Address "Somewhere in Singapore")
 
-
-
-
-
-
-
-
