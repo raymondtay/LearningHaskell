@@ -1,5 +1,9 @@
 module Chap17 where
 
+--
+-- You need Test.QuickCheck.Checkers i.e. checkers package 
+-- for the tests (which are commented out) to run
+--
 import Data.List (elemIndex) 
 import Data.Maybe 
 
@@ -92,6 +96,9 @@ mkAddress a = fmap Address $ validateLength 100 a
 
 data List a = Nil | Cons a (List a) deriving (Eq, Show)
 
+--
+-- The approach i took is equivalent to foldl
+--
 instance Functor List where
   fmap f Nil = Nil
   fmap f (Cons x xs) = Cons (f x) $ fmap f xs
