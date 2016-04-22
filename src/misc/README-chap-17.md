@@ -1,3 +1,11 @@
+The basic motivation of Applicative is probably
+best summed up by the following description:
+```
+I want to do something kinda like fmap, but my function
+is embedded in the functorial structure too, not just 
+the value i want to apply my function to.
+```
+
 
 # Difference btween fmap and `(<*>)`
 ```haskell
