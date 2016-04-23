@@ -7,6 +7,41 @@ and transforming `IO` actions, older implementations of Haskell did not.
 Monads are powerful and fun, but they do not define Haskell. Rather, monads
 are defined in terms of Haskell.
 
+## What Monad is not ?
+
+Since Monad is somewhat abstract and can be quite slippery, many 
+people talk about it from one or two perspectives that they feel most
+comfortable with. Quite often, they address what `Monad` is from the 
+perspective of the `IO Monad`. `IO` does have a `Monad` instance 
+and it is a very common use of monads. However, understanding monads only
+through that instance leads to limited intuitions for what monads are 
+and can do, and to a lesser extent, a wrong notion of what `IO` is all
+about.
+
+Monad is not:
+
++ Impure. Monadic functions are pure functions. Io is an abstract
+  data type that allows for impure, or effectful, actions and it has
+  a Monad instance. But there is nothing impure about monads.
+
++ An embedded language for imperative programming. Simon Peyton Jones,
+  one of the lead developers and researchers of Haskell and its implementataion
+  in GHC, has famously said, "Haskell is the world's finest imperative programming
+  language", and he was talking about the way monad handle effectful programming.
+  While monads are often used for sequencing actions in a way that looks like
+  imperative programming, there are commutative monads that do not order actions.
+
++ A value. The typeclass describes a specific relationship between 
+  elements in a domain and defines some operations over them.
+  When we refer to something as "a monad", we are using that the same way
+  we talk about "a monoid" or "a functor". None of theese are values.
+
++ About strictness. The monadic operations of bind and return are nonstrict. 
+  Some operations can be made strict within a specific instances.
+
+Using Monads does not require math. Or category theory.
+
+
 Monads are applicative functors, but they have something special about them
 that makes them different from and more powerful than either `<*>` or `fmap` alone.
 
