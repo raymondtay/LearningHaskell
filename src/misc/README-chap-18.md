@@ -86,6 +86,12 @@ putStrLn :: String -> IO ()
             (a     -> b)
 putStrLn :: String -> IO ()
 
+--
+-- Here's how it looks like and that is to say 
+-- the IO () is suppressed as its nested inside a IO.
+-- 
+putStrLn <$> getLine :: IO (IO ())
+
 ```
 So, `b` is specialized to `IO ()` which is going to jam another
 IO action inside of the IO that getLine performs. What we need to do
