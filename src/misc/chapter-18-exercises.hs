@@ -302,3 +302,60 @@ instance Monad (Sum a) where
   return = pure
   (Second a) >>= f = f a
 
+--
+-- Wriet a Monad instance for Identity
+--
+newtype Identity a = Identity a deriving (Eq, Ord, Show)
+
+instance Functor Identity where
+  fmap f (Identity a) = Identity (f a)
+
+instance Applicative Identity where
+  pure = Identity
+  (Identity f) <*> (Identity a) = Identity (f a)
+
+instance Monad Identity where
+  return = pure
+  (Identity a) >>= f = (f a)
+
+data List a = Nil | Cons a (List a)
+
+instance Functor List where
+  fmap f Nil = Nil
+  fmap f (Cons a as) = Cons (f a) $ fmap f as
+
+instance Applicative List where
+  pure x = Cons x Nil
+  (Cons f xs) <*> (Cons y ys) = Cons (f y) $ (Cons f xs) <*> ys
+
+--
+-- Monad Composition
+--
+mcomp :: Monad m => (b -> m c) -> (a -> m b) -> a -> m c
+mcomp f g a = (g a) >>= f
+-- Why did it work?
+-- when we apply g to a i.e. (g a) it returns a monad which is m b
+-- and u need to realize that we are basically working on a monad 
+-- and f which is `m b` and `(b -> m c) ` respectively so that 
+-- we can merge them together.
+-- Turns out i don't have to learn how to do that,because its already
+-- there in the Control.Monad package which is known as (>=>)
+
+j :: Monad m => m (m a) -> m a
+j mma = mma >>= id
+
+l1 :: Monad m => (a -> b) -> m a -> m b
+l1 f ma = f <$> ma
+
+l2 :: Monad m => (a -> b -> c) -> m a -> m b -> m c
+l2 f ma mb = do
+  a <- ma
+  b <- mb
+  return (f a b) -- `return` is necessary s.t. it can comply with the type signature in Monad
+
+a :: Monad m => m a -> m (a -> b) -> m b
+a ma fma = do
+  f <- fma
+  a' <- ma
+  return (f a')-- `return` is necessary s.t. it can comply with the type signature in Monad
+
