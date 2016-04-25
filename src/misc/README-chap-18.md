@@ -107,6 +107,13 @@ blah
 join $ putStrLn <$> getLine :: IO ()
 ```
 
+What `join` did here is to _merge_ the effects of `getLine` and `putStrLn` 
+into a single `IO` action. This merged IO action performs the effects in the 
+`order` determined by the nesting of the `IO` actions. As it happens, the cleanest
+way to express "ordering" in a lambda calculus without bolting on something
+unpleasant is through nesting of expressions or lambdas.
+
+
 As quoted in the book, 
 <pre>
 As it happens, the cleanest way to express "ordering" in a lambda 

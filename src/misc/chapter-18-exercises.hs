@@ -4,10 +4,21 @@ module Chap18 where
 import Control.Monad
 import Control.Applicative
 import Test.QuickCheck
-import Test.QuickCheck.Checkers
-import Test.QuickCheck.Classes
+-- import Test.QuickCheck.Checkers
+-- import Test.QuickCheck.Classes
 
-{--
+{-
+Concentrating on the defn of `bind` or `>>=`:
+class Applicative m => Monad (m :: * -> *) where
+  (>>=) :: m a -> (a -> m b) -> m b
+                       m    a -> (a ->  m     b) -> m b
+Prelude Control.Monad> Just 1 >>= \x -> Just (x+1)
+Just 2
+
+Again, let's map types: m      a        -> (a  -> m     b)
+Prelude Control.Monad> Just (\x -> x+1) >>= \f -> Just (f 4) -> m b 
+Just 5
+
  - To understand how (>>=) works in monads
  - its good to start with a simple example 
  - and work our way up
@@ -254,5 +265,40 @@ data ButEither b a =
 instance Functor (ButEither b) where
   fmap f (Chap18.Left a) = Chap18.Left (f a)
 
+{-
 
+import Control.Monad (ap)
+
+(<*>) == ap
+
+-- keeping in mind
+(<*>) :: Applicative f => f (a -> b) -> f a -> f b
+ap    :: Monad m       => m (a -> b) -> m a -> m b
+ap m m' = do
+  x  <- m -- "extracting" the function
+  x' <- m' -- "extracting" the monad
+  return (x x') -- function application btw
+Control.Monad> Just (\x -> x + 1) <*> Just 4
+Just 5
+Control.Monad> ap (Just (\x -> x + 1)) $ Just 4
+Just 5
+```
+behavior if derived from the Monad instance's bind operation.
+-}
+
+data Sum a b = 
+  First a | Second b deriving (Eq, Show)
+
+instance Functor (Sum a) where
+  fmap _ (First a) = First a
+  fmap f (Second b) = Second (f b)
+
+instance Applicative (Sum a) where
+  pure x = Second x
+  (Second f) <*> (Second g) = f <$> Second g
+  _ <*> (First a)  = First a
+
+instance Monad (Sum a) where
+  return = pure
+  (Second a) >>= f = f a
 
