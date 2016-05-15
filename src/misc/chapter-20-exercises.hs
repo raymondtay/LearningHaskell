@@ -89,4 +89,31 @@ maximum = Just . (foldr max 0)
 --
 filterF p = foldMap (\x -> if p x then pure x else mempty)
 
+data Constant a b = Constant a deriving (Eq,Show)
+
+--
+-- as `foldMap` can be implemented in terms of `foldr` in Foldable
+-- and that means having one of either is enough.
+--
+instance Foldable (Constant a) where
+  foldr f z (Constant a) = z
+
+data Two a b = Two a b deriving (Eq,Show)
+
+instance Foldable (Two a) where
+  foldr f z (Two a b) = f b z
+
+
+data Three a b c = Three a b c
+instance Foldable (Three a b) where
+  foldr f z (Three a b c) = f c z
+
+data Three' a b = Three' a b b
+instance Foldable (Three' a) where
+  foldr f z (Three' a b b') = f b z
+
+data Four' a b = Four' a b b b 
+instance Foldable (Four' a) where
+  foldr f z (Four' a b c d) = f b z
+
 
