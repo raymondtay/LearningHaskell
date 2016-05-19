@@ -3,6 +3,7 @@
 module Chap22 where
 
 import Control.Applicative
+import Data.Char
 
 newtype Reader r a = Reader { runReader :: r -> a }
 
@@ -120,4 +121,37 @@ instance Monad (Reader r) where
   (>>=) :: Reader r a -> (a -> Reader r b) -> Reader r b
   (Reader ra) >>= aRb = Reader $ (\r -> ((runReader (aRb (ra r))) r))
 
+
+
+hurr = (*2) 
+durr = (+10)
+
+m :: Integer -> Integer
+m = hurr . durr
+
+cap :: [Char] -> [Char]
+cap xs = map toUpper xs
+
+rev :: [Char] -> [Char]
+rev xs = reverse xs
+
+-- applied in `fmapped`
+composed :: [Char] -> [Char]
+composed = rev . cap
+
+-- defined in terms of composed
+fmapped :: [Char] -> [Char]
+fmapped = composed
+
+tupled :: [Char] -> ([Char], [Char])
+tupled xs = (cap xs, rev xs)
+
+--tupledViaApplicative :: [Char] -> ([Char], [Char])
+--tupledViaApplicative xs = [cap , rev] <*> xs
+
+tupled' :: [Char] -> ([Char], [Char])
+tupled' xs =
+  let 
+    xchg p = (snd(p), fst(p))
+  in xchg(tupled xs)
 
