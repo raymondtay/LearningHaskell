@@ -6,6 +6,7 @@ module RandomExample2 where
 import Control.Applicative (liftA3)
 import Control.Monad (replicateM)
 import Control.Monad.Trans.State
+import qualified Data.DList as DL
 import System.Random
 
 data Die = 
@@ -69,4 +70,67 @@ rollDieThreeTimes' = liftA3 (,,) rollDie rollDie rollDie
 --
 infiniteDie :: State StdGen [Die]
 infiniteDie = repeat <$> rollDie
+
+-- 
+-- replicateM :: Monad m => Int -> m a -> m [a]
+-- 
+-- is a replicator function.
+nDie :: Int -> State StdGen [Die]
+nDie n = replicateM n rollDie
+
+-- 
+-- Tells you how many rolls it took
+-- to reach the number 20. 
+-- Constraints Programming ?
+--
+rollsToGetTwenty :: StdGen -> Int
+rollsToGetTwenty g = go 0 0 g
+  where go :: Int -> Int -> StdGen -> Int
+        go sum count gen
+          | sum >= 20 = count
+          | otherwise = 
+            let (die, nextGen) = randomR(1, 6) gen
+            in go (sum + die) (count + 1) nextGen
+
+rollsToGetN :: StdGen -> Int -> Int
+rollsToGetN g ceil = go 0 0 g
+  where go :: Int -> Int -> StdGen -> Int
+        go sum count gen
+          | sum >= ceil = count
+          | otherwise = 
+            let (die, nextGen) = randomR(1, 6) gen
+            in go (sum + die) (count + 1) nextGen
+
+fizzBuzz :: Integer -> String
+fizzBuzz n | n `mod` 15 == 0 = "FizBuzz"
+           | n `mod` 5 == 0 = "Fizz"
+           | n `mod` 3 == 0 = "Buzz"
+           | otherwise = show n
+
+
+fizzbuzzList :: [Integer] -> [String]
+fizzbuzzList list = execState (mapM_ addResult list) []
+
+fizzbuzzList' :: [Integer] -> [String]
+fizzbuzzList' list = 
+  let dlist = execState (mapM_ addResult' list) DL.empty
+  in DL.apply dlist []
+
+addResult' :: Integer -> State (DL.DList String)()
+addResult' n = do
+  xs <- get
+  let result = fizzBuzz n
+  put (DL.snoc xs result)
+
+
+addResult :: Integer -> State [String]()
+addResult n = do
+  xs <- get
+  let result = fizzBuzz n
+  put (result : xs)
+
+
+main :: IO ()
+main = 
+  mapM_ putStrLn $ reverse $ fizzbuzzList [1..100]
 
