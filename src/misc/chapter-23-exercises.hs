@@ -43,7 +43,7 @@ instance Monad (Moi s) where
   (Moi f) >>= g = Moi $ \s -> 
     let 
       (a, s1) = f s
-      (b, s2) = runMoi (g a) $ s -- i have to use `runMoi` on (g a)
+      (b, s2) = runMoi (g a) $ s -- is it 's' or 's1' ?
     in (b, s2)
 
 
@@ -54,4 +54,27 @@ instance Monad (Moi s) where
 --
 get' :: State s s 
 get' = state $ \x -> (x,x) 
+
+-- 
+-- construct a state where the resulting state is the argument
+-- provided and the value is defaulted to unit
+--
+put' :: s -> State s ()
+put' s = state $ \_ -> ((), s)
+
+--
+-- Run the state with S and get the state that results
+-- In here, 'm' is the State object (i.e. s -> (a, s)) 
+-- and 's' is the state in question.
+--
+exec' :: State s a -> s -> s
+exec' m s = snd (runState m s)
+
+--
+-- Run the state with S and get the value that results
+-- In here, 'm' is the State object (i.e. s -> (a, s)) 
+-- and 's' is the state in question.
+--
+eval' :: State s a -> s -> a
+eval' m s = fst (runState m s) 
 
