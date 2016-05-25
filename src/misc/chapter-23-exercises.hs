@@ -78,3 +78,26 @@ exec' m s = snd (runState m s)
 eval' :: State s a -> s -> a
 eval' m s = fst (runState m s) 
 
+-- 
+-- This could be trickier than the others
+-- as (s -> s) is a function which consumes a state
+-- and returns a state. An endo function, that is.
+-- When you follow the types, you will realize that 
+-- actually modify'' needs to consume a function (which i assume
+-- to be of type s -> s ).
+--
+modify'' :: (s -> s) -> State s ()
+modify'' f = state $ \s -> ((), f s) 
+
+{-
+ - Here's an excerpt of how they would look like when you run them 
+ - on the console terminal. Remember that State is a Monad 
+ - *Chap23 Control.Monad.State System.Random> runState (modify'' (+1)) 9
+ - ((),10)
+ - *Chap23 Control.Monad.State System.Random> runState (modify'' (+1)) 0
+ - ((),1)
+ - *Chap23 Control.Monad.State System.Random> runState (modify'' (+1) >> modify'' (+1)) 0
+ - ((),2)
+ - *Chap23 Control.Monad.State System.Random>
+ -
+ -}
