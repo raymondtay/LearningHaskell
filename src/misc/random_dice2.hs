@@ -70,3 +70,18 @@ rollDieThreeTimes' = liftA3 (,,) rollDie rollDie rollDie
 infiniteDie :: State StdGen [Die]
 infiniteDie = repeat <$> rollDie
 
+nDie :: Int -> State StdGen [Die]
+nDie n = replicateM n rollDie
+
+{-
+  *RandomExample2> execState  (nDie 4) (mkStdGen 1)
+  879767458 1872071452
+  *RandomExample2> evalState  (nDie 4) (mkStdGen 1)
+  [DieSix,DieFive,DieTwo,DieSix]
+  *RandomExample2> evalState  (nDie 4) (mkStdGen 2)
+  [DieSix,DieFour,DieOne,DieFive]
+  *RandomExample2> evalState  (nDie 4) (mkStdGen 4)
+  [DieSix,DieThree,DieThree,DieTwo]
+-}
+
+
