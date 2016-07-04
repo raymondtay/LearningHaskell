@@ -28,6 +28,9 @@ newtype One f a = One (f a) deriving (Eq, Show)
 instance Functor f => Functor (One f) where
   fmap f (One fa) = One $ fmap f fa
 
+instance Functor f => Applicative (One f) where
+  pure a = One $ id a
+  (<*>)  = undefined
 
 newtype Three f g h a = 
   Three (f (g (h a))) deriving (Eq, Show)
