@@ -69,6 +69,8 @@ instance (Functor f, Functor g, Functor h) => Functor (Three f g h) where
 --
 
 -- 
+-- Referencing the type of `pure` which is `pure :: Applicative f => a -> f a`
+-- the clue seems to be hidden within that defn.
 -- Referencing the file `libraries/base/Control/Applicative.hs`
 -- in the GHC codebase, i can see that the problem i have was how to
 -- bring `f::pure` , `g::pure` into `Compose f g::pure`
@@ -82,10 +84,28 @@ instance (Applicative f, Applicative g) =>
 -- can i do the same thing for defining the `apply`
 -- of Applicatives? we'll see soon.
 --
+-- By writing the type signature as part of the function
+-- defn might help to unravel the mystery of how to write 
+-- this particular instance. E.g. the type of 'a'
+-- in the following definition is actually `f (g a)`
+-- and type of 'f' is actually `f(g (a -> b))`
+-- but how does this actually help me in figuring things out??
+--
+-- If we attempt to write an expression, the GHCI would throw the
+-- following error:
+--
+-- *StartWithMonadT> Compose (Just (Just (+1))) <*> Compose (Just (Just 3))
+-- Compose {getCompose = *** Exception: Prelude.undefined
+-- CallStack (from HasCallStack):
+--   error, called at libraries/base/GHC/Err.hs:79:14 in base:GHC.Err
+--     undefined, called at chapter-25-monad-transformers.hs:107:33 in main:StartWithMonadT
+--
+-- 
   (<*>) :: Compose f g (a -> b)
         -> Compose f g a
         -> Compose f g b
   (Compose f) <*> (Compose a) = undefined
+  -- (Compose f) <*> (Compose a) = undefined
 
 
 
