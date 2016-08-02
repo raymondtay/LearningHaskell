@@ -100,13 +100,13 @@ instance (Applicative f, Applicative g) =>
 --   error, called at libraries/base/GHC/Err.hs:79:14 in base:GHC.Err
 --     undefined, called at chapter-25-monad-transformers.hs:107:33 in main:StartWithMonadT
 --
+-- After some R&D, the answer lies on this page => https://hackage.haskell.org/package/transformers-0.3.0.0/docs/Data-Functor-Compose.html
+-- 
 -- 
   (<*>) :: Compose f g (a -> b)
         -> Compose f g a
         -> Compose f g b
-  (Compose f) <*> (Compose a) = undefined
-  -- (Compose f) <*> (Compose a) = undefined
-
+  (Compose f) <*> (Compose a) = Compose ((<*>) <$> f <*> a)
 
 
 {-
