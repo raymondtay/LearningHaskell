@@ -110,8 +110,18 @@ instance (Applicative f, Applicative g) =>
 
 
 {-
--- Can this be an Applicative ??? Doesn't look like it.
-instance Functor f => Applicative (One f) where
-  pure a = One $ Just a
-  -- (<*>)  = undefined
+ - What about Monad? There's no problem composing two arbitrary datatypes
+ - that have Monad instances. We saw this already when we used Compose with
+ - Maybe and list, which both have Monad instances defined. However, the 
+ - result of having done so does not give you a Monad.
+ -
+ - The issue comes down to a lack of information. Both types Compose is working
+ - with are polymorphic, so when you try to write a bind for the Monad
+ - you are trying to combine two polymorphic binds into a single
+ - combined bind. This, as it turns out, is not possible.
+ -
+ - Since getting another Monad given the compositino of two 
+ - arbitrary types that have aMonad instance is impossible, what can we do to get
+ - a Monad instance for combination of types?? The answer is, monad transformers.
+ -
 -}
