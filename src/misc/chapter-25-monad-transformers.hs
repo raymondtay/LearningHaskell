@@ -125,3 +125,14 @@ instance (Applicative f, Applicative g) =>
  - a Monad instance for combination of types?? The answer is, monad transformers.
  -
 -}
+
+instance (Foldable f, Foldable g) => 
+  Foldable (Compose f g) where
+  foldMap f (Compose fga) = foldMap (foldMap f) fga
+
+
+instance (Traversable f, Traversable g) =>
+  Traversable (Compose f g) where
+  traverse f (Compose fga) = Compose <$> traverse (traverse f) fga
+
+
