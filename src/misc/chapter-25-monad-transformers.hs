@@ -135,4 +135,76 @@ instance (Traversable f, Traversable g) =>
   Traversable (Compose f g) where
   traverse f (Compose fga) = Compose <$> traverse (traverse f) fga
 
+class Bifunctor p where
+  {-# MINIMAL bimap | first, second #-}
+  bimap :: (a -> b) -> (c -> d) -> p a c -> p b d
+  bimap f g = first f . second g
+
+  first :: (a -> b) -> p a c -> p b c
+  first f = bimap f id
+
+  second :: (b -> c) -> p a b -> p a c
+  second = bimap id
+
+
+-- It's a functor that can map over two type arguments instead of 
+-- just one. Write Bifunctor instances for the following types
+--
+data Deux a b = Deux a b
+data Const a b = Const a
+data Drei a b c = Drei a b c
+
+instance Bifunctor Deux where
+  first f (Deux a b) = Deux (f a) b 
+  second f (Deux a b) = Deux a (f b)
+
+instance Bifunctor Const where
+  first f (Const a) = Const (f a)
+  second f (Const a) = Const a
+
+-- 
+-- recall that this means `Drei a` is bound to `Bifunctor`
+-- and hence in the definitions, we can't use the type parameter `a`
+-- because its already bound, which implies that type parameter `b`
+-- and `c` are hence aka `a` and `b` when writing the implementation for
+-- `first` and `second`.
+--
+instance Bifunctor (Drei a) where
+  first f (Drei a b c) = Drei a (f b) c
+  second f (Drei a b c) = Drei a b (f c)
+
+{-
+ - IdentityT is going to help you begin to understand
+ - monad transformers. Using this type that doesnt' have a
+ - lot of interesting stuff going on with it will help keep us
+ - focused on the types and the important fundamentals of 
+ - transformers. What we see here will be applicable to other
+ - transformers as well, but types
+ -}
+
+newtype IdentityT f a = IdentityT { runIdentityT :: f a } deriving (Eq, Show)
+
+instance Functor f => Functor (IdentityT f) where
+  fmap f (IdentityT fa) = IdentityT $ f <$> fa
+
+--
+-- Quick lesson: the declaration of the Applicative for IdentityT 
+-- tells that the type parameter names like 'm' are bound in all expressions
+-- found later in the declarations. E.g. see where 'm' are declared
+--
+instance (Applicative m) => Applicative (IdentityT m) where
+  pure :: a -> IdentityT m a
+  pure x = IdentityT $ pure x 
+  (<*>) :: IdentityT m (a -> b) -> IdentityT m a -> IdentityT m b
+  (IdentityT fab) <*> (IdentityT fa) = IdentityT (fab <*> fa)
+
+--
+-- Now we can define Monads
+--
+instance (Monad m) => Monad (IdentityT m) where
+  return :: a -> IdentityT m a
+  return = pure
+  (>>=) :: IdentityT m a -> (a -> IdentityT m b) -> IdentityT m b
+  (IdentityT fa) >>= f = IdentityT $ fa >>= runIdentityT . f
+  
 
