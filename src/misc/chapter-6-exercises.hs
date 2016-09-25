@@ -65,3 +65,23 @@ instance Eq Mood where
 settleDown :: Mood -> Mood
 settleDown x = if x == Woot then Blah else x
 
+data Employee = Coder | Manager | Veep | CEO deriving (Eq, Show, Ord)
+
+reportBoss :: Employee -> Employee -> IO ()
+reportBoss e e' = putStrLn $ show e ++ " is the boss of " ++ show e'
+
+coderRules :: Employee -> Employee -> Ordering
+coderRules Coder Coder = EQ
+coderRules Coder _     = GT
+coderRules _     Coder = LT
+coderRules e e'        = compare e e'
+
+
+employeeRank :: (Employee -> Employee -> Ordering)
+            -> Employee -> Employee -> IO()
+employeeRank f e e' = 
+  case f e e' of
+    GT -> reportBoss e e'
+    EQ -> putStrLn "Neither employee is the boss"
+    LT -> (flip reportBoss) e e'
+
