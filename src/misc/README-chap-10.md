@@ -78,3 +78,39 @@ or reduction proceeds.
 foldr (+) 0 (take 5([1,2,3,4,5] ++ undefined))
 ```
 
+## foldr
+
+The rest of the fold (recursive invocation of _foldr_) is an 
+argument to the folding funciton you passed to _foldr_. It
+doesn't directly self-call as a tail-call like _foldl_. You could
+thik of it as alternating between applications of _foldr_ and your 
+folding function _f_. The next invocation of _foldr_ is conditional 
+on _f_ having asked for more of the results of having folded the list. That is:
+
+```
+foldr :: (a -> b -> b) -> b -> [a] -> b
+               ^
+```
+
+Associates to the right.
+
+Works with infinite lists. We know this because 
+```
+Prelude> foldr const 0 [0..1]
+1
+```
+
+## foldl
+
++ Self-calls (tail-call) through the list, only beginning to produce 
+  values after it's reached the end of the list.
+
++ Associates to the left.
+
++ Cannot be used with infinite lists. Try the infinite list example
+  earlier and your REPL will hang.
+
++ Is nearly useless and should almost always be replaced with _foldl'_
+  for reasons we will explain later as _foldl_ is not efficient.
+
+
