@@ -66,6 +66,31 @@ are monoidal (binary, associative and having an identity value) but
 each type should only have one unique instance for a given typeclass, not 
 two (one instance for a sum, one for a product)
 
+## Why `newtype` ?
+
+Use of a _newtype_ can be hard to justify or explain to people that don't 
+yet have a good intuition for how HAskell code gets compiled and the
+representations of data used by your computer in the course of executing 
+your programs. With that in mind, we will do our best and offer two explanations
+nitended for two different audiences. We will return to the topic of _newtype_
+in more detail later in the book.
+
+First, there's not much semantic difference (modulo _bottom_, explained later)
+between the two following datatypes:
+```haskell
+data Server = Server String
+
+newtype Server' = Server' String
+```
+
+The main differences are that using _newtype_ constrains the datatype
+to having a single unary data constructor and _newtype_ guarantees no
+additional runtime overhead in "Wrapping" the original type. That is, 
+the runtime representation of _newtype_ and what it wraps are always 
+identical - no additional "boxing up" of the data is necessary for
+typical products and sums.
+
+
 # Why you might use newtype
 
 - Signal intent: using `newtype` makes it clear that you only intend for
