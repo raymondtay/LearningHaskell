@@ -5,7 +5,7 @@ import Data.Monoid
 newtype Mem s a = Mem { runMem :: s -> (a, s) }
 
 instance Monoid a => Monoid (Mem s a) where
-  mempty = Mem $ \s -> (mempty, s)
+  mempty = Mem $ \s -> (mempty, s) -- Haskell understands from the type signature that 'a' is actually a Monoid which explains why it allows the expression 'mempty' 
   mappend msa msa' = Mem $ \_s -> (mappend (fst (runMem msa $ _s)) (fst (runMem msa' $ _s)), _s)
 
 f' = Mem $ \s -> ("hi", s + 1)
