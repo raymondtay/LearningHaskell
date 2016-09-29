@@ -21,3 +21,15 @@ liftedReplace'' = (fmap . fmap) replaceWithP
 
 liftedReplace''' :: (Functor f2, Functor f1, Functor f) => f(f1 (f2 a)) -> f(f1 (f2 Char))
 liftedReplace''' = (fmap . fmap . fmap) replaceWithP
+
+thriceLifted :: [Maybe [Char]] -> [Maybe [Char]]
+thriceLifted = liftedReplace'''
+
+main :: IO ()
+main = do
+  print (replaceWithP' lms)
+  print (liftedReplace lms)
+  print (liftedReplace' lms)
+  print (liftedReplace'' lms)
+  print (liftedReplace''' lms)
+
