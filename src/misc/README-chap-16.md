@@ -23,6 +23,10 @@ the `f` is `a` type that has an instance of the `Functor` typeclass.
 The return value is `f b`. It is the same `f` from `f a`, while the type argument `b`
 possibily but not necessarily refers to a different type.
 
+The first thing we know is that our `f` here must have the kind * -> * and we recall that a type constant or a fully applied type has the kind *. A type with kind * -> * is awaiting application to a type constant of type *. We know that the f in our Functor definition must be kind * -> * for a couple of reasons, which we would now describe:
+* Each argument and result in the type signature for a function must be a fully applied and inhabitable, module void, etc) type. Each argument must have the kind *.
+* The type f was applied to a single argument in two different places: f a and f b. Since f a and f b must each have the kind *, f by itself must be kind * -> *.
+
 # Functor Laws
 
 Instances of the functor typeclass should abide by two basic laws.
@@ -76,6 +80,17 @@ It might be obvious to say this but it doesn't hurt to know that the identity
 law is the law that prevents you from say `fmap _ ItDoesnt = WhatIsThisCalled`
 and similarly `fmap _ WhatIsThisCalled = ItDoesnt`. :-)
 </pre>
+
+But what if you do want a function that can change the value
+and the structure? We've got wonderful news for you: that exists!
+It's just a plain old function. Write one. Write many! The point of
+Functor is to reify and be able to talk about cases where we want to 
+reuse functions in the presence of more structure and be transparently
+oblivious to that additional structure. We already saw that Functor
+is in some sense just a special sort of function application, but 
+since it is special, we want to preserve the things about it that 
+make it different and more powerful than ordinary function application.
+So, we stick to the laws.
 
 # How about an _real world_ example ? :: Fun ::
 
