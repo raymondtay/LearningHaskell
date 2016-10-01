@@ -1,5 +1,13 @@
 module ReplaceExperiment where
 
+-- 
+-- Lifting in functional programming is to 
+-- really get to the value hidden within contexts.
+-- E.g. when we have a value that's "embedded" inside
+-- several layers of contexts and we want to run functions
+-- to transform the value, then we need a elegant way to 
+-- get to it and lifting is one way.
+--
 replaceWithP :: b -> Char
 replaceWithP = const 'p'
 
