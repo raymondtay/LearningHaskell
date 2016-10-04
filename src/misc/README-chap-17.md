@@ -1,3 +1,13 @@
+Applicative is a typeclass in Haskell; Applicatives can be thought 
+of characterizing monoidal functors in Haskell. For a Haskeller's purpose,
+it's a way to functorially apply a function which is embedded
+in structure 'f' of the same type as the value you're mapping over.
+```haskel
+fmap :: (a -> b) -> f a -> f b
+
+(<*>) :: f (a -> b) -> f a -> f b
+```
+
 The basic motivation of Applicative is probably
 best summed up by the following description:
 ```
