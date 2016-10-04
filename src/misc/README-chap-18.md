@@ -67,6 +67,11 @@ fmap f xs = xs >>= return . f
 [1..4] >>= return . (+1)
 [2,3,4,5]
 
+There's a difference between the expression `return . f` vs say `id . f` because
+of the fact that `return`adds the Monadic context around the value which allows us 
+to say `return . (\x -> x + 1) $ 5 :: Maybe Integer` and you cannot do that via
+`id . (\x -> x + 1) $ 5 :: Maybe Integer`.
+
 ```
 An interesting thing about Monads is the ability to order (i.e. chain) executions
 together but before we go about doing that, let's understand how we think it _should_
