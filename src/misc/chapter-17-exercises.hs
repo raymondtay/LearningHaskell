@@ -249,6 +249,16 @@ instance Monad (Sum a) where
 data Person = 
   Person Name Address deriving (Eq, Show)
 
+mkPerson  :: String -> String -> Maybe Person
+mkPerson n a = 
+  case mkName n of
+    Nothing -> Nothing
+    Just n' -> 
+      case mkAddress a of 
+        Nothing -> Nothing
+        Just a' -> 
+          Just $ Person n' a'
+
 --
 -- `something` is of type Maybe Person
 -- for the reason that `Person <$> Just (Name "Ray")` is of type Maybe(Address -> Person)
