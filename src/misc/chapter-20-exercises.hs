@@ -57,8 +57,8 @@ product = foldr mappend mempty
 elem :: (Foldable t, Eq a) => a -> t a -> Bool
 elem = any . ( == ) 
 
-newtype Max a = Max { getMax :: Maybe a} deriving (Eq,Ord)
-newtype Min a = Min { getMin :: Maybe a} deriving (Eq,Ord)
+newtype Max a = Max { getMax :: Maybe a} deriving (Eq,Ord,Show)
+newtype Min a = Min { getMin :: Maybe a} deriving (Eq,Ord,Show)
  
 instance Ord a => Monoid (Max a) where
   mempty = Max Nothing
