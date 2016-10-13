@@ -1,5 +1,10 @@
 module AboutStates where
 
+import Control.Applicative (liftA3)
+import Control.Monad (replicateM)
+import Control.Monad.Trans.State
+import System.Random
+
 newtype State s a = State { runState :: s -> (a , s) }
 
 {-
