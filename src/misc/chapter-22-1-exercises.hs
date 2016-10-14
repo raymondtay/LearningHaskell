@@ -162,6 +162,7 @@ x2 =
     (Nothing, Just r) -> Just (0, r)
     (_, _) -> Nothing     
 
---x3 :: Integer -> (Maybe Integer, Maybe Integer)
-x3 = (,) <$> [z', z']
-
+x3 :: Integer -> (Maybe Integer, Maybe Integer)
+--x3 n = (,) <$> (z' n) <*> (z' n)
+x3 n = (z' n, z' n) -- this works!
+    
