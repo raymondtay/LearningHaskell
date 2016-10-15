@@ -20,13 +20,3 @@ thriceLifted = (fmap . fmap . fmap) replaceWithP
 thriceLifted' :: [Maybe [Char]] -> [Maybe [Char]]
 thriceLifted' = thriceLifted
 
-
-data X a = X a deriving (Read, Show)
-let
-  f = read "[2]" :: [X Int]
-in
-  case f of 
-    ((X i):xs) -> do
-      print "I got a value: " ++ i
-      return i
-

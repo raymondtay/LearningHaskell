@@ -2,6 +2,29 @@ module Chap23 where
 
 import Control.Monad.Trans.State
 
+-- Inside System.Random, we see the following:
+-- ****************************
+-- Prelude System.Random> :i RandomGen
+-- class RandomGen g where
+--   next :: g -> (Int, g)
+--   genRange :: g -> (Int, Int)
+--   split :: g -> (g, g)
+--   {-# MINIMAL next, split #-}
+--   -- Defined in ‘System.Random’
+--   instance RandomGen StdGen -- Defined in ‘System.Random’
+--
+-- class Random a where
+--   randomR :: RandomGen g => (a, a) -> g -> (a, g)
+--   random :: RandomGen g => g -> (a, g)
+--   randomRs :: RandomGen g => (a, a) -> g -> [a]
+--   randoms :: RandomGen g => g -> [a]
+--   randomRIO :: (a, a) -> IO a
+--   randomIO :: IO a
+--   {-# MINIMAL randomR, random #-}
+--   -- Defined in ‘System.Random’
+-- *****************************
+
+
 -- `Moi s a` is another way to write s -> (a, s)
 -- and it can be confusing because we think there's
 -- a special way to interpret `Moi s a`
