@@ -28,3 +28,20 @@ One of the hardest problems in writing parsers, especially the parser libraries 
 is making it easy to express things the way the programmer would like, but still have the resulting
 parser be fast.
 
+## Definitions
+
+A _parser combinator_ combines two or more parsers to produce a new parser.
+Good examples of this are things like using <|> from Alternative to produce
+a new parser from the disjunction of two parser arguments to <|>. Or `some`. Or `many`.
+Or `mappend`. Or `(>>)`.
+
+_Marshalling_ is transforming a potentially non-linear representation of data in 
+memory into a format that can be stored on disk or transmitted over a network socket.
+Going in the opposite direction is called _unmarshalling_. Coming from Java, you would
+be familiar with _serialization_ and _deserialization_.
+
+A _tokenizer_ converts text, usually a stream of characters, into more meaningful or "chunkier"
+structures such as words, sentences or symbols. The `lines` and `words` functions you've used
+earlier in this book are like very unsophisticated tokenizers.
+
+
