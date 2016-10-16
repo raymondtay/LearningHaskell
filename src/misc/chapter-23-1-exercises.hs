@@ -1,3 +1,5 @@
+{-# LANGUAGE InstanceSigs #-}
+
 module RandomExample where
 
 import Control.Applicative (liftA3)
@@ -99,5 +101,44 @@ rollsToGetTwenty g = go 0 0 g
 --
 rollsToGetN :: Int -> StdGen -> Int
 rollsToGetN = undefined
+
+
+--
+-- Despite a few months ago, this is still tricky for me.
+-- Sigh :( - just keep trying but in any case, again you (i mean "me")
+-- need to remember that `Moi s a` is another way of writing `s -> (a, s)`
+--
+newtype Moi s a = Moi { runMoi :: s -> (a, s) }
+
+instance Functor (Moi s) where
+  fmap :: (a -> b) -> Moi s a -> Moi s b
+  fmap f (Moi g) = Moi $ \s -> let (a, s1) = g s in (f a, s1) 
+
+-- 
+-- Writing or exposing the type signature of the various
+-- functions i'm trying to provide an explanation of is
+-- useful and helpful in helping me work through as a beginner
+--
+instance Applicative (Moi s) where
+  pure :: a -> Moi s a
+  pure a = Moi $ \s -> (a, s)
+
+  (<*>) :: Moi s (a -> b) -> Moi s a -> Moi s b
+  (Moi f) <*> (Moi g) = 
+    Moi $ \s ->
+    let
+      (f', _) = f s -- pull the `a -> b` out from f
+      (a', _) = g s -- pull the value from `s -> (a, s)` of g
+    in (f' a', s) -- we basically ignore the derived states from the application of 's' to 'f' and 'g'
+
+instance Monad (Moi s) where
+  return = pure
+
+  (>>=) :: Moi s a -> (a -> Moi s b) -> Moi s b
+  (Moi f) >>= g = Moi $ \s ->
+    let
+      (a, _) = f s -- alternatively, we can write `a = fst $ f s`
+      (b, _) = runMoi (g a) $ s -- alternatively, we can write `b = fst $ runMoi (g a) $ s`
+    in (b, s)
 
 

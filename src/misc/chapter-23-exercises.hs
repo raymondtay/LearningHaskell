@@ -52,9 +52,9 @@ instance Applicative (Moi s) where
   -- (<*>) :: Moi s (a -> b) -> Moi s a -> Moi s b
   (Moi f) <*> (Moi g) = Moi $ \s ->
     let 
-      (a, g1) = g s -- "pull" the "a" out from the State
+      (a, _) = g s -- "pull" the "a" out from the State
       (f', _) = f s -- "pull" the function out from the State
-    in (f' a, g1)
+    in (f' a, s) -- ignore the derived states from the input states
 
 --
 -- Similarly as in Applicative and Functor, i applied
@@ -65,9 +65,9 @@ instance Monad (Moi s) where
   -- (>>=) :: Moi s a -> (a -> Moi s b) -> Moi s b
   (Moi f) >>= g = Moi $ \s -> 
     let 
-      (a, s1) = f s
-      (b, s2) = runMoi (g a) $ s -- is it 's' or 's1' ?
-    in (b, s2)
+      (a, _) = f s
+      (b, _) = runMoi (g a) $ s -- is it 's' or 's1' ?
+    in (b, s)
 
 
 --
