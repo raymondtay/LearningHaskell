@@ -2,6 +2,8 @@
 
 module Chap25 where
 
+import Data.Foldable
+
 --
 -- `{-# LANGUAGE InstanceSigs #-}` 
 -- Allows type signatures to be specified in 
@@ -35,6 +37,14 @@ instance (Applicative f, Applicative g) => Applicative (Compose f g) where
   (Compose f') <*> (Compose a') = Compose $ ((<*>) <$> f') <*> a'
 
 
+instance (Foldable f, Foldable g) => Foldable (Compose f g) where
+  foldMap f (Compose fga) = (foldMap . foldMap) f fga
+
+
+instance (Traversable f, Traversable g) => Traversable (Compose f g) where
+  -- traverse :: Applicative f => (a -> f b) -> t a -> f (t b)
+  traverse f (Compose fga) = Compose <$> (traverse . traverse) f fga
+
 -- 
 -- Here's how a multi-layered functor can be potentially 
 -- expressed.
@@ -56,6 +66,29 @@ instance (Functor f, Functor g, Functor h) => Functor (Three f g h) where
 --
 --
 
+-- 
+-- It's a functor that can map over two type arguments instead of just one.
+--
+class Bifunctor p where
+  {-# MINIMAL bimap | first, second #-}
+
+  bimap :: (a -> b) -> (c -> d) -> p a c -> p b d
+  bimap f g = first f . second g
+
+  first :: (a -> b) -> p a c -> p b c
+  first f = bimap f id
+
+  second :: (b -> c) -> p a b -> p a c
+  second = bimap id
 
 
+data Deux a b = Deux a b deriving (Show)
+
+instance Bifunctor Deux where
+  bimap f g = first f . second g
+
+data Const a b = Const a
+instance Bifunctor Const where
+  first f = bimap f id
+  second = bimap id
 
