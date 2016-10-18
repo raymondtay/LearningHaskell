@@ -92,3 +92,58 @@ instance Bifunctor Const where
   first f = bimap f id
   second = bimap id
 
+data Drei a b c = Drei a b c 
+instance Bifunctor (Drei a) where
+  first f = bimap f id
+  second = bimap id
+
+data SuperDrei a b c = SuperDrei a b
+instance Bifunctor (SuperDrei a) where
+  first f = bimap f id
+  second = bimap id
+
+data SemiDrei a b c = SemiDrei a 
+instance Bifunctor (SemiDrei a) where
+  first f = bimap f id 
+  second = bimap id
+
+data Quadriceps a b c d = Quadzzz a b c d
+instance Bifunctor (Quadriceps a b) where
+  first f = bimap f id
+  second = bimap id
+
+-- See the README-chap-25.md for a detailed explanation of how
+-- this works.
+monads_1 = [Right 4] >>= (\x -> [Right (+4) <*> x])
+monads_2 = [[Right 4]] >>= (\x -> x >>= (\y -> [Right (+4) <*> y]))
+
+-- 
+-- Understanding Monad Transformers
+-- 
+newtype Identity a = Identity { runIdentity :: a } deriving (Eq, Show)
+
+newtype IdentityT f a = IdentityT { runIdentityT :: f a } deriving (Eq, Show)
+
+instance Functor Identity where
+  fmap f (Identity a) = Identity (f a )
+
+instance (Functor m) => Functor (IdentityT m) where
+  fmap f (IdentityT fa) = IdentityT (fmap f fa)
+
+instance Applicative Identity where
+  pure = Identity
+  (Identity f) <*> (Identity a) = Identity (f a)
+
+instance (Applicative m) => Applicative (IdentityT m) where
+  pure x = IdentityT (pure x)
+  (IdentityT fab) <*> (IdentityT fa) = IdentityT (fab <*> fa)
+
+instance Monad Identity where
+  return = pure
+  (Identity a) >>= f = f a
+
+instance (Monad m) => Monad (IdentityT m) where
+  return = pure
+  (IdentityT ma) >>= f = IdentityT $ ma >>= runIdentityT . f
+
+
