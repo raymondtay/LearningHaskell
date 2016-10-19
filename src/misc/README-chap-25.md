@@ -167,5 +167,34 @@ Applicative instance for `m` to handle that bit, this instance defines how to
 applicatively apply in the presence of that outer IdentityT layer.
 
 
+## Finding a pattern
 
+Transformers are bearers of single-type concrete information that lets you 
+create ever-bigger Monads in a sense. Nesting such as 
+```haskell
+(Monad m) => m (m a)
+``` 
+has been addressed by `join` already. We use transformers when we want a `>>=`
+operation over `f` and `g` of different types (but both have Monad instances).
+You have to create new types called monad transformers and write Monad instances
+for those types to have a way of dealing with the extra structure generated.
+
+The general pattern is this : You want to compose two polymorphic types, f and g, 
+that each have a Monad instance. But you'll end up with this pattern:
+```haskell
+f (g (f b))
+```
+Monad's bind cannot join these types, not with that intervening g. So you need to 
+get to this:
+```haskell
+f (f b)
+```
+You won't be able to unless you have some way of folding the g in the middle.
+You cannot do that with just Monad. The essence of Monad is `join`, but here
+you have only one bit of g structure, not `g (g ...)` so that's not enough.
+The straightforward thing to do is to make `g` concrete. With concrete type information
+for hte "inner" bit of structure, we can fold out the g and get on with it. 
+The good news is that transformers don't require f be concrete; f can remain 
+polymorphic so long as it has a Monad instance, so we only write a transformer 
+once for each type.
 
