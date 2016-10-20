@@ -147,3 +147,5 @@ instance (Monad m) => Monad (IdentityT m) where
   (IdentityT ma) >>= f = IdentityT $ ma >>= runIdentityT . f
 
 
+innerMost :: [Maybe (Identity (a -> b))] -> [Maybe (Identity a -> Identity b)]
+innerMost = (fmap . fmap) (<*>)
