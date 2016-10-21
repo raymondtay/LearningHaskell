@@ -149,3 +149,41 @@ instance (Monad m) => Monad (IdentityT m) where
 
 innerMost :: [Maybe (Identity (a -> b))] -> [Maybe (Identity a -> Identity b)]
 innerMost = (fmap . fmap) (<*>)
+
+
+{-
+ - *Chap25> :t fmap
+ - fmap :: Functor f => (a -> b) -> f a -> f b
+ - *Chap25>
+ - *Chap25> :t (<*>)
+ - (<*>) :: Applicative f => f (a -> b) -> f a -> f b
+ - *Chap25>
+ - *Chap25>
+ - *Chap25> :t fmap (<*>)
+ - fmap (<*>)
+ -   :: (Applicative f1, Functor f) =>
+ -        f (f1 (a -> b)) -> f (f1 a -> f1 b)
+ -        *Chap25>
+ -}
+
+
+
+second' :: [Maybe (Identity a -> Identity b)] -> [Maybe (Identity a) -> Maybe (Identity b)]
+second' = fmap (<*>)
+
+final' :: [Maybe (Identity a) -> Maybe (Identity b)] -> [Maybe (Identity a)] -> [Maybe (Identity b)]
+final' = (<*>)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
