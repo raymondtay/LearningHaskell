@@ -1,6 +1,7 @@
 module Chapter26_1 where
 
 import Control.Monad.Trans.Reader
+import Control.Monad.Trans.State.Lazy
 import Data.Functor.Identity
 
 -- 
@@ -96,4 +97,40 @@ rPrintAndInc = let
 -- Hi: 9
 -- Hi: 10
 -- [2,3,4,5,6,7,8,9,10,11]
+--
+--
+
+-- Now, for the last exercise in chapter 26
+
+-- 
+-- sPrintIncAccum first prints the input with a greeting, then puts 
+-- the incremented input as the new state, and returns the original 
+-- input as a String.
+-- StateT a IO String means (\a -> IO(String, a))
+--
+-- 
+
+sPrintIncAccum :: (Num a, Show a) => StateT a IO String
+sPrintIncAccum = let
+    printConsole :: (Show b, Num b) => b -> IO (String, b)
+    printConsole a = do putStrLn ("Hi: " ++ show a); return $ (,) (show a) (a+1)
+  in StateT $ printConsole  
+
+-- 
+-- According to the book, we need to have our function perform 2 use cases, here it is:
+-- *Chapter26_1 Control.Monad.IO.Class Control.Monad.Trans.Reader Data.Functor.Identity Control.Monad.Trans.State.Lazy> runStateT sPrintIncAccum 10
+-- Hi: 10
+-- ("10",11)
+-- *Chapter26_1 Control.Monad.IO.Class Control.Monad.Trans.Reader Data.Functor.Identity Control.Monad.Trans.State.Lazy> mapM (runStateT sPrintIncAccum) [1..10]
+-- Hi: 1
+-- Hi: 2
+-- Hi: 3
+-- Hi: 4
+-- Hi: 5
+-- Hi: 6
+-- Hi: 7
+-- Hi: 8
+-- Hi: 9
+-- Hi: 10
+-- [("1",2),("2",3),("3",4),("4",5),("5",6),("6",7),("7",8),("8",9),("9",10),("10",11)]
 --
