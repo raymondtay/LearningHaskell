@@ -25,3 +25,9 @@ a definition, and then data constructors (or names of values that inhabit your t
 
 These numeric datatypes all have instances of a typeclass called `Num`. Typeclasses are a way of adding functionality to types that is resuable across all the types that have instances of that typeclass. `Num` is a typeclass for which most numeric types will have an instance because there are standard functions that are convenient to have available for all types of numbers. The `Num` typeclass is what 
 provides your standard`(+)`, `(-)` and `(*)` operators along with a few others. Any type that has an instance of `Num` can be used with those functions.
+
+In Haskell, the `Bool` data type comes standard in the `Prelude`. `Bool` is a sump type with two constructors. For now, it is enough to understand that sum types means `or` or logical disjunction. 
+
+In Haskell, there are six categories of entities that have names. First, there are variables and data constructors which exist at the term-level. Term-level is where your values live and is the code that executes when your program is running. At the type-level, which is used during the static analysis and verification of your program, we have type variables, type constructors and typeclasses. Lastly, for the purpose of organizing our code into coherent groupings across different files (more later), we have modules which have names as well.
+
+
