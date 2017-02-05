@@ -32,3 +32,15 @@ composition opeartors. Quite often, the pointfree code is tidier on the page
 and easier to read as it helps the reader focus on the functions rather than
 the data that is being shuffled around.
 
+Pointfree is programming tacitly, or without mentioning arguments by name. This
+tends to look like plumby code where you are routing data around implicitly or
+leaving off unnecessary arguments thanks to currying. The "point" referred to
+in the term pointfree is an argument.
+
+Bottom is a non-value used to denote that the program cannot returna value or
+result. The msot elemental manifestaition o fthis is aprogram that lops
+infinitely. Other forms can involve things like writign a function that doesn't
+handled all of its inputs and fails on a pattern match. Bottoms can be useful
+as a canary for signalling when code paths are being evaluated.
+
+
