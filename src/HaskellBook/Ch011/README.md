@@ -25,4 +25,41 @@ in more detail than we have covered so far. Let's begin with a review of
 the important parts of datatypes, using the data constructors for `Bool` and
 `lists`:
 
+# Data and Type constructors
 
+There are two kinds of constructors in Haskell: type constructors and data
+constructors. Type constructors are used only at the type level, in type
+signatures and typeclass declarations and instances. Types are static and
+resolve at compile time. Data constructors construct the values at term level,
+values you can interact with at runtime. 
+
+Type and data constrcutros that take no arguments are constatns. They can only
+store a fixed type and amount of data. However, sometimes we need the
+flexibility of allowing diferent types or amounts of data to be stored in our
+datatypes. For those times, type and data constructors may be parameteric. When
+a constructor takes an argument, then it is like a function in at least one
+sense - it must be applied to become a concrete type or value. The following
+datatypes are psedonymous versions of real datatypes in Haskell.
+
+
+# What's a type and what's data?
+
+Types are static and resolve at compile time. Types are known before runtime,
+whether through explicit declaration or type inference, and that's what makes
+them static types. Information about types does not persist through to runtime.
+Data are waht we are working with at runtime.
+
+Here compile time is literally when your program is getting compiled by GHC or
+checked before execution in a REPL like GHCi. Runtime is the actual execution
+of your program. Types circumscribe values and in that way, they describe which
+values are flowing through what parts of your program.
+
+# What makes these datatypes algebraic
+
+ADTs in Haskell are algebraic because we can descirbe the patterns of argument
+structures using two basic operations: sum and product. The most direct way to
+explain why they are called sum and product is to demonstrate sum and prodcut
+in terms of cardinality. This can be understood in terms of the cardinality you
+see with finite sets. This doesn't map perfectly as we can have infinite data
+structures in Haskell, but it's a good way to begin understanding and
+appreciating how datatypes work.
