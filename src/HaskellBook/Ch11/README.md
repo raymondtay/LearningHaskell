@@ -63,3 +63,18 @@ in terms of cardinality. This can be understood in terms of the cardinality you
 see with finite sets. This doesn't map perfectly as we can have infinite data
 structures in Haskell, but it's a good way to begin understanding and
 appreciating how datatypes work.
+
+# Sum Types
+
+The `|` represents logical disjunction - that is , "or". This is the _sum_ in
+algebraic datatypes. To know the cardinality of sum types, we _add_ the
+cardinalities of their data constructors. `True` and `False` take no type
+arguments and thus are nullary constructors, each with a value of 1.
+
+# Product Types
+
+What does it mean for a type to be a product? A product type's cardinality is
+the _product_ of the cardinality of its inhabitants. Arithmeticallh speaking,
+products are _multiplication_. Where a sum type expresses `or`, product types
+talk about `and`.
+
