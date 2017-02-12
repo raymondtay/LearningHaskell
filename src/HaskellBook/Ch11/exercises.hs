@@ -68,6 +68,68 @@ data Automobile = Null
 -- instead of only as an inline data constructor product.
 --
 
+data BinaryTree a = Leaf | Node (BinaryTree a) a (BinaryTree a) deriving (Eq, Ord, Show)
+
+--
+-- if the incoming value i.e. v is equal to a then there isn't a need to
+-- replace the value of 'a' with that of 'v'
+-- otherwise we continue to push either to the left tree or right tree
+-- depending on whether its bigger or smaller
+-- What you would notice is that in the end of this process, the tree is
+-- sorted.
+--
+insert' :: Ord a => a -> BinaryTree a -> BinaryTree a
+insert' v Leaf = Node Leaf v Leaf
+insert' v (Node left x right) 
+  | v == x = Node left x right
+  | v <  x = Node (insert' v left) x right
+  | v >  x = Node left v (insert' v right)
+
+
+mapTree :: (a -> b) -> BinaryTree a -> BinaryTree b
+mapTree _ Leaf = Leaf
+mapTree f (Node left a right) = 
+  Node (mapTree f left) (f a) (mapTree f right)
+
+testTree' ::  BinaryTree Integer
+testTree' = Node (Node Leaf 3 Leaf) 1 (Node Leaf 4 Leaf)
+
+mapExpected = Node (Node Leaf 4 Leaf) 2 (Node Leaf 5 Leaf)
+
+mapOkay = 
+  if mapTree (+1) testTree' == mapExpected
+      then print "yup okay!"
+      else error "test failed!"
+
+preorder :: BinaryTree a -> [a]
+preorder Leaf = []
+preorder (Node left a right) = [a] ++ preorder left ++ preorder right
+
+inorder :: BinaryTree a -> [a]
+inorder = undefined
+
+postorder :: BinaryTree a -> [a]
+postorder = undefined
+
+-- 
+-- Over here, i made use of the preorder function to overcome the problem of
+-- having to associated type constraints over the types 'a' and 'b'; there
+-- seems to be a pattern here.
+--
+foldTree :: (a -> b -> b) -> b -> BinaryTree a -> b
+foldTree f x Leaf = x
+foldTree f x tree = foldr f x (preorder tree)
+
+-- As-patterns
+--
+-- These sorts of things are a good way to pattern match on part of something
+-- and still refer to the entire original value.
+--
+
+f :: Show a => (a, b) -> IO (a, b)
+f t@(a, _) = do
+  print a
+  return t
 
 
 

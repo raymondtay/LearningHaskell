@@ -78,3 +78,31 @@ the _product_ of the cardinality of its inhabitants. Arithmeticallh speaking,
 products are _multiplication_. Where a sum type expresses `or`, product types
 talk about `and`.
 
+# Higher-kinded datatypes
+
+Kinds are the types of type constructors, primarily encoding the number of
+arguments they take. The default kind in Haskell is *. Kind signatures work
+like type signatures, using the same :: and -> syntax, but there are only a few
+kinds and you will most often see *.
+
+Kinds are not types until they are fully applied. Only types have inhabitants
+at the term level. The kind * -> * is waiting for a single * before it is fully
+applied. The kind * -> * -> * must be applied twice before it willbe a real
+type. This is knmown as a higher-kinded type.
+
+Gettig comfortable with higher-kinded types is important as type arguments
+provide a genric way to express a hole to be filled by consumers of your
+datatype later. 
+
+## Lists as polymorphic types
+
+Any operator that starts with a colon must be an infix type or data
+constructor. All infix data constructors must start with a colon. The type
+constructor of functions (->) is the only infix type constructor that doesn't
+start with a colon. Another exception is that they cannot be :: as this syntax
+is preserved for type assertions.
+
+Type constructors are functions one level up, structuring things that cannot
+exist at runtime - it is purely static and describes the srtcuture of our
+types.
+
