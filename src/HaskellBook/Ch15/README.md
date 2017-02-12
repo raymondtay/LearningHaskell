@@ -23,3 +23,19 @@ class Monoid m where
   mconcat = foldr mappend mempty
 ```
 
+Integers form a monoid under summation and multiplication. We can similarly say
+that lists form a monoid under concatenation.
+
+It's worth pointing out here that numbers are not the only sets that have more
+than one possible monoid. Lists have more than one possible monoid, although
+for now we are only working with concatenation. We usually enforce the unique
+instance rule by using `newtype` to separate the different monoidal behaviors.
+
+A variant of monoid that provides even stronger guarantees is the abelian or
+commutative monoid. Commutativity can be particularly helpful when doing
+concurrent or distributed processing of data because it means the intermediate
+results being computed in a different order would not change the eventual
+answer.
+
+Monoids are even strongly associated with the concept of folding or
+catamorphism - something we do all the time in Haskell.
