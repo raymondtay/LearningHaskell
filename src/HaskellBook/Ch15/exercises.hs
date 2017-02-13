@@ -5,6 +5,35 @@
 --
 module Chapter15 where
 
+import Control.Monad
+import Data.Monoid
+import Test.QuickCheck
+data Bull = Fools | Twoo deriving (Eq, Show)
+instance Arbitrary Bull where
+  arbitrary = frequency[(1, return Fools), (1, return Twoo)]
+
+instance Monoid Bull where
+  mempty = Fools
+  mappend _ _ = Fools
+
+
+monoidAssoc :: (Eq m, Monoid m) => m -> m -> m -> Bool
+monoidAssoc a b c = (a <> (b <> c)) == ((a <> b) <> c)
+
+monoidRightIdentity :: (Eq m, Monoid m ) => m -> Bool
+monoidRightIdentity a = (a <> mempty) == a
+
+monoidLeftIdentity :: (Eq m, Monoid m ) => m -> Bool
+monoidLeftIdentity a = (mempty <> a) == a
+
+type BullAppend = Bull -> Bull -> Bull -> Bool
+
+main :: IO ()
+main = do
+  quickCheck (monoidAssoc :: BullMapped)
+  quickCheck (monoidLeftIdentity :: Bull -> Bool)
+  quickCheck (monoidRightIdentity :: Bull -> Bool)
+
 data Optional a = Nada | Only a deriving (Eq, Show)
 
 -- 
@@ -26,5 +55,33 @@ instance Monoid a => Monoid (Optional a) where
 -- *Chapter15 Data.List Data.Monoid> Nada <> Only (Sum 1)
 -- Nada
 --
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
