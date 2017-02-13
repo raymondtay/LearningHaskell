@@ -39,3 +39,29 @@ answer.
 
 Monoids are even strongly associated with the concept of folding or
 catamorphism - something we do all the time in Haskell.
+
+Commutativity is a strong property and can be useful in circumstances when you
+might need to be able to reorder evaluation of your data for efficiency
+purposes without needing to worry about the result changing. Distributed
+systems use commutative monoids in designing and thinking about constraints,
+which are monoids that guarantee their operation commutes.
+
+Monoid abides by the law of associativity but not the law of commutativity,
+even though some monoidal operations are commutative.
+
+# The problem of orphan instances
+
+
+Sometime, we do end up with multiple instances for a single type when orphan
+instances are written. But writing orphan instances should be avoided at all
+costs.
+Do not be lazy about this! If you get an orphan instance warning from GHC, fix
+it.
+
+An orphan instance is when an instance is defined for a datatype and
+typeclass,but not in the same module as either the declaration of the typeclass
+or the datatype. If you don't own the typeclass or the datatype, newtype it!
+
+If you want an orphan instance so that you can have multiple instances for the
+same type, you still want to use newtype.
+
