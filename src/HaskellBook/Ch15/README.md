@@ -65,3 +65,25 @@ or the datatype. If you don't own the typeclass or the datatype, newtype it!
 If you want an orphan instance so that you can have multiple instances for the
 same type, you still want to use newtype.
 
+# Semigroup
+
+```haskell
+
+class Semigroup a where
+  (<>) :: a -> a -> a
+  
+(a <> b) <> c = a <> (b <> c) 
+
+```
+
+Semigroup still provides a binary associative operation, one that typically
+joins two things together (as in concatenation or summation) but doesn't have
+an identity value. In that sense, its a _weaker_ algebra.
+
+## NonEmpty a useful datatype
+
+`NonEmpty` is defined as follows:
+
+```haskell
+data NonEmpty a = a :| [a] deriving (Eq, Show, Ord)
+```
