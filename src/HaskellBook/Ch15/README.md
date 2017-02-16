@@ -87,3 +87,33 @@ an identity value. In that sense, its a _weaker_ algebra.
 ```haskell
 data NonEmpty a = a :| [a] deriving (Eq, Show, Ord)
 ```
+
+## Strength in an algebra can be weakness
+
+When haskellers talk about the strength of an algebra, they usually mean the
+number of operations it provides which in turn expands what you can do with any
+given instance of that algebra without needing to know specifically what type
+you are working with.
+
+The reason we cannot and do not want to simply make all of our algebras as big
+as possible is that there are datatypes which are very useful
+representationally, but which do not have the ability to satisfy everything in
+a larger algebra that could work fine if you removed an operation or law. This
+becomes a serious problem if NonEmpty is the right datatype for something in
+the domain you are representing. If you are an experienced programmer, think
+carefully. How many times have you meant for a list to never be empty? 
+
+To guarantee this and make the types more informative, we use types like
+NonEmpty. The problem is that NonEmpty has no identity value for the combining
+operation (`mappend`) in `Monoid`. So, we keep the associativity but drop the
+identity value and its laws of left and right identity. This is what introduces
+the need for and idea of Semigroup from a datatype.
+
+Polymorphism isn't only useful for reusing code; it is also useful for
+expressing intent through parametericity so that people reading the code know
+what we meant to accomplish.
+
+When Monoid is too strong or more than we need, we can use Semigroup. If you
+are wondering what's weaker than Semigroup, the usual next step is removing the
+associativity requirement, giving you a magma.
+

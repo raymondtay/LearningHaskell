@@ -5,7 +5,10 @@ module Chapter15_3 where
 import Control.Monad
 import Data.Monoid
 import Test.QuickCheck
+import Data.Semigroup
 
+-- Turns out <> exists both in Monoid and Semigroup
+--
 monoidRightIdentity :: (Eq m, Monoid m ) => m -> Bool
 monoidRightIdentity a = (a <> mempty) == a
 
@@ -34,7 +37,7 @@ instance Semigroup Trivial where
 instance Arbitrary Trivial where
   arbitrary = return Trivial
 
-semigroupAssoc :: (Eq m, Semigroup m) => m -> m -> -> m -> Bool
+semigroupAssoc :: (Eq m, Semigroup m) => m -> m -> m -> Bool
 semigroupAssoc a b c = (a <> (b <> c)) == ((a <> b) <> c)
 
 type TrivialAssoc = Trivial -> Trivial -> Trivial -> Bool
