@@ -26,11 +26,11 @@ monoidRightIdentity a = (a <> mempty) == a
 monoidLeftIdentity :: (Eq m, Monoid m ) => m -> Bool
 monoidLeftIdentity a = (mempty <> a) == a
 
-type BullAppend = Bull -> Bull -> Bull -> Bool
+type BullMappend = Bull -> Bull -> Bull -> Bool
 
 main :: IO ()
 main = do
-  quickCheck (monoidAssoc :: BullMapped)
+  quickCheck (monoidAssoc :: BullMappend)
   quickCheck (monoidLeftIdentity :: Bull -> Bool)
   quickCheck (monoidRightIdentity :: Bull -> Bool)
 

@@ -3,47 +3,58 @@
 module Chapter15_3 where
 
 import Control.Monad
-import Data.Monoid
-import Test.QuickCheck
-import Data.Semigroup
+import qualified Data.Semigroup as S
 
 -- Turns out <> exists both in Monoid and Semigroup
+-- The exercises here relates to **Semigroups**
 --
-monoidRightIdentity :: (Eq m, Monoid m ) => m -> Bool
-monoidRightIdentity a = (a <> mempty) == a
 
-monoidLeftIdentity :: (Eq m, Monoid m ) => m -> Bool
-monoidLeftIdentity a = (mempty <> a) == a
+-- 
+-- 12 (see below)
+--
+newtype AccumulateRight a b = AccumulateRight (Validation a b) deriving (Eq, Show)
+instance (S.Semigroup a, S.Semigroup b) => S.Semigroup (AccumulateRight a b) where
+  (AccumulateRight (Success a)) <> (AccumulateRight (Success b)) = AccumulateRight (Success (a S.<> b))
+  (AccumulateRight (Failure a)) <> _ = AccumulateRight (Failure a)
 
-monoidAssoc :: (Eq m, Monoid m) => m -> m -> m -> Bool
-monoidAssoc a b c = (a <> (b <> c)) == ((a <> b) <> c)
+--
+-- 11 (see below)
+--
+data Validation a b = Failure a | Success b deriving (Eq, Show)
+instance (S.Semigroup a, S.Semigroup b) => S.Semigroup (Validation a b) where
+  (Failure a) <> _ = Failure a
+  (Success b) <> (Success c) = Success (b S.<> c)
+  (Success b) <> _ = Success b
 
+--
+-- 10 (see below)
+--
+newtype Comp a = Comp { unComp :: (a -> a) }
+instance S.Semigroup a => S.Semigroup (Comp a) where
+  (Comp f) <> (Comp g) = Comp $ (\x -> (f S.<> g) x)
 
+-- 
+-- 9  (see below)
+--
+newtype Combine a b = Combine { unCombine :: (a -> b) }
+instance (S.Semigroup b) => S.Semigroup (Combine a b) where
+  (Combine f) <> (Combine g) = Combine $ (\x -> (f S.<> g) x)
 
-data Optional a = Nada | Only a deriving (Eq, Show)
-instance Monoid a => Monoid (Optional a) where
-  mempty = Nada
-  mappend :: Optional a -> Optional a -> Optional a
-  mappend Nada _ = Nada
-  mappend (Only a) Nada = Only a
-  mappend (Only a) (Only b) = Only (mappend a b)
+--
+-- 8 (see below)
+--
+data Or a b = Fst a | Snd b
 
+showOr :: (Show a, Show b) => Or a b -> String
+showOr (Fst a) = "Fst " ++ show a
+showOr (Snd b) = "Snd " ++ show b
 
-data Trivial = Trivial deriving (Eq, Show)
+instance (Show a, Show b) => Show (Or a b) where
+  show = showOr
 
-instance Semigroup Trivial where
-  _ <> _ = undefined
-
-instance Arbitrary Trivial where
-  arbitrary = return Trivial
-
-semigroupAssoc :: (Eq m, Semigroup m) => m -> m -> m -> Bool
-semigroupAssoc a b c = (a <> (b <> c)) == ((a <> b) <> c)
-
-type TrivialAssoc = Trivial -> Trivial -> Trivial -> Bool
-
-main :: IO ()
-main = do
-  quickCheck (semigroupAssoc :: TrivialAssoc)
+instance S.Semigroup (Or a b) where
+  (Fst a) <> (Fst b) = Fst b
+  (Fst a) <> (Snd b) = Snd b
+  (Snd a) <> _ = Snd a 
 
 
