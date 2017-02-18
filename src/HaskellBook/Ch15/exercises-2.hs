@@ -2,42 +2,40 @@
 
 module Chapter15_2 where
 
-import Control.Monad
-import Data.Monoid
-import Test.QuickCheck
+import qualified Data.Monoid as M
+import qualified Data.Semigroup as S
 
-monoidRightIdentity :: (Eq m, Monoid m ) => m -> Bool
-monoidRightIdentity a = (a <> mempty) == a
+data Trivial = Trivial deriving (Eq, Show)
 
-monoidLeftIdentity :: (Eq m, Monoid m ) => m -> Bool
-monoidLeftIdentity a = (mempty <> a) == a
+instance S.Semigroup Trivial where
+  Trivial <> Trivial = Trivial
 
+instance M.Monoid Trivial where
+  mappend Trivial Trivial = Trivial
+  mempty = Trivial
 
-monoidAssoc :: (Eq m, Monoid m) => m -> m -> m -> Bool
-monoidAssoc a b c = (a <> (b <> c)) == ((a <> b) <> c)
+--
+-- 4
+--
+newtype BoolConj = BoolConj Bool deriving Show
+instance Monoid BoolConj where
+  mempty = BoolConj False
+  mappend (BoolConj False) (BoolConj True) = BoolConj True
+  mappend (BoolConj False) _ = BoolConj False
+  mappend (BoolConj True) _ = BoolConj True 
 
-data Optional a = Nada | Only a deriving (Eq, Show)
-instance Monoid a => Monoid (Optional a) where
-  mempty = Nada
-  mappend :: Optional a -> Optional a -> Optional a
-  mappend Nada _ = Nada
-  mappend (Only a) Nada = Only a
-  mappend (Only a) (Only b) = Only (mappend a b)
+--
+-- 8 
+--
 
-newtype First' a = First' { getFirst' :: Optional a  } deriving (Eq, Show)
+newtype Mem s a = Mem { runMem :: s -> (a, s) }
 
-instance Monoid a => Monoid (First' a) where
-  mempty = First' Nada
-  mappend (First' a) (First' b) = First' (mappend a b)
+instance Monoid a => Monoid (Mem s a) where
+  mempty = Mem (\x -> (mempty, x)) -- the type signature hinted at `a` being a `Monoid`
+  --mappend = undefined
+  mappend (Mem f) (Mem g) = Mem (\s -> 
+    let (a1, s1) = (f s)
+        (a2, s2) = (g s)     
+    in (a2, s))
 
-firstMappend :: First' a -> First' a -> First' a
-firstMappend = mappend
-
-type FirstMappend = First' String -> First' String -> First' String -> Bool
-
-main :: IO ()
-main = do
-  quickCheck (monoidAssoc :: FirstMappend)
-  quickCheck (monoidLeftIdentity :: FirstMappend)
-  quickCheck (monoidRightIdentity :: FirstMappend)
 
