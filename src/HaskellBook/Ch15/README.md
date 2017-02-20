@@ -117,3 +117,21 @@ When Monoid is too strong or more than we need, we can use Semigroup. If you
 are wondering what's weaker than Semigroup, the usual next step is removing the
 associativity requirement, giving you a magma.
 
+# Definitions
+
+A Monoid is a set that is closed under an associative binary operation and has
+an identity element. Closed is the posh mathematical way of saying it's type
+is:
+
+`mappend :: m -> m -> m`
+
+Such that your arguments and output will always inhabit the same type (set).
+
+A semigroup is a set that is closed under an associative binary operation - and
+nothing else.
+
+Laws are rules about how an algebra or structure should behave. These are
+needed in part to make abstraction over the commonalities of different
+instantiations of the same sort of algebra possible and practical. This is
+critical to having abstractions which are not unpleasantly surprising.
+
