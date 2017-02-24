@@ -57,3 +57,40 @@ oblivious to that additional structure. We already saw that in Functor is in
 some sense just a special sort of function application, but since it is
 special, we want to preserve the things about it that make it different and
 more powerful than ordinary function application. So, we stick to the laws.
+
+
+# Transforming the unapplied type argument 
+
+We've seen that `f` must be a higher-kinded type and that Functor instances
+must abide by two laws, and we have played around with some basic fmapping. We
+know that the goal of fmapping is to leave the outer structure untouched while
+transforming the type arguments inside.
+
+Way back in the beginning, we noticed that when we fmap over a typle, it only
+transforms the second argumnet .We saw a similar thing when we fmapped over and
+either value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
