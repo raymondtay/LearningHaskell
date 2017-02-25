@@ -45,5 +45,13 @@ instance Functor Possibly where
 -- > Yeppers 5
 -- 
 -- remember that the intention of the functor
--- is to lift a function into the Yeppers 
--- 
+-- is to lift a function into the Yeppers value and here's another example of
+-- this in action
+--
+-- > fmap show (fmap (+1) (Yeppers 4))
+-- > Yeppers "5"
+--
+
+
+
+
