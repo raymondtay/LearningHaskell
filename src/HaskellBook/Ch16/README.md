@@ -70,6 +70,16 @@ Way back in the beginning, we noticed that when we fmap over a typle, it only
 transforms the second argumnet .We saw a similar thing when we fmapped over and
 either value.
 
+# IO Functor
+
+The `IO` type is an abstract data type, there are no data constructors that we
+are permitted to pattern match on, so the typeclasses `IO` provides are the
+only way you can work with values of type `IO a`.
+
+What if we wanted to transform onlhy the structure and leave the type argument
+to that structure or type constructor alone? With this, we have arrived at
+natural transformations. We can attempt to put together a type to express what
+we want.
 
 
 
