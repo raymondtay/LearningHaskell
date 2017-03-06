@@ -40,7 +40,7 @@ instance Functor (Constant a) where
 -- that Functor skips over. 
 -- The second argument to the Constant type constructor is the phantom
 -- type variable b which has no value or term-level witness in the datatype.
--- Sienc there are no values of the type the Functor is supposed to 
+-- Since there are no values of the type the Functor is supposed to 
 -- be mapping, we have nothing we are allowed to apply the fmap'd 
 -- function to, so we never the const expressions.
 
@@ -61,27 +61,5 @@ data Wrap f a = Wrap (f a) deriving (Eq, Show)
 -- be applied to "f".
 instance Functor f => Functor (Wrap f) where
   fmap f (Wrap fa) = Wrap (fmap f fa)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

@@ -79,4 +79,13 @@ instance Monoid a => Applicative ((,) a) where
 
 ```
 
+# Identity
+
+The `Identity` type here is a way to introduce structure without changing the
+semantics of what you are doing. 
+
+# Constant
+
+This is not so different from the Identity type, except this not only provides
+structure it also acts like the `const` function. 
 
