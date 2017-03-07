@@ -1,3 +1,5 @@
+{-# LANGUAGE InstanceSigs #-}
+
 module Chapter_17 where
 
 newtype Identity a = Identity a deriving (Eq, Ord, Show)
@@ -48,3 +50,28 @@ instance Monoid a => Applicative (Constant a) where
   pure a = Constant (mempty a)
   (<*>) (Constant a) (Constant b) = Constant (mappend a b)
 
+-- 
+-- Copying from Haskell's inbuild data structure called `Maybe`
+-- here is how i would declare a Maybe Applicative 
+--
+data Maybe' a = Just' a | Nothing'
+
+instance Functor Maybe' where
+  fmap _ Nothing' = Nothing'
+  fmap f (Just' a) = Just' (f a)
+
+instance Applicative Maybe' where
+  pure :: a -> Maybe' a
+  pure = Just'
+  (<*>) :: Maybe' ( a -> b ) -> Maybe' a -> Maybe' b
+  (<*>) (Just' f) Nothing' = Nothing'
+  (<*>) (Just' f) (Just' a) = Just' (f a)
+  (<*>) (Nothing') _  = Nothing'
+
+--
+-- You normally would use an Applicative or craft of your own in the situation
+-- where you are thinking : " I want to do something kinda like fmap, but my
+-- function is embedded in the functorial structure too, not just the value i
+-- want to apply my function to". This is the basic motivation of the
+-- Applicative.
+--
