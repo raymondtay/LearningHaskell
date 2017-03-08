@@ -89,3 +89,93 @@ semantics of what you are doing.
 This is not so different from the Identity type, except this not only provides
 structure it also acts like the `const` function. 
 
+# Applicative Laws
+
+After examining the law, test each of the expressions in the REPL.
+
+1. Identity
+
+Here is the definition of the identity law:
+
+pure id <*> v = v
+
+as you may recall, Functor has a similar identity law, and comparing them
+directly might help you see what's happening:
+
+id [1..5]
+
+fmap id [1..5]
+
+pure id <*> [1..4]
+
+
+The identity law states that all three of those should equal. You can test them
+for equality in your REPL or you could write a simple test to get the answer.
+So, what's `pure` doing for us? It's embedding our id function into some
+strucutre so that we can use `apply` instead of `fmap`.
+
+2. Composition
+
+Here is the definition of the composition law for applicatives:
+
+pure (.) <*> u <*> v <*> w = u <*> (v <*> w)
+
+You may find the syntax a bit unusual and difficult to read here. This is
+similar to the law of composition for Functor. It is the law stating that the
+result of composing our functions first and then applying them and the result
+of applying the functions first then composing them should be the same. We are
+using the composition operator as a prefix instead of the more usual infix and
+using `pure` in order to embed that operator into the appropriate structure so
+that it can work with `apply`.
+
+pure (.) <*> [(+1)] <*> [(*2)] <*> [1,2,4]
+
+This law is meant to ensure that there are no surprises resulting from
+composing your function applications.
+
+3. Homomorphism 
+
+A homomorphism is a structure preserving map between two categories. The effect
+of applying a funciton that is embedded in some structure to a value that is
+embedded in some structure should be the same as applying a function to a value
+without affecting any outside structure:
+
+pure f <*> pure x = pure (f x)
+
+That's the statement of the law. Here's how it looks in practice:
+
+pure (+1) <*> pure 1
+
+pure ((+1) 1) 
+
+Those two lines of code should give you the same result. In fact, the result
+you see for those should be indistinguishable from the result of : 
+(+1) 1 
+because the structure that `pure` is providing there isn't really meaningful.
+So you can thikn of this law as having to do with the monoidal part of the
+applicative deal: the result should be the result of the function application
+without doing anything other than combining the structure bits. Just as we saw
+how `fmap` is really just a special type of function application that ignores a
+context or surrounding strucutre, applicative is also function application that
+preserves strucutre. However, with applicative, since the funciton being
+applied also has a structure, the structures have to be monoidal and come
+together in some fashion.
+
+pure (+1) <*> pure 1 :: Maybe Int
+
+pure((+1) 1) :: Maybe Int
+
+Those two results should again be the same, but this time the structure is
+being provided by Maybe, so will the result of :
+
+(+1) 1
+
+be equal this time around? 
+
+Here are a couple more examples to try out:
+
+pure (+1) <*> pure 1 :: [Int]
+
+pure (+1) <*> pure 1:: Either a Int
+
+

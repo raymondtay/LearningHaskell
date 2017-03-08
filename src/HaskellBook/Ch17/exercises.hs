@@ -2,6 +2,8 @@
 
 module Chapter_17 where
 
+import Data.Monoid
+
 newtype Identity a = Identity a deriving (Eq, Ord, Show)
 
 instance Functor Identity where 
@@ -75,3 +77,44 @@ instance Applicative Maybe' where
 -- want to apply my function to". This is the basic motivation of the
 -- Applicative.
 --
+
+data List a = Nil | Cons a (List a) deriving (Eq, Show)
+
+instance Monoid (List a) where
+  mempty = Nil
+  mappend Nil _ = Nil
+  mappend _ Nil = Nil
+  mappend (Cons a xs) ys = Cons a $ mappend xs ys
+
+instance Functor List where
+  fmap _ Nil = Nil
+  fmap f (Cons a Nil) = Cons (f a) Nil
+  fmap f (Cons ele tail) = Cons (f ele) (fmap f tail)
+
+instance Applicative List where
+  pure :: a -> List a
+  pure a = Cons a Nil
+  (<*>) :: List (a -> b) -> List a -> List b
+  (<*>) (Cons f b) ca = fmap f ca <> (b <*> ca)
+  (<*>) _ Nil = Nil
+  (<*>) Nil _ = Nil
+
+append :: List a -> List a -> List a
+append Nil ys = ys
+append (Cons x xs) ys = Cons x $ xs `append` ys
+
+fold :: (a -> b -> b) -> b -> List a -> b
+fold _ b Nil = b
+fold f b (Cons h t) = f h (fold f b t)
+
+concat' :: List (List a) -> List a
+concat' = fold append Nil
+
+-- 
+-- Crafted this solution because i know fmap returns a `List a`
+-- and typically `flatMap` returns a `List (List a)`; and i know concat
+-- "flattens" a nested list, and hence the solution.
+--
+flatMap :: (a -> List b) -> List a -> List b
+flatMap f as = concat' $ fmap f as
+
