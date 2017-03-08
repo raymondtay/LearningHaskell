@@ -91,11 +91,45 @@ instance Functor List where
   fmap f (Cons a Nil) = Cons (f a) Nil
   fmap f (Cons ele tail) = Cons (f ele) (fmap f tail)
 
+--
+-- How did i arrive at this declaration? This deserves a good analysis because
+-- i was confused ... question was what was i really confused by?
+--
+-- The one problem i had was the fact that when i have the situation of 
+--
+-- (Cons f somelist) somelist' 
+--
+-- and i didn't know how was i suppose to apply the function 'f' to both
+-- somelist and somelist' and finally merging them??? Finally, i realize we can
+-- leverage the Monoid's mappend (i.e. <>) to do this and hence i went about
+-- making List an instance of the Monoid (see above the definition). Next thing
+-- i had to do was to actually merge it. Question is how??
+--
+-- At this point in time, i was confused by the symbolic representation i.e.
+-- List (a -> b) and i began to misinterpret it ... long story short the
+-- correct way to interpret is as follows:
+-- 
+-- Cons f Nil => which means a List of 1 function
+-- Cons f tail => which means a list of n-functions since we have no idea how
+-- many functions are in `tail`. 
+--
+-- After correcting myself, i realize the best way and infact the correct way
+-- to understand this is to realize that `tail` is infact List(a -> b).
+-- Therefore:
+--
+-- (<*>) (Cons f fs) ca = something <> something'
+--
+-- something = fmap f ca since ca is a `List a`
+-- something' = (fs <> ca) since fs is `List(a->b)` and ca is `List a` which
+-- fits the Applicative use case and finally we have the expression:
+--
+-- (<*>) (Cons f fs) ca = fmap f ca <> (fs <*> ca) 
+--
 instance Applicative List where
   pure :: a -> List a
   pure a = Cons a Nil
   (<*>) :: List (a -> b) -> List a -> List b
-  (<*>) (Cons f b) ca = fmap f ca <> (b <*> ca)
+  (<*>) (Cons f fs) ca = fmap f ca <> (fs <*> ca)
   (<*>) _ Nil = Nil
   (<*>) Nil _ = Nil
 
