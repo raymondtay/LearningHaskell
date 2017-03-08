@@ -2,8 +2,8 @@
 
 module Chapter_17_validation where
 
-import Data.Semigroup
-import Data.Monoid hiding ((<>))
+import Data.Semigroup hiding (First, Sum)
+import Data.Monoid hiding ((<>),First, Sum)
 
 --
 -- The code here is implemented w.r.t page 749 of the haskellbook. let's go
@@ -48,4 +48,38 @@ data Errors =
     | StackOverflow
     | MooglesChewedWires
     deriving (Eq, Show)
+
+data Sum a b = First a | Second b deriving (Eq, Show)
+
+data Validation' e a = Error' e | Success' a deriving (Eq, Show)
+
+instance Functor (Sum a) where
+  fmap f (First a) = First a
+  fmap f (Second b) = Second (f b)
+
+instance Applicative (Sum a) where
+  pure :: b -> Sum a b
+  pure a = Second a
+  (<*>) :: Sum a (b -> c) -> Sum a b -> Sum a c
+  (<*>) (First a) (Second f) = First a
+  (<*>) (First a) (First f) = First f
+  (<*>) (Second f) (First a) = First a
+  (<*>) (Second f) (Second b) = Second (f b)
+
+instance Functor (Validation' e) where
+  fmap f (Error' e) = Error' e
+  fmap f (Success' a) = Success' (f a)
+
+instance Monoid e => Applicative (Validation' e) where
+  pure a = Success' a
+  (<*>) :: (Validation' e)(a -> b) -> (Validation' e) a -> (Validation' e) b
+  (<*>) (Success' f) (Error' e)   = Error' e
+  (<*>) (Success' f) (Success' b) = Success' (f b)
+  (<*>) (Error' f) (Success' b)   = Error' f
+  (<*>) (Error' f) (Error' b)     = Error' f
+
+applyIfBothSecond :: (Sum e) (a -> b) -> (Sum e) a -> (Sum e) b
+applyIfBothSecond (First f) _ = First f
+applyIfBothSecond (Second f) (First a) = First a
+applyIfBothSecond (Second f) (Second a) = Second (f a)
 
