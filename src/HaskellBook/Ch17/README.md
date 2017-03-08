@@ -178,4 +178,22 @@ pure (+1) <*> pure 1 :: [Int]
 
 pure (+1) <*> pure 1:: Either a Int
 
+# Either versus Validation
+
+Often the interesting part of an Applicative is wherever the monoidal in
+monoidal functor is coming from. One byproduct of this is that just as you can
+have more than one valid Monoid for a given datatype, unlike Functor,
+Applicative can have more than one valid and lawful instance for a given
+datatype.
+
+How does Validation differ? Principally in what the Applicative instance does
+with errors. Rather than just short-circuiting when it has two error values, it
+would use the Monoid typeclass to combine them. Often this will just be a list
+or set of errors but you can do whatever you want.
+
+
+
+
+
+
 

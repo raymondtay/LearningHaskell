@@ -152,3 +152,33 @@ concat' = fold append Nil
 flatMap :: (a -> List b) -> List a -> List b
 flatMap f as = concat' $ fmap f as
 
+take' :: Int -> List a -> List a
+take' _ Nil = Nil
+take' n (Cons h tail)
+  | n >  0 = Cons h (take' (n - 1) tail)
+  | n <= 0 = Nil
+
+--
+-- The definitions i have below are mostly implemented from the book and the
+-- thing i had to declare was for the `Monoid` instances for ZipList'; reason
+-- for doing that was because i wanted to reuse the new swanky technique i
+-- learnt about leveraging monoids to merge the results of the Applicative
+-- application.
+--
+newtype ZipList' a = ZipList' (List a) deriving (Eq, Show)
+
+instance Monoid (ZipList' a) where
+  mempty = ZipList' Nil
+  mappend (ZipList' xs) (ZipList' ys) = ZipList' $ xs `mappend` ys
+
+instance Functor ZipList' where
+  fmap f (ZipList' xs) = ZipList' $ fmap f xs
+
+instance Applicative ZipList' where
+  pure :: a -> ZipList' a
+  pure a = ZipList' (Cons a Nil)
+  (<*>) :: ZipList'(a -> b) -> ZipList' a -> ZipList' b
+  (<*>) (ZipList' Nil) (ZipList' xs) = ZipList' Nil
+  (<*>) (ZipList' (Cons fs xs)) (ZipList' Nil) = ZipList' Nil
+  (<*>) (ZipList' (Cons fs xs)) (ZipList' ys) = ZipList' $ fmap fs ys <> (xs <*> ys)
+
