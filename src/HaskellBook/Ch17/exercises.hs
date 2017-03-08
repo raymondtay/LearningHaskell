@@ -82,8 +82,8 @@ data List a = Nil | Cons a (List a) deriving (Eq, Show)
 
 instance Monoid (List a) where
   mempty = Nil
-  mappend Nil _ = Nil
-  mappend _ Nil = Nil
+  mappend Nil xs = xs
+  mappend xs Nil = xs
   mappend (Cons a xs) ys = Cons a $ mappend xs ys
 
 instance Functor List where
