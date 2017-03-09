@@ -86,3 +86,36 @@ type: ap :: Monad m => m (a -> b) -> m a -> m b
 
 which means that is behaves like the `ap` in Applicatives. See the similarity?
 
+# Application and Composition
+
+What we have seen so far has been primarily about function application. We
+probably were not thinking too much about the relationship between function
+application and composition because with Functor and Applicative it hadn't
+mattered much.Both concerned functions that looked like the usual (a -> b)
+arrangement, so composition "just worked" and that this was true was guaranteed
+by the laws of those typeclasses.
+
+# Monadic Composition
+
+How does one actually compose monads? First of all, can it actually be done?
+Turns out it can be done and its via the `Kleisli` composition i.e. (>=>)
+which actually is function composition written in terms of >>= to allow us to
+deal with the extra structure, that's what the Kleisli fish gives us.
+
+Just as function composition in Haskell, expressed as 
+
+(.) :: (b -> c) -> (a -> b) -> (a -> c)
+
+and the Monadic-bind operator 
+
+(>>=) :: Monad m => m a -> (a -> m b) -> m b
+
+and to get the Kleisli composition off the ground, we have to flip some
+arguments around to make the types work. But in Monads, here is how its being
+defined:
+
+(>=>) :: Monad m => (a -> m b) -> (b -> m c) -> a -> m c
+
+and you can almost immediately draw the similarities out.
+
+
