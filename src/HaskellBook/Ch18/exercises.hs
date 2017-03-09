@@ -65,3 +65,20 @@ instance Monad List where
   (Cons h t) >>= f = f h <> (t >>= f)
 
 
+newtype Identity a = Identity a deriving (Eq, Ord, Show) 
+
+instance Functor Identity where
+  fmap f (Identity a) = Identity (f a)
+
+instance Applicative Identity where
+  pure :: a -> Identity a
+  pure = Identity
+  (<*>) :: Identity (a -> b) -> Identity a -> Identity b
+  (<*>) (Identity f) (Identity a) = Identity (f a)
+
+instance Monad Identity where
+  return :: a -> Identity a
+  return = pure
+  (>>=) :: Identity a -> (a -> Identity b) -> Identity b
+  (Identity a) >>= f = f a
+
