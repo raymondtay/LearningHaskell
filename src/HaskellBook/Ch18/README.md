@@ -81,4 +81,8 @@ is of type `IO String` and the code `putStrLn <$> getLine` is `IO (IO ())`
 which means its doesn't quite work as expected. Instead, the following code
 works as expected: `getLine >>= putStrLn` (its type is `IO ()`).
 
+Inside the module `Control.Monad`, it is known that `ap` has the following
+type: ap :: Monad m => m (a -> b) -> m a -> m b
+
+which means that is behaves like the `ap` in Applicatives. See the similarity?
 
