@@ -68,3 +68,17 @@ Monad is not:
   and hewas talking about the way monads handle effectful programming. While monads are often used for sequencing 
   actions in a way that looks like imperative programming, there are commutative monads that do not order actions.
 
+# Monad: its got what coders crave
+
+What `join` did here is merge the effects of `getLine` and `putStrLn` into a single
+`IO` action. This merged `IO` action performs the effects in the "order" determined
+by the nesting of the `IO` actions. As it happens, the cleanest way to express
+"ordering" in a lambda calculus without bolting on something unpleasant is
+through nesting of expressions or lambdas.
+
+Inside the book, the code `putStrLn` has type `String -> IO ()` and `getLine`
+is of type `IO String` and the code `putStrLn <$> getLine` is `IO (IO ())`
+which means its doesn't quite work as expected. Instead, the following code
+works as expected: `getLine >>= putStrLn` (its type is `IO ()`).
+
+
