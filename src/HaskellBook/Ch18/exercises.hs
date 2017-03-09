@@ -2,6 +2,7 @@
 
 module Chapter_18 where
 
+import Data.Monoid ((<>))
 import Control.Monad
 
 data Sum a b = First a | Second b deriving (Eq, Show)
@@ -37,4 +38,30 @@ instance Monad (Sum a) where
   (First a) >>= f = First a
   (Second a) >>= f = f a
   
+data List a = Nil | Cons a (List a)
+
+instance Monoid (List a) where
+  mempty = Nil
+  mappend Nil xs = xs
+  mappend xs Nil = xs
+  mappend (Cons h t) t2 = Cons h $ (t `mappend` t2)
+
+instance Functor List where
+  fmap _ Nil = Nil
+  fmap f (Cons h t) = Cons (f h) (fmap f t)
+
+instance Applicative List where
+  pure a = Cons a Nil
+  (<*>) :: List (a -> b) -> List a -> List b
+  (<*>) _ Nil = Nil
+  (<*>) Nil _ = Nil
+  (<*>) (Cons f fs) t2 = fmap f t2 <> (fs <*> t2)
+
+instance Monad List where
+  return :: a -> List a
+  return = pure
+  (>>=) :: List a -> (a -> List b) -> List b
+  Nil        >>= _ = Nil
+  (Cons h t) >>= f = f h <> (t >>= f)
+
 

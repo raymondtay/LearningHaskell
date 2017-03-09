@@ -196,4 +196,39 @@ or set of errors but you can do whatever you want.
 
 
 
+# Definition
 
+A Monad is a typeclass reifying an abstraction that is commonly used in Haskell. Instead of an ordinary function of type a to be,
+you are functorially applying a function which produces more structure itself and using `join` to reduce the nested struture that 
+results.
+
+```haskell
+
+fmap :: (a -> b) -> f a -> f b
+
+(<*>) :: f (a -> b) -> f a -> f b
+
+(=<<) :: (a -> f b) -> f a -> f b
+
+```
+
+A Monadic function is one which generates more structure after having been lifted over monadic structure. Contrast the function
+arguments to fmap and >>= in
+
+```haskell
+
+fmap :: (a -> b) -> f a -> f b
+
+(>>=) :: m a -> (a -> m b) -> m b
+
+```
+The significant difference is that the result is m b and requires joining the result after lifting the function over m.
+What does this mean? That depends on the Monad instance. The distinction can be seen with ordinary function 
+composition and kleisli composition as well:
+```haskell
+
+(.) :: (b -> c) -> (a -> b) -> a -> c
+
+(>=>) :: Monad m => (a -> m b ) -> (b -> m c) -> a -> mc
+
+```
