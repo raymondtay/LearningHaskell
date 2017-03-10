@@ -4,9 +4,8 @@ The interesting thing about `Traversable` is this, what it does is
 actually quite interesting. In order to understand what it is that `Traversable` does, it helps when i can 
 actually observe what it does and from my observation, what it seems to do is the following
 
-traverse actually accepts a function (i.e. a -> f b) where it returns an "applicative of b" 
-and it accepts a "traversable of a"s and walks the function through the 2nd argument; applies the function
-(without breaking the context of the 2nd argument) and finally adds 1-layer to the context of the 2nd argument.
+`traverse` actually maps each element of the structure to an action, evaluates
+these actions from left-to-right and collecting the results. 
 
 Below illustrates what happens...
 
