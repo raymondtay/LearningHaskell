@@ -2,6 +2,8 @@
 
 module Chapter_23 where
 
+import Control.Monad (join)
+
 -- If i look back at Chapter 21,22 and earlier i can discover that i know what
 -- these symbols mean now and its considerably easier to build functions. 
 --
@@ -27,4 +29,18 @@ instance Applicative (Moi s) where
       let (ff, s2) = (f s)
           (a, s3) = (g s) in ((ff a), s3)
 
+-- Monad instance for Moi
+-- The easiest thing to get confuse is when we are dealing with symbols and its
+-- symbolic interpretation.
+--
+instance Monad (Moi s) where
+  return :: a -> Moi s a
+  return a = Moi (\s -> (a,s))
+
+  (>>=) :: Moi s a -> (a -> Moi s b) -> Moi s b
+  (Moi f) >>= g =
+    Moi (\s ->
+      let (a, s2) = (f s)
+          (b, s3) = runMoi (g a) $ s
+      in (b, s))
 
