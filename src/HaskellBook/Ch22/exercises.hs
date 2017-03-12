@@ -3,6 +3,7 @@
 module Chapter_22 where
 
 import Control.Applicative
+import Control.Monad (join)
 
 newtype Reader r a = Reader { runReader :: r -> a }
 
@@ -32,6 +33,15 @@ instance Applicative (Reader r) where
   pure a = Reader (\_ -> a)
   (<*>) :: Reader r (a -> b) -> Reader r a -> Reader r b
   (<*>) (Reader f) (Reader g) = Reader $ (\x -> ((f x)(g x)))
+
+-- on page 887 of the book, readers are requested to implement Monad instances
+-- for the Reader typeclass.
+--
+instance Monad (Reader r) where 
+  return :: a -> Reader r a
+  return a = Reader (\_ -> a)
+  (>>=) :: Reader r a -> (a -> Reader r b) -> Reader r b
+  (>>=) (Reader f) g = join $ Reader $ \x -> (g . f) x
 
 --
 -- Reader a a is really a -> a where we replace 'r' with 'a'; then it should be
@@ -93,3 +103,31 @@ myLiftA2 f l r = f <$> l <*> r
 myLiftA3 :: Applicative f => (a -> b -> c -> d) -> f a -> f b -> f c -> f d
 myLiftA3 f a b c = f <$> a <*> b <*> c
 
+-- On page 886 of the book, the author claims that functions are Monads as
+-- well; there might be confusion over the terminology here because i've been
+-- working on providing functor, applicatives, monoids and monad instances for
+-- the various typeclasses but i haven't read anything regarding how "Functions
+-- are actually Monads".
+--
+-- How do i reconcile what i've learnt and applied with functions ?
+--
+-- (>>=) :: Monad m => m a -> (a -> m b) -> m b
+-- (>>=) (->) r a -> (a -> (->) r b) -> (->) r b # now we are assuming that (->) r is the monad.
+--
+-- The above expression ↑ is now "reduced" to 
+--
+-- (>>=) :: (r -> a) -> (a -> r -> b) -> r -> b
+--
+-- return :: Monad m => a -> m a
+-- return :: a -> (->) r a
+-- return :: a -> r -> a
+--
+
+-- We can do a similar thing with applicatives as well 
+-- (<*>) :: f (a -> b) -> f a -> f b
+-- (<*>) :: (->)r (a -> b) -> (->)r a -> (->)r b
+--
+-- (<*>) :: r -> (a -> b) -> (r -> a) -> (r -> b)
+-- compare ↑ ↓
+-- (>>=) :: (r -> a) -> (a -> r -> b) -> (r -> b)
+--
