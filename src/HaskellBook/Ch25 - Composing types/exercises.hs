@@ -2,6 +2,7 @@
 
 module Chapter25 where
 
+import Data.Monoid ((<>))
 import Control.Applicative (liftA2)
 
 -- This is the compose type. It should look to you much like function
@@ -79,4 +80,29 @@ instance (Applicative f, Applicative g) => Applicative (Compose f g) where
   (<*>) :: Compose f g (a -> b) -> Compose f g a -> Compose f g b
   (Compose f) <*> (Compose g) = 
     Compose (liftA2 (<*>) f g)
+
+--
+-- Write the Foldable instance for Compose.
+--
+instance (Foldable f, Foldable g) => Foldable (Compose f g) where
+  foldMap :: (Monoid m) => (a -> m) -> Compose f g a -> m
+  foldMap f (Compose g) = foldMap (foldMap f) g
+
+-- 
+-- This deserves explanation on how i arrived at the final conclusion.
+--
+-- First of all, you need to remember that sequenceA is used for flipping the
+-- context of Applicatives. Second of all, i find it incredibly helping to have
+-- the type signatures embedded so that less experienced haskellers like myself
+-- actually can ponder over how to construct this.
+--
+-- We know that (a -> f1 b) needs to be applied to `Compose f g a` and i can do
+-- that by fmap-twice which i do so (see below); next is to realize the
+-- structure i have is Compose f g (f1 b) so we use the sequenceA to lift the
+-- 'f1' out of 'Compose'.
+--
+instance (Traversable f, Traversable g) => Traversable (Compose f g) where
+  traverse :: Applicative f1 => (a -> f1 b) -> Compose f g a -> f1 (Compose f g b) 
+  traverse f (Compose g) = sequenceA $ Compose ((fmap . fmap) f g)
+
 

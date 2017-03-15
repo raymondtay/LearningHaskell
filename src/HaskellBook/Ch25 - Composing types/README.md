@@ -26,3 +26,8 @@ Type constructors can take other type constructors as arguments, too, just as
 functions can take other functions as arguments. This is what allows us to
 compose types.
 
+# Reason why we need Monad Transformers
+
+According to the book, the reason why we need _monad transformers_ is because
+of the failure to be able to compose two arbitrary monad types.
+
