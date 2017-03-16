@@ -12,12 +12,67 @@ for exampl, a Maybe monad with an IO, you can be performing IO actions while
 also building up computations that have a possibility of failure, handled by
 the Maybe Monad.
 
-A monad transformer is a variant of an ordnariy type that takes an
+A monad transformer is a variant of an ordinary type that takes an
 additional type argument which is assumed to have a monad instance. For
 example, a MaybeT is the transformer variant of the Maybe type. The transformer
 variant of a type gives us a Monad instance that binds over both bits of
 structure. This allows us to compose monads and combine their effects. Getting
 comfortable with monad transformers is important to becoming proficient in
 Haskell, so we are going to take it pretty slowly and go step by step.
+
+# Monadic Stacking
+
+Applicative allows us to apply functions of more than one argument in the
+presence of functorial structure, enabling us to cope with this transition.
+
+# IdentityT 
+
+Just as `IdentityT` show off the most basic essence of Functor, Applicative and
+Monad, `IdentityT` is going to help you begin to understand monad transformers.
+Using this type that doesn't have a lot of interesting stuff going on with it
+will help keep us focused on the types and the important fundamentals of
+transformers. What we see here will be applicable to other transformers as
+well, but types like Maybe and list introduce other possibilities (failure
+cases, empty lists) that complicate things a bit.
+
+```haskell
+
+newtype Identity a = Identity { runIdentity :: a } deriving (Eq, Show) 
+newtype IdentityT f a = IdentityT { runIdentityT :: f a } deriving (Eq, Show) 
+
+instance Functor Identity where
+ fmap f (Identity a) = Identity (f a)
+
+instance (Functor m) => Functor (IdentityT m) where
+ fmap f (IdentityT g) = IdentityT (fmap f g)
+
+```
+
+The IdentityT instance here should look similar to the Functor instance for the
+One datatype above - the `g` argument is the value inside the IdentityT with the
+untouchable structure wrapped around it. 
+
+```haskell
+
+instance Applicative Identity where
+  pure = Identity
+  
+(Identity f) <*> (Identity a) = Identity (f a) 
+
+instance (Applicative m) => Applicative (IdentityT m) where
+  pure x = IdentityT (pure x)
+
+  (IdentityT fab) <*> (IdentityT fa) = IdentityT (fab <*> fa)
+
+instance Monad Identity where
+  return = pure
+
+  (Identity a) >>= f = f a
+
+instance (Monad m) => Monad (IdentityT m) where
+  return = pure
+  (IdentityT ma) >>= f = IdentityT $ ma >>= runIdentityT . f
+
+```
 
 
