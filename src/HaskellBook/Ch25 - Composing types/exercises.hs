@@ -129,4 +129,19 @@ instance (Monad f, Monad g) => Monad (Compose f g) where
   (>>=) :: Compose f g a -> (a -> Compose f g b) -> Compose f g b
   (Compose f) >>= g = join $ fmap g (Compose f)
 
+-- Writer the Foldable instance for Compose 
+instance (Foldable f, Foldable g) => Foldable (Compose f g) where
+  foldMap :: Monoid m => (a -> m) -> Compose f g a -> m
+  foldMap f (Compose g) = foldMap (foldMap f) g
+
+-- Write the Traversable instance for Compose
+-- Let's understand how the expression was constructed.
+-- i want to get to the 'a' value embedded in 'Compose f g a' so i lift 'f'
+-- once into 'Compose f g a' and that would return 'Compose f g (ff b)' and
+-- then i remembered that sequenceA is really good at flipping contexts
+-- so i applied it, last.
+instance (Traversable f, Traversable g) => Traversable (Compose f g) where
+  traverse :: Applicative ff => (a -> ff b) -> Compose f g a -> ff (Compose f g b) 
+  traverse f (Compose c) = sequenceA $ fmap f (Compose c)
+
 
