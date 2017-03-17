@@ -52,12 +52,16 @@ The IdentityT instance here should look similar to the Functor instance for the
 One datatype above - the `g` argument is the value inside the IdentityT with the
 untouchable structure wrapped around it. 
 
+Let's dissect the code and understand its individual moving parts.
+
 ```haskell
 
 instance Applicative Identity where
+  pure :: a -> Identity a
   pure = Identity
   
-(Identity f) <*> (Identity a) = Identity (f a) 
+  (<*>) :: Identity (a -> b) -> Identity a -> Identity b
+  (Identity f) <*> (Identity a) = Identity (f a) 
 
 instance (Applicative m) => Applicative (IdentityT m) where
   pure x = IdentityT (pure x)
@@ -65,12 +69,16 @@ instance (Applicative m) => Applicative (IdentityT m) where
   (IdentityT fab) <*> (IdentityT fa) = IdentityT (fab <*> fa)
 
 instance Monad Identity where
+  return :: a -> Identity a
   return = pure
 
+  (>>=) :: Identity a -> (a -> Identity b) -> Identity b
   (Identity a) >>= f = f a
 
 instance (Monad m) => Monad (IdentityT m) where
+  return :: a -> IdentityT m a
   return = pure
+  (>>=) :: IdentityT m a -> (a -> IdentityT m b) -> IdentityT m b
   (IdentityT ma) >>= f = IdentityT $ ma >>= runIdentityT . f
 
 ```
