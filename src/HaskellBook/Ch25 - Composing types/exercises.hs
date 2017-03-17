@@ -2,6 +2,8 @@
 
 module Chapter25 where
 
+import Control.Monad (join)
+
 newtype Identity a = Identity { runIdentity :: a } deriving (Eq, Show) 
 newtype IdentityT f a = IdentityT { runIdentityT :: f a } deriving (Eq, Show) 
 
@@ -86,5 +88,45 @@ instance (Monad m) => Monad (IdentityT m) where
 -- it in IdentityT. Note:
 --
 
+
+newtype Compose f g a = Compose { getCompose :: f (g a) } deriving (Eq, Show)
+
+-- This is quite straight-forward since it really means lifting 'f' twice into
+-- the structure.
+--
+instance (Functor f, Functor g) =>  Functor (Compose f g) where
+  fmap f (Compose g) = Compose $ (fmap . fmap) f g
+
+-- Constructing the following example from the book required the following
+-- hint:
+-- *Chapter25 Control.Monad> :t ((<*>) <$>)
+--   ((<*>) <$>)
+--   :: (Functor f1, Applicative f) =>
+--   f1 (f (a -> b)) -> f1 (f a -> f b)
+--
+-- This ((<*>) <$>) needs to consume a structure like    f1 (f (a -> b)) with those
+-- type constraints and what it really means is ↑ (above) maps to f (g (a -> b))
+--
+instance (Applicative f, Applicative g) => Applicative (Compose f g) where
+  pure :: a -> Compose f g a
+  pure a = Compose (pure (pure a))
+
+  (<*>) :: Compose f g (a -> b) -> Compose f g a -> Compose f g b
+  (Compose f) <*> (Compose a) = Compose ((<*>) <$> f <*> a)
+
+
+-- It pays to understand what's going on here ... so let's dissect the (>>=)
+-- implementation. What's going on is essentially this:
+--
+-- I know i need to lift 'g' into 2-layers of the monad i'm given (i.e. Compose
+-- f) which the following type : `Compose f g (Compose f g b)` and now i know
+-- that `join :: Monad m => m(m a) -> m a` can actually help me flatten it.
+-- Therefore, its being applied. See below.
+--
+instance (Monad f, Monad g) => Monad (Compose f g) where
+  return = pure
+
+  (>>=) :: Compose f g a -> (a -> Compose f g b) -> Compose f g b
+  (Compose f) >>= g = join $ fmap g (Compose f)
 
 
