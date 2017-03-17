@@ -20,6 +20,7 @@ structure. This allows us to compose monads and combine their effects. Getting
 comfortable with monad transformers is important to becoming proficient in
 Haskell, so we are going to take it pretty slowly and go step by step.
 
+<<<<<<< HEAD
 # Monadic Stacking
 
 Applicative allows us to apply functions of more than one argument in the
@@ -83,4 +84,16 @@ instance (Monad m) => Monad (IdentityT m) where
 
 ```
 
+=======
+## Type contructors are functions
+
+Type constructors can take other type constructors as arguments, too, just as
+functions can take other functions as arguments. This is what allows us to
+compose types.
+
+# Reason why we need Monad Transformers
+
+According to the book, the reason why we need _monad transformers_ is because
+of the failure to be able to compose two arbitrary monad types.
+>>>>>>> c69c267c3ca6300cc05e36f7f2b3aab7f3d3ec17
 
