@@ -97,6 +97,63 @@ of the failure to be able to compose two arbitrary monad types.
 ## No free burrito lunches
 
 Since getting another Monad given the composition of two arbitrary types that
-have a Monad instance is impossibnle, what can we do to get a Monad isntance
+have a Monad instance is impossible, what can we do to get a Monad isntance
 for combinations of types? The answer is, Monad Transformers.
+
+# The essential extra of Monad Transformers
+
+It may not seem like it, but the IdentityT monad transformer actually captures
+the essence fo transformers generally. We only embarked on this quest because
+we could not be guaranteed a monad instance given the composition of two types.
+Given that, we know having Functor / Applicative / Monad at our disposal isn't
+enough to make that new Monad instance.
+
+"""
+We needed to know one of the types concretely so that we could use runIdentityT
+(essentially fmapping a fold of the IdentityT structure) and then repack the
+value in IdentityT.
+"""
+
+# Finding a pattern
+
+Transformers are bearers of single-type concrete information that let you
+create ever bigger Monads in a sense. Nesting such as 
+```haskell
+
+(Monad m) => m ( m a ) 
+
+```
+
+is addressed by `join` already. WE use transformers when we want a >>=
+operation over f and g of different types (but both have Monad instances). You
+have to create new types called monad transformers and write Monad instances
+for those types to have a way of dealing with the extra structure generated. 
+
+The general pattern is this: You want to compose two polymorhpic types, f and
+g, that each have a Monad isntance. But you will end up with this pattern:
+
+```haskell
+
+f( g (f b) )
+
+```
+
+Monad's bind cannot join those types, not with that intervening g. So you need
+to get to this:
+
+```haskell
+f (f b) 
+```
+
+You won't be able to do that unless you have some way of folding the g in the
+middle. You cannot do that with just Monad. The essence of Monad is `join`, but
+here you have only one bit of `g` structure, not `g(g ...)` so that is not
+enough. The straightforward thing to do is to make g concrete. With concrete
+type information for the "inner" bit of structure, we can fold out the g and
+get on with it. The good news is that transformers do not require f be
+concrete; f can remain polymorphic so long as it has a Monad instance, so we
+only write a transformer once for each type.
+
+We can see this pattern with `IdentityT` as well. You may recall this step in
+our process of writing `IdentityT`'s Monad.
 
