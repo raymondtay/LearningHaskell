@@ -2,6 +2,8 @@
 
 module Chapter26_EitherT where
 
+import Data.Either
+
 newtype EitherT e m a = EitherT { runEitherT :: m (Either e a) }
 
 -- Basically, i need to map 'f' 2-layers (crossing both 'm' and 'Either')
@@ -50,5 +52,39 @@ swapEither ea =
 --
 swapEitherT :: (Functor m) => EitherT e m a -> EitherT a m e
 swapEitherT ea = EitherT $ (fmap swapEither $ runEitherT ea)
+
+-- This is trickier than the last because it has more symbols !!!
+-- Let's dissect this further, shall we?
+-- My way of doing this is rather simple, considering my skills at this point
+-- isn't God-like....
+--
+-- EitherT a m b is equivalent to `m (Either a b)` so i basically use the
+-- combination of the do-syntax to extract either embedded Either value out and
+-- pattern match to discover whether i'm seeing a Left or Right and applying
+-- either f or g accordingly.
+--
+-- In Scala's CATS, there's a notion of `bimap` which basically does the same
+-- thing.
+--
+eitherT :: Monad m => (a -> m c) -> (b -> m c) -> EitherT a m b -> m c
+eitherT f g et = 
+  do
+    v <- runEitherT et 
+    case v of 
+        (Left l) -> f l
+        (Right r) -> g r
+
+-- This was written like 10 minutes later coz i remember CAT's bimap has a
+-- similar functionality, i was eager to find out for myself whether something
+-- like it exists. Turns out there is, its in `Data.Either` and the function is
+-- `either`.
+-- Hence, proceeding as usual i use do-syntax combined with runEitherT to
+-- extract the Either a e value and leverage `either`.
+--
+eitherT' :: Monad m => (a -> m c) -> (b -> m c) -> EitherT a m b -> m c
+eitherT' f g et =
+  do 
+    v <- runEitherT et
+    either f g v
 
 
