@@ -62,3 +62,24 @@ instance Applicative m => Applicative (MaybeT m) where
   (MaybeT f) <*> (MaybeT g) = MaybeT (((<*>) <$> f ) <*>g)
   -- ↑ the same as → (MaybeT f) <*> (MaybeT g) = MaybeT ((<*>) <$> f <*> g)
 
+-- Let me write the Monad instance for my MaybeT 
+-- i've interleaved types into each of the expressions so that it helps
+-- clarifying how things work....step-by-step.
+--
+instance Monad m => Monad (MaybeT m) where
+  return :: a -> MaybeT m a
+  return = pure
+
+  (>>=) :: MaybeT m a -> (a -> MaybeT m b) -> MaybeT m b
+  (MaybeT ma) >>= f = 
+    MaybeT $ do
+      -- ma :: m (Maybe a)
+      -- v :: Maybe a
+      v <- ma
+      case v of 
+          -- return Nothing :: m (Maybe b)
+          Nothing -> return Nothing
+          -- (f t) :: MaybeT m b
+          -- runMaybeT (f t) :: m (Maybe b)
+          (Just t) -> runMaybeT (f t)
+
