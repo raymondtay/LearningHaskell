@@ -60,5 +60,5 @@ instance Applicative m => Applicative (MaybeT m) where
 
   (<*>) :: MaybeT m (a -> b) -> MaybeT m a -> MaybeT m b
   (MaybeT f) <*> (MaybeT g) = MaybeT (((<*>) <$> f ) <*>g)
-  -- (MaybeT f) <*> (MaybeT g) = MaybeT ((<*>) <$> f <*> g)
+  -- ↑ the same as → (MaybeT f) <*> (MaybeT g) = MaybeT ((<*>) <$> f <*> g)
 
