@@ -32,12 +32,22 @@ instance (Monad m) => Monad (EitherT e m) where
 -- The book suggests to build a combinator like swapEither first before
 -- expressing swapEitherT interms of swapEither.
 --
+-- It's pretty easy to develop this small function to swap Either values
+-- so i can move on to the next function, swapEitherT.
 swapEither :: Either e a -> Either a e
 swapEither ea =
   case ea of 
       (Left v) -> Right v
       (Right v) -> Left v
 
+-- 
+-- This function requires some thought ... and i made use of the fact that we
+-- have a functor to lift swapEither into the embedded structure EitherT e m a
+-- which works out to be `m (Either a e)` so i use runEitherT to extract the
+-- embedded value and since `m` is functor then i can use `fmap swapEither` to 
+-- access the Either values in the `m (Either a e)` structure.
+-- Voila !!!!
+--
 swapEitherT :: (Functor m) => EitherT e m a -> EitherT a m e
 swapEitherT ea = EitherT $ (fmap swapEither $ runEitherT ea)
 
