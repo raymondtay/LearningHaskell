@@ -27,3 +27,18 @@ instance (Monad m) => Monad (EitherT e m) where
       case v of 
           (Left l) -> return (Left l)
           (Right r) -> runEitherT (f r)
+
+-- 
+-- The book suggests to build a combinator like swapEither first before
+-- expressing swapEitherT interms of swapEither.
+--
+swapEither :: Either e a -> Either a e
+swapEither ea =
+  case ea of 
+      (Left v) -> Right v
+      (Right v) -> Left v
+
+swapEitherT :: (Functor m) => EitherT e m a -> EitherT a m e
+swapEitherT ea = EitherT $ (fmap swapEither $ runEitherT ea)
+
+
