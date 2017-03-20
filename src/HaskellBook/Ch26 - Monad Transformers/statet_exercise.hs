@@ -58,4 +58,22 @@ instance Monad m => Applicative (StateT s m) where
         gg <- (ma s) -- gg :: (a, s)
         return ((fst ff) (fst gg), s))
 
+-- Write a monad instance for StateT
+--
+instance (Monad m) => Monad (StateT s m) where
+  return :: a -> StateT s m a
+  return = pure
+
+  
+  (>>=) :: StateT s m a -> (a -> StateT s m b) -> StateT s m b
+  (StateT ma) >>= f = 
+    StateT $ (\s -> do
+      a <- ma s -- (ma s) :: m a, a :: (a ,s)
+      -- (f (fst a)) :: StateT s m b
+      -- runStateT (f (fst a)) :: s -> m (a, s)
+      -- consuming 's' right after invoking runStateT gives `m (a , s)`
+      (runStateT (f (fst a)) $ s) ) 
+
+
+
 
