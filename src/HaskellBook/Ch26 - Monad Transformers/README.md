@@ -55,3 +55,37 @@ the gap.
 """
 which makes sense now.
 
+# Let's talk about MonadTrans now 
+
+We often want to lift functions into a larger context. We have been doing this
+for a while with `Functor`, which lifts a function into a context (or,
+alternatively, lifts the functions ovefr the context) and applies it to the
+value inside. The facility to do this also undergirds Applicative, Functor,
+Monad and Traversable. Howevr, fmap isn't always enough, so we have some
+functions that are essentially `fmap` for different contexts:
+
+```haskell
+
+fmap :: Functor f => (a -> b) -> f a -> f b
+
+liftA :: Applicative f => (a -> b) -> f a -> f b
+
+liftM :: Monad m => (a -> r) -> m a -> m r
+
+```
+
+You might notice the latter two examples have lift in the function name. While
+we have encouraged you not to get too excited about the meaning of function
+names, in this case they do give you a clue of what they're doing. They are
+lifting, just as `fmap` does, a function into some larger context. The
+underlying structure of the bind function from Monad is also a lifting function
+- fmap again! - composed with the crucial `join` function. 
+
+In some cases, we want to talk about more or different structure than these
+types permit. In other cases, we want something that does as much lifting as is
+necessary to reach some (structurally) outermost position in a stack of monad
+transformers. Monad transformers can be nested in order to compose various
+effects into one monster function, but in order to manage those stacks, first,
+we need to lift more.
+
+
