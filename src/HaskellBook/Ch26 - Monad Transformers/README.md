@@ -88,4 +88,11 @@ transformers. Monad transformers can be nested in order to compose various
 effects into one monster function, but in order to manage those stacks, first,
 we need to lift more.
 
+# Monads do not commute 
+
+Remember that monads in general do not commute, and you aren't guaranteed
+something sensible for every possible combination of types. The kit we have for
+constructing and using monad transformers is useful but is not a license to not
+think!
+
 
