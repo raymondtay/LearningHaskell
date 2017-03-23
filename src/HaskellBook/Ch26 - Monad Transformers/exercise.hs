@@ -93,6 +93,16 @@ rPrintAndInc = ReaderT (\r ->
 -- String.
 --
 sPrintIncAccum :: (Num a, Show a) => StateT a IO String
-sPrintIncAccum = undefined
+sPrintIncAccum = StateT (\s ->
+  do
+    putStr ("Hello there input: " ++ show s ++ "\n")
+    return (show s, s+1))
 
+-- *Chapter26 Control.Monad.Identity Control.Monad.State> mapM (runStateT sPrintIncAccum ) [1..4]
+-- Hello there input: 1
+-- Hello there input: 2
+-- Hello there input: 3
+-- Hello there input: 4
+-- [("1",2),("2",3),("3",4),("4",5)]
+-- *Chapter26 Control.Monad.Identity Control.Monad.State>
 
