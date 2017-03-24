@@ -33,4 +33,10 @@ be evaluated, then it would force the evaluation of the first value of type
 will ever be evaluated *period*. Instead, we have to create links between nodes
 in the graph of expressions where forcing one expression will force yet another
 expression.
+ 
+# seq and weak head normal form
+
+What `seq` does is evaluate your expression up to weak head normal form. WHNF
+evaluation means it stops at the first data constructor or lambda. 
+
 

@@ -66,3 +66,67 @@ possiblyKaboom' b =
       False -> snd tup
       where tup = (42, undefined)
             
+-- The function, hypo, illustrates the classical problem of non-strict
+-- evaluation. For a strict language, the following code is going to be a
+-- problem. A strict language cannot evaluate `hypo` successfully unless the x
+-- isn't bottom. This is because strict languages will force the bottom before
+-- binding x. A strict language is evaluating each binding as it comes into
+-- scope, not when a binding is used.
+--
+-- 
+hypo :: IO ()
+hypo = do
+  let x :: Int
+      x = undefined
+  s <- getLine
+  case s of 
+    "hi" -> print x
+    _    -> putStrLn "hello"
+    
+-- The idea is that evaluation is driven by demand, not by construction. We
+-- don't get the exception unless we are forcing evaluation of 'x' outside in.
+--
+--
+
+
+hypo' :: IO ()
+hypo' = do
+  let x :: Integer
+      x = undefined
+  s <- getLine
+  case x `seq` s of 
+      "hi" -> print x
+      _    -> putStrLn "hello"
+
+--
+-- seq :: Eval a => a -> b -> b
+--
+-- Eval is short for "evaluation for weak head normal form", and it provided a
+-- method for forcing evaluation. Instances were provided for all the types in
+-- `base`. It was elided in part so you could use `seq` in your code without
+-- churning your polymorphic type variables and forcing a bunch of changes.
+-- W.r.t bottom, seq is defined as behaving in the following manner:
+--
+-- seq bottom b = bottom
+-- seq anythingbutbottom b = b
+--
+-- Evaluation in Haskell is demand driven, we cannot guarantee that something
+-- will ever be evaluated period. Instead we have to create links between nodes
+-- in the graph of expressions where forcing one expression will force yet
+-- another expression.
+--
+
+
+
+-- This returns 11 and why? The information around `seq` infixr 0
+-- The expression below is the same as...
+--
+-- snd $ (seq undefined seq 2 10, 11)
+--
+notGonnaHappenBru :: Int
+notGonnaHappenBru = 
+  let x = undefined
+      y = 2
+      z = (x `seq` y `seq` 10, 11)
+  in snd z
+
