@@ -25,4 +25,12 @@ program executes or how efficiently it does so.
 The essence of non-strictness is that you can have an expression which results
 in a value, even if bottom or infinite data lurks within.
 
+A strict language is evaluating each binding as it comes into scope, not when a
+binding is used. The `seq` function has the type signature `seq :: a -> b -> b`
+but what it really means is that whenever the second value of type 'b' needs to
+be evaluated, then it would force the evaluation of the first value of type
+'a'. Evaluatin in Haskell is demand-driven, we cannot guarantee that something
+will ever be evaluated *period*. Instead, we have to create links between nodes
+in the graph of expressions where forcing one expression will force yet another
+expression.
 
