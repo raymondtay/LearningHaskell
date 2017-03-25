@@ -39,4 +39,28 @@ expression.
 What `seq` does is evaluate your expression up to weak head normal form. WHNF
 evaluation means it stops at the first data constructor or lambda. 
 
+Another way we can talk about different evaluation strategies is by
+distinguishing them on the basis of call by name, call by need and call by
+value.
+
+### Call by value
+
+Argument expressions have been evaluated before entering a function. The
+expressions that bindings reference are evaluated before creating the binding.
+This is conveniently called strict. This is inside-out evalution.
+
+### Call by name
+
+Expressions can be arguments to a function without having been evaluated, or in
+some cases, never being evaluated. You can create bindings to expressions
+without evaluating them first. Non-strictness includes this evaluation
+strategy. This is outside-in.
+
+### Call by need
+
+This is the same as call by name, but expressions are only evaluated once. This
+only happens some of the time in GHC Haskell, usually when an expressions isn't
+a lambda that takes arguments and also has a name. Results are typically shared
+within that name only in GHC Haskell (that is, other implementations of Haskell
+may choose to do things differently). This is also non-strict and outside-in.
 
