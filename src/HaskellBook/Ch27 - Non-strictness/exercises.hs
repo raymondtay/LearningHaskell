@@ -130,3 +130,12 @@ notGonnaHappenBru =
       z = (x `seq` y `seq` 10, 11)
   in snd z
 
+hypo'' :: IO ()
+hypo'' = do
+  let x :: Integer
+      x = undefined
+  s <- seq x getLine  -- forced the evaluation of 'x'
+  case s of 
+    "hi" -> print x
+    _ -> putStrLn "hello"
+
