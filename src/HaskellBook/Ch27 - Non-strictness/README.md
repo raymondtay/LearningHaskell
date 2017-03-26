@@ -64,3 +64,89 @@ a lambda that takes arguments and also has a name. Results are typically shared
 within that name only in GHC Haskell (that is, other implementations of Haskell
 may choose to do things differently). This is also non-strict and outside-in.
 
+## Non-strict evaluation changes what we can do
+
+Let's look at examples of non-strictness and what it enables.
+```haskell
+Prelude> let mm = [1,2,3]
+Prelude> tail mm
+[2,3]
+```
+That works in either strict or non-strict languages because there is nothing
+there that cannot be evaluated. However, if we keep in mind that `undefined` as
+an instance of `bottom` then it will throw an error when forced:
+
+```haskell
+Prelude> undefined
+*** Exception: Prelude.undefined
+```
+
+Below is an example of what i mean by being _forced_ ...
+```haskell
+
+Prelude> let mm = [undefined, 1,2]
+Prelude> tail mm
+[1,2]
+Prelude> head mm
+*** Exception: Prelude.undefined
+```
+
+A strict language would have crashed on construction of `mm` due to the
+presence of bottom. This is because strict languages eagerly evaluate all
+expressions as soon as they are constructed. In Haskell, however, non-strict
+evaluation means that bottom values won't be evaluated unless it is needed for
+some reason.
+
+Here's a interesting expression which i thought would render the same but turns
+out it wasn't. At first glance, it seems like list-generator functions like
+`..` are in-built functions which aren't evaluated at declaration time and when
+compared to literal list construction, the contrast is clear.
+
+The interesting thing here is that even though we constructed `[1,2,3,4]` i
+would expect that GHC should already know that its a `[Integer]` but turns out
+its not evaluated but when i declared it for what it really is, we can see that
+the entire expression is unfolded and revealed.
+
+```haskell
+
+Prelude> let listOfLiterals = [1..4]::[Integer]
+Prelude> :sprint listOfLiterals
+listOfLiterals = _
+...
+Prelude> let listOfLiterals = [1,2,3,4]::[Integer]
+Prelude> :sprint listOfLiterals
+listOfLiterals = [1,2,3,4]
+Prelude>
+...
+Prelude> let listOfLiterals = [1,2,3,4]
+Prelude> :sprint listOfLiterals
+listOfLiterals = _
+
+```
+
+## Refutable and Irrefutable patterns
+
+When we are talking about pattern matching, it is important to be aware that
+there are refutable and irrefutable patterns. An irrefutable pattern is one
+which will never fail to match. A refutable pattern is one which has potential
+failures. Often, the problem is one of specificity.
+
+```haskell
+refutable :: Bool -> Bool
+refutable True= False
+refutable False = True
+
+irrefutable :: Bool -> Bool
+irrefutable x = not x
+
+oneOfEach :: Bool -> Bool
+oneOfEach True = False
+oneOfEach _ = True
+```
+
+In the book, the authors cautioned us to bear in mind that the pattern is
+refutable or not, not the function itself. The function `refutable` is
+refutable because each case is refutable; each case could be given an input
+that fails to match. In contrast, irrefutable has an irrefutable pattern; that
+is , its pattern does not rely on matching with a specific value.
+
