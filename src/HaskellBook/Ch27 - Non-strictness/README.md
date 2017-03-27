@@ -150,3 +150,16 @@ refutable because each case is refutable; each case could be given an input
 that fails to match. In contrast, irrefutable has an irrefutable pattern; that
 is , its pattern does not rely on matching with a specific value.
 
+## What subverts or prevents sharing 
+
+Sometimes we don't want sharing. Sometimes we want to know why sharing didn't
+happen when we did want it. Understanding what kinds of things prevent sharing
+is therefore useful. 
+
+Inlining expressions where they get used prevents sharing because it creates
+independent thunks that will get computed separately. Being a function with
+explicit, named arguments also prevents sharing. Haskell is not fully lazy; it
+is merely non-strict, so it is not required to remember the result of every
+function application for a given set of arguments, nor would it be desirable
+given memory constraints.
+
