@@ -18,3 +18,20 @@ manualSeq b = b `seq` 1
 banging :: Bool -> Int
 banging !b = 1
 
+-- Bang patterns in data
+--
+-- when we evaluate the outer data constructor of a data type, at times we
+-- would also like to evaluate the contents to weak head normal form just like
+-- with functions.
+--
+-- a simple way to see the difference between strict and non-strict constructor
+-- arguments is how they behave when they are undefined. 
+--
+data Foo = Foo Int !Int
+
+first (Foo x _) = x
+second (Foo _ y) = y
+
+-- since the non-strict argument isn't evaluated by `second`, passing in
+-- `undefined` doesn't cause a problem
+--
