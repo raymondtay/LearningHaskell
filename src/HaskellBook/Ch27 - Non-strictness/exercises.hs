@@ -139,3 +139,17 @@ hypo'' = do
     "hi" -> print x
     _ -> putStrLn "hello"
 
+-- Lazy patterns
+-- these kinds of patterns are irrefutable.
+--
+strictPattern :: (a, b) -> String
+strictPattern (a ,b) = const "Cousin it" a
+
+lazyPattern :: (a, b) -> String
+lazyPattern ~(a,b) = const "Cousin it" a
+
+-- the tilde (i.e. ~) is how one makes a pattern match lazy. A caveat is that
+-- since it makes the pattern irrefutable, you cannot use it to discriminate
+-- cases of a sum - it's useful for unpackig products that might not get used.
+--
+
