@@ -163,3 +163,41 @@ is merely non-strict, so it is not required to remember the result of every
 function application for a given set of arguments, nor would it be desirable
 given memory constraints.
 
+Implicit parameters are implemented similarly to typeclass constraints and have
+the same effect on sharing. Sharing doesn't work in the presence of constraints
+(typeclasses or implicit parameters) because typeclass constraints and
+implicit parameters decay into function arguments when the compiler simplifies
+the code. Values of a concrete, constant type can be shared, once evaluated.
+Polymorphic values may be evaluated once but still not shared because
+underneath, they continue to be functions awaiting application.
+
+## Preventing sharing on purpose
+
+When do we want to prevent sharing? When we don't want a large datum hanging
+out in memory that was calculated to provide a much smaller answer.
+
+## Forcing sharing 
+
+You can force sharing by giving your expression a name. The most common way of
+doing this is with `let`.
+```haskell
+-- calculates 1 + 1 twice
+(1+1) * (1+1)
+
+-- shares 1 + 1 result under 'x'
+let x = 1 + 1 in x * x
+```
+With that in mind, if you take a look at the forever function in Control.Monad,
+you might see something a litte mysterious looking:
+
+```haskell
+forever :: (Monad m) => m a -> m b
+forever a = let a' >> a' in a'
+```
+
+Why the let expression? well, we want sharing here so that running a monadic
+action indefinitely doesn't leak memory. The sharing here causes GHC to
+overwrite the thunk as it runs each step in the evaluation, which is quite
+handy. Otherwise, it would keep constructing new thunks indefinitely and that
+would be very unfortunate.
+
