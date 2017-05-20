@@ -9,7 +9,7 @@ lists, they become one list, so the structures themselves have been joined.
 However, the core operation of Functor, fmap applies a function to a value that
 is within some structure whiel leaving that structure unaltered.
 
-We come now to Applicative. Applicative is a monoidal functor. The applicative
+We come now to Applicative. _*Applicative is a monoidal functor*_. The applicative
 typeclass allows for functiona pplication lifted over structure (like
 Functors), but with Applicative the function we are applying is also embedded
 in some structure. Because the function and the value it's being applied to
