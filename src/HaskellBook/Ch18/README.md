@@ -95,6 +95,17 @@ mattered much.Both concerned functions that looked like the usual (a -> b)
 arrangement, so composition "just worked" and that this was true was guaranteed
 by the laws of those typeclasses.
 
+## Instances
+
+Even if you don't understand the intuition behind the `Monad` class, you can
+still create instances of it by just seeing where the types lead you. You may
+be surprised to find that this actually gets you a long way towards
+understanding the intuition, at the very least, it will give you some concrete
+examples to play with as you read more about the `Monad` class in general. The
+first few examples are from the stadnard `Prelude`; the remain examples are
+from the `transformers` package.
+
+
 # Monadic Composition
 
 How does one actually compose monads? First of all, can it actually be done?

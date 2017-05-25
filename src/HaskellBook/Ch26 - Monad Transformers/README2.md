@@ -64,4 +64,4 @@ A necessary byproduct of how transformers work is that the additional strucutre
 wrapped around things we can have, not things we need, such as with `ReaderT`.
 
 The consequence of this is that a series of monad transformers in a type will
-begi with the innermost type structurally speaking.
+begin with the innermost type structurally speaking.
