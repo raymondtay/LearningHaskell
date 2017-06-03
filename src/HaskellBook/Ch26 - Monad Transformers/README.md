@@ -96,3 +96,14 @@ constructing and using monad transformers is useful but is not a license to not
 think!
 
 
+The idea here is that we have to lift an Applicative `apply` over the outer
+structure `f` to get the `g (a -> b)` into `g a -> g b` so that the 
+Applicative instance for `f` can be leveraged. We can stretch this idea a bit
+and use concrete types:
+
+```haskell
+
+innerMost:: [Maybe (Identity (a -> b))] -> [Maybe (Identity a -> Identity b)]
+innerMost = (fmap . fmap)(<*>)
+
+```
