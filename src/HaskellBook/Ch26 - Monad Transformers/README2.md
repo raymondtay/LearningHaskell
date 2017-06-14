@@ -65,3 +65,21 @@ wrapped around things we can have, not things we need, such as with `ReaderT`.
 
 The consequence of this is that a series of monad transformers in a type will
 begin with the innermost type structurally speaking.
+
+# Monads do not commute 
+
+Remember that monads in general,and you aren't guaranteed that something
+sensible forevery possible combination of types.The kit we have for every
+possible combination of types. The kit we have for constructing and using
+monad transformaters is useful but is not a license to not think!
+
+### Hypothetical exercise
+
+Consider `ReaderT r Maybe` and `MaybeT (Reader r)` -- are these types
+equivalent? Do they do the samething? Try writing otherwise similar bits of
+code with each and see if you can prove they are the same or different.
+
+
+## Transform if you want to
+
+
