@@ -5,6 +5,12 @@ module Chapter_22 where
 import Control.Applicative
 import Control.Monad (join)
 
+hurr :: Num a => a -> a
+hurr = (*2) 
+durr :: Num a => a -> a
+durr = (+10)
+m :: Num a => a -> a
+m = hurr . durr
 newtype Reader r a = Reader { runReader :: r -> a }
 
 --
