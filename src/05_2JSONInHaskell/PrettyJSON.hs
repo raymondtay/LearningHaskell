@@ -6,8 +6,6 @@ import Data.Bits (shiftR, (.&.))
 import SimpleJSON (JValue(..))
 import Prettify (Doc, (<>), char, double, fsep, hcat, punctuate, text, compact, pretty)
 
-data Doc = TobeDefined deriving Show
-
 renderJValue :: JValue -> Doc
 renderJValue (JBool True) = text "true"
 renderJValue (JBool False) = text "false"
