@@ -1,3 +1,21 @@
+## Evaluation in Haskell
+
+In Haskell, the subexpression 1 + 2 is not reduced to the value 3. Instead, we
+create a "promise" that when the valu eof the expression `isOdd (1 + 2 )` is
+needed, we will be able to compute it. The record that we use to track an
+unevaluated expression is referred to as a thunk. This is all that happens: we
+create a thunk and defer the actual evaluation untill it is really needed. If
+the result of this expression is never subsequently used, we will not compute
+its value at all.
+
+Nonstrict evluation is often referred to as lazy evaluation.
+
+
+Purity makes the job of understanding code easier. The behavior of a pure
+function does not depend on the value of a global variable, or the contents of
+a database or the state of a network connection. Pure code is inherently
+modular: every function is self-contained and has a well-defined interface.
+
 
 ## About Parameteric Polymorphism
 
