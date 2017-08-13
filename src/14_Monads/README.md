@@ -50,3 +50,22 @@ shortcoming:
 the type constructor that wraps a monadic value makes it tricky to use a
 normal, pure function on a value trapped inside a monadic wrapper.
 """
+
+# Desugaring of `do`-Blocks
+
+Haskell's `do` syntax is an example of syntactic sugar: it provides an
+alternative way of writing monadic code, without using `(>>=)` and anonymous
+functions. Desugaring is the translation of syntactic sugar back to the core
+language.
+
+The rules for desugaring a `do`-block are easy to follow. We can think of a
+compiler as applying these rules mechanically and repeatedly to a do-block
+until no more do keywords remain.
+
+A do-keyword followed by a single action is translated to that action by
+itself:
+A do keyword followed by more than one action is translated to the first
+action, then (>>), followed by a do keywrod and the remaining actions. When we
+apply this rule repeatedly, the entire do-block ends up chained together by
+applications of (>>).
+
