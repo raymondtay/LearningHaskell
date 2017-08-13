@@ -33,3 +33,20 @@ escape from its monadic wrapper. The author of a monad thus has complete
 control over how whatever happens inside the monad gets out.
 
 
+From the book "Real World Haskell" on page 328 reads
+"""
+We intentionally have said nothing about how the chaining and injection
+functions of a monad should behave, because this almost does not matter. In
+fact, monads are ubiquitous in Haskell code precisely because they are so
+simple. Many common programming patterns have a monadic structure : passing
+around implicit data or short-circuiting a chain of evaluations if one fails,
+to choose but two.
+"""
+
+From the book "Real World Haskell" on page 334 reads
+"""
+Based on the code we have seen so far, monads seem to have a substantial
+shortcoming:
+the type constructor that wraps a monadic value makes it tricky to use a
+normal, pure function on a value trapped inside a monadic wrapper.
+"""
