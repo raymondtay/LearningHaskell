@@ -69,3 +69,18 @@ action, then (>>), followed by a do keywrod and the remaining actions. When we
 apply this rule repeatedly, the entire do-block ends up chained together by
 applications of (>>).
 
+# Monads and Functors
+
+Functors and monads are closely related. The terms are borrowed from a branch
+of mathematics called category theory, but they did not make the transition to
+Haskell completely unscathed.
+
+In category theory, a monad is built from a functor. You might expect that in
+Haskell, the Monad typeclass would thus be a subclass of Functor, but it isn't
+defined as such in the standard Prelude - an unfortunate oversight.
+
+However, authors of Haskell libraries use a workaround: When programmers define
+an instance of Monad for a type, they almost always write a Functor instance
+for it, too. You can expect that you will be able to use the Functor
+typeclass's `fmap` function with any monad.
+
