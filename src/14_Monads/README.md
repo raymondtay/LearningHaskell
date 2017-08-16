@@ -104,3 +104,13 @@ class (Monad m) => MonadSupply s m | m -> s where
 This typeclass defines the interface that any supply monad must implement. It
 bears careful inspection, since it uses several unfamiliar Haskell language
 extensions. We will cover each one in the sections that follow.
+
+# The Reader Monad
+
+The `State` monad lets us plumb a piece of mutable state through our code.
+Sometimes, we would like to be able to pass some immutable state around, such
+as a program's configuraiton data. We could use the `State` monad for this
+purpose, but we might then find ourselves accidentally modifying data that
+should remain unchanged.
+
+
