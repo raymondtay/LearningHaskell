@@ -84,3 +84,23 @@ an instance of Monad for a type, they almost always write a Functor instance
 for it, too. You can expect that you will be able to use the Functor
 typeclass's `fmap` function with any monad.
 
+# Separating Interface from Implementation
+
+Another important way to make code more modular involves separating its
+interface (What the code can do) from its implementation - how it does it.
+
+The standard random number generator in `System.Random` is known to be quite
+slow. One simple and effective way that we could deal with this is to provide
+`Supply` with a better source of random numbers. Let's set this idea aside,
+though, and consider an alternative approach,one that is useful in many
+settings. We will separate the actions we can perform with the monad from how
+it works using a typeclass:
+
+```haskell
+class (Monad m) => MonadSupply s m | m -> s where
+  next :: m (Maybe s)
+```
+
+This typeclass defines the interface that any supply monad must implement. It
+bears careful inspection, since it uses several unfamiliar Haskell language
+extensions. We will cover each one in the sections that follow.

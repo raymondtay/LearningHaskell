@@ -8,4 +8,21 @@ If we had a constructor or pure function that takes, say, 10 parameters and
 decided to stick with the standard libraries, you might think we would be out
 of luck.
 
+Together with the haskell language extension `GeneralizedNewtypeDeriving`, we
+can basically remove boilerplate code from the implementation. See
+[[Supply.hs]] for an example of how this can be done.
+
+Another important way to make code more modular involves separating its
+interface (what the code can do) from its implementation - how it does it.
+
+The standard random number generator in `System.Random` is known to be quite
+slow. If we use our `randomsIO` function to provide it with random numbers,
+then our next action will not perform well.
+
+One simple and effective way that we could deal with this is to provide
+`Supply` with a better source of random numbers. Let's set this idea aside,
+though, and consider an alternative approach, one that is useful in many
+settings. We will separate the actions we can perform with the monad from how
+it works using a typeclass (See [[SupplyClass.hs]])
+
 
