@@ -25,4 +25,14 @@ though, and consider an alternative approach, one that is useful in many
 settings. We will separate the actions we can perform with the monad from how
 it works using a typeclass (See [[SupplyClass.hs]])
 
+# Using Typeclasses
 
+On page 378, the passage reads 
+"""
+The disadvantage of hiding IO in another monad is that we are still tied to a
+concrete implementation. If we want to swap HandleIO for some other monad, we
+must change the type of every action that uses HandleIO.
+
+"""
+
+**Note** : Go read the source files [[MonadHandle.hs]], [[MonadHandleIO.hs]], 
