@@ -37,8 +37,7 @@ The type that's being referred to is `Maybe a` that is now held by `Identity`;
 which you can use in the non-transformer variant parts of your code.
 
 The book goes along and makes the following statement:
-"""
-
+```haskell
 Given that, we can get Identity from IdentityT and so on in the following
 manner:
 
@@ -52,7 +51,7 @@ This works fine for recovering the non-transformer varaint of each type as the
 Identity type is acting as a bit of do-nothing structural paste for filling in
 the gap.
 
-"""
+```
 which makes sense now.
 
 # Let's talk about MonadTrans now 
@@ -79,7 +78,7 @@ we have encouraged you not to get too excited about the meaning of function
 names, in this case they do give you a clue of what they're doing. They are
 lifting, just as `fmap` does, a function into some larger context. The
 underlying structure of the bind function from Monad is also a lifting function
-- fmap again! - composed with the crucial `join` function. 
+- `fmap` again! - composed with the crucial `join` function. 
 
 In some cases, we want to talk about more or different structure than these
 types permit. In other cases, we want something that does as much lifting as is
