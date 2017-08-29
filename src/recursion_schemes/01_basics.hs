@@ -15,7 +15,7 @@ data NatF a = ZeroF | SuccF a deriving (Show, Functor)
 data ListF a r = NilF | ConsF a r deriving (Show, Functor)
 
 type Nat = Fix NatF -- Declaring that `Nat` is a type alias to a 'recursive defn of NatF'
-type List a = Fix (ListF a)
+type List a = Fix (ListF a) -- Declaring `List` is a type alias to a 'recursive defn of ListF'
 
 zero :: Nat 
 zero = Fix ZeroF
@@ -53,4 +53,9 @@ filterL p = cata alg where
   alg (ConsF x xs) 
     | p x = cons x xs
     | otherwise = xs
+
+--
+-- `filterL (\x -> x mod 2 == 0) (cons 1 (cons 2 (cons 3 nil)))`
+--
+
 
