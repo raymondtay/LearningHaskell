@@ -1,4 +1,9 @@
-module MyModule where
+module MyTMVar ( -- make the exports explicit; excluding the main function.
+  TMVar,
+  newEmptyTMVar,
+  takeTMVar,
+  putTMVar
+  ) where
 
 -- |
 -- | Here's how to develop the transaction MVars which is what TMVar is really
