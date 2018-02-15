@@ -115,7 +115,13 @@ hypo' = do
 -- in the graph of expressions where forcing one expression will force yet
 -- another expression.
 --
-
+{-
+  Another way to understand what is meant by "forcing the bottom" can probably be understood as follows:
+  let {x = undefined, y = 2} in seq x y  <--- throws an exception because to get 'y', ghc will eval 'x'
+  let {x = undefined, y = 2, z = (x `seq` y `seq` 10, 11)} in snd z <--- DOES not throw an error because 'snd z' does not eval the first element of the pair but if you changed the expression to:
+  let {x = undefined, y = 2, z = (x `seq` y `seq` 10, 11)} in fst z <--- throws an exception because to eval the first element
+  of the pair, means it has to eval "x `seq` y `seq` 10" which triggers the evaluation of 'x' eventually which is undefined.
+-}
 
 
 -- This returns 11 and why? The information around `seq` infixr 0
