@@ -159,3 +159,12 @@ lazyPattern ~(a,b) = const "Cousin it" a
 -- cases of a sum - it's useful for unpackig products that might not get used.
 --
 
+{-
+  
+  seq and weak head normal form
+
+  What seq does is evaluate your expression up to weak head normal form. We have discussed it before but if you like a deeper 
+  investigation and contrast of weak head normal form and normal form, Simon Marlow's book has a good section which explains
+  what is meant. In a nutshell, WHNF evaluation means it stops at the first data constructor or lambda.
+
+-}
