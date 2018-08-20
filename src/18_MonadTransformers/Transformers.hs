@@ -25,6 +25,9 @@ data Value = IntVal Integer | FunVal Env Name Exp deriving (Show) -- values
 
 type Env = Map.Map Name Value -- mapping from names to values
 
+-- first attempt at the interpreter of this algebra
+--
+
 eval0 :: Env -> Exp -> Value
 eval0 env (Lit i) = IntVal i
 eval0 env (Var n) = fromJust (Map.lookup n env)
@@ -193,3 +196,12 @@ eval2 env (App e1 e2) = do val1 <- eval2 env e1
 -- encapsulated computation cannot change the value used by surrounding
 -- computation.
 --
+eval0 env (Abs n e) = FunVal env n e
+eval0 env (App e1 e2) = let val1 = eval0 env e1
+                            val2 = eval0 env e2
+                        in case val1 of
+                               FunVal env' n body -> eval0 (Map.insert n val2 env') body
+
+
+main = do
+  putStrLn ""
