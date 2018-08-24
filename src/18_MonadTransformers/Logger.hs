@@ -41,4 +41,11 @@ instance Monad Logger where
                      (a1,log1) = execLogger . f $ a
                  in Logger( a1, log ++ log1 ) 
 
-
+-- Reading and Modifying the State
+--
+--  The definitions of >>= and return for the State monad simply act as
+--  plumbing : they move  apiece of state around but they dont touch iut in any
+--  way. We need a few other simple functions to actually do useful work with
+--  the state:
+--
+--

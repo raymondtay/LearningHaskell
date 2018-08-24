@@ -34,5 +34,20 @@ instance Monad (SimpleState s) where
                                     (a2, s3) = (run $ g a) $ s2
                                 in (a2, s3)
 
+-- The State Monad, by contrast, accepts any type of state as a parameter. We
+-- supply the type of the state to give, for example, State ByteString. The
+-- State Monad wil lprobably feel more familiar to you than many other monads
+-- if you have a background in imperative languages. After all, imperative
+-- languages are all about carrying around some implicit state, reading some
+-- parts, and modifying others through assignment, which is just what the STate
+-- monad is for.
+--
+-- Running the State Monad. Each Monad has its own specialized evaluation
+-- functions. In the case of the State Monad, we have several to choose from:
+-- runState - returns both the result and final state
+-- evalState - returns only the result, discarding the final state
+-- execState - returns only the final state, discarding the result
+-- Note: this is coincidentally the convention chosen by Scalaz and later on by
+-- Cats.
 
 
