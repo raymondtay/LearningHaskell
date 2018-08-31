@@ -1,6 +1,6 @@
 {-# LANGUAGE FunctionalDependencies, MultiParamTypeClasses #-}
 
-import MonadHandle -- the name of the file is also the module name
+import MonadHandle
 import qualified System.IO
 import System.IO (IOMode(..))
 import Control.Monad.Trans (MonadIO(..), MonadTrans(..))
