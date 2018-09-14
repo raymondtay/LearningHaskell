@@ -3,6 +3,8 @@ import System.Directory
 import System.FilePath
 import Control.Monad.Reader
 import Control.Monad.State
+import Control.Monad.Writer
+
 
 data AppConfig = AppConfig { cfgMaxDepth :: Int } deriving (Show)
 
@@ -92,4 +94,19 @@ runApp k maxDepth =
       state = AppState 0
   in runStateT (runReaderT k config) state
 
+-- Now, let's explore about Writer Monads 
+whatsMyName :: WriterT [String] (ReaderT String IO) ()
+whatsMyName = do
+  name <- ask
+  tell ["You gave me: " ++ name]
+
+getMyName = runReaderT (runWriterT whatsMyName)
+
+type Log = [String]
+type AppW = WriterT Log App ()
+
+runAppW k maxDepth =
+  let config = AppConfig maxDepth
+      state = AppState 0
+  in runWriterT (runStateT (runReaderT k config) state)
 
