@@ -1,7 +1,9 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 import Control.Monad.Reader
+import Data.Functor.Identity
 
+myName :: String -> ReaderT String Identity String
 myName step = do
   name <- ask
   return (step ++ ", I am " ++ name)

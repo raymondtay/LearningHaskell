@@ -13,4 +13,11 @@ For example, the transformer equivalent of `State` is `StateT`; it adds a
 mutable state to an underlying monad. The `WriterT` monad transformer makes it
 possible to write data when stacked on top of another monad.
 
+# Stacking Multiple Monad Transformers
+
+When we stack a monad transformer on a normal monad, the result is another
+monad. This suggests the possibility that we can again stack a monad
+transformer on top of our combined monad, in order to get a new monad and in
+fact, this is a common thing to do. Under what circumstances might we want to
+create such a stack?
 
