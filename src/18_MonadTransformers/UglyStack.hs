@@ -110,3 +110,21 @@ runAppW k maxDepth =
       state = AppState 0
   in runWriterT (runStateT (runReaderT k config) state)
 
+-- Track our current depth and record the maximum depth we reach
+constrainedCount :: Int -> FilePath -> App [(FilePath, Int)]
+constrainedCount curDepth path = do
+  contents <- liftIO . listDirectory $ path
+  cfg <- ask
+  rest <- forM contents $ \name -> do
+    let newPath = path </> name
+    isDir <- liftIO $ doesDirectoryExist newPath
+    if isDir && curDepth < cfgMaxDepth cfg
+        then do
+          let newDepth = curDepth + 1
+          st <- get
+          when (stDeepestReached st < newDepth) $
+            put st { stDeepestReached = newDepth }
+          constrainedCount newDepth newPath
+        else return []
+  return $ (path, length contents ) : concat rest
+
