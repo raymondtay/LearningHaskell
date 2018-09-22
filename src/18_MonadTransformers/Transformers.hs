@@ -1,10 +1,19 @@
 module Transformers where
 
+{-
+  |
+  | Source code for "Monad Transformers Step by Step" - Oct 2006 Martin Grabmuller
+  | Updates:
+  |   - Source code updated for GHC 8.4.3
+  |
+-}
+
 import Control.Monad.Identity
-import Control.Monad.Error -- its already deprecated in GHC 8.4.3
+import Control.Monad.Except
 import Control.Monad.Reader
 import Control.Monad.State
 import Control.Monad.Writer
+import Control.Monad.Trans.Except
 import Data.Maybe
 
 import qualified Data.Map as Map
@@ -40,10 +49,11 @@ eval0 env (App e1 e2) = let val1 = eval0 env e1
                             val2 = eval0 env e2
                         in case val1 of FunVal env' n body -> eval0 (Map.insert n val2 env') body
 {-
-Run the following and it still works !
-*> exampleExp = Lit 12 `Plus` (App (Abs "x" (Var "x")) (Lit 4 `Plus` Lit 2))
-*> eval0 Map.empty exampleExp
-IntVal 18
+
+  Run the following and it works !
+  *> exampleExp = Lit 12 `Plus` (App (Abs "x" (Var "x")) (Lit 4 `Plus` Lit 2))
+  *> eval0 Map.empty exampleExp
+  IntVal 18
 
 -}
 
@@ -64,7 +74,7 @@ IntVal 18
 --
 --
 
-type Eval1 a = Identity a
+type Eval1 a = Identity a -- First thing to do
 runEval1 :: Eval1 a -> a 
 runEval1 ev = runIdentity ev
 
@@ -84,21 +94,22 @@ eval1 env (App e1 e2) = do val1 <- eval1 env e1
                                FunVal env' n body -> eval1 (Map.insert n val2 env') body
 
 {-
-Run the following and it still works !
-*> exampleExp = Lit 12 `Plus` (App (Abs "x" (Var "x")) (Lit 4 `Plus` Lit 2))
-*> runEval1 (eval1 Map.empty exampleExp)
-IntVal 18
+
+  Run the following and it still works !
+  *> exampleExp = Lit 12 `Plus` (App (Abs "x" (Var "x")) (Lit 4 `Plus` Lit 2))
+  *> runEval1 (eval1 Map.empty exampleExp)
+  IntVal 18
 
 -}
 -- Adding error handling
 -- Using monad transformers, we simply go to our local monad transformer
--- library and take the ErrorT monad transformer, using it to extend the basic
+-- library and take the ExceptT monad transformer, using it to extend the basic
 -- Eval1 monad to Eval2.
 --
-type Eval2 a = ErrorT String Identity a
+type Eval2 a = ExceptT String Identity a
 
 runEval2 :: Eval2 a -> Either String a
-runEval2 ev = runIdentity (runErrorT ev)
+runEval2 ev = runIdentity (runExceptT ev)
 
 -- We can now simply change the type of our eval1 function, giving the
 -- following version, called eval2a.
@@ -121,7 +132,7 @@ eval2a env (App e1 e2) = do val1 <- eval2a env e1
 --
 
 -- But unfortunately, when given an invalid expression the error reporting of
--- the ErrorT transofmr is not used. We have to modify our definition in
+-- the ExceptT transofmr is not used. We have to modify our definition in
 -- order to give useful error messages:
 --
 
@@ -196,12 +207,31 @@ eval2 env (App e1 e2) = do val1 <- eval2 env e1
 -- encapsulated computation cannot change the value used by surrounding
 -- computation.
 --
-eval0 env (Abs n e) = FunVal env n e
-eval0 env (App e1 e2) = let val1 = eval0 env e1
-                            val2 = eval0 env e2
-                        in case val1 of
-                               FunVal env' n body -> eval0 (Map.insert n val2 env') body
+
+-- unicode for alpha is '03b1' and lambda is '03bb' i.e. α λ
+type Eval3 α = ReaderT Env (ExceptT String Identity) α
+
+runEval3 :: Env -> Eval3 α -> Either String α
+runEval3 env ev = runIdentity (runExceptT (runReaderT ev env))
+
+eval3 :: Exp -> Eval3 Value
+eval3 (Lit i) = return (IntVal i)
+eval3 (Var n) = do env <- ask
+                   case Map.lookup n env of
+                       Nothing -> throwError ("unbound variable: " ++ show n)
+                       Just val -> return val
+eval3 (Plus e1 e2) = do e1' <- eval3 e1
+                        e2' <- eval3 e2
+                        case (e1', e2') of
+                            (IntVal i1, IntVal i2) -> return (IntVal $ i2 + i1)
+                            _ -> throwError "type error in addition"
+eval3 (Abs n e) = do env <- ask
+                     return (FunVal env n e)
+                     
+eval3 (App e1 e2) = do val1 <- eval3 e1
+                       val2 <- eval3 e2
+                       case val1 of
+                           FunVal env' n body -> local (const (Map.insert n val2 env')) (eval3 body)
+                           _ -> throwError "type error in application"
 
 
-main = do
-  putStrLn ""
