@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving #-}
 
 import System.Directory
 import System.FilePath
@@ -42,7 +43,10 @@ h = do
 -- Here's how i can chain readers and the nice thing about haskell syntax is
 -- that the partial function application on the RHS of the bind-operator is subtle and
 -- implicit
+i :: IO String
 i = (runReaderT g "hi") >>= (runReaderT h)
+
+j :: IO String
 j = do
   x <- i
   (runReaderT g x) *> (runReaderT h x)
@@ -100,6 +104,7 @@ whatsMyName = do
   name <- ask
   tell ["You gave me: " ++ name]
 
+-- Demonstration
 getMyName = runReaderT (runWriterT whatsMyName)
 
 type Log = [String]
@@ -108,7 +113,9 @@ type AppW = WriterT Log App ()
 runAppW k maxDepth =
   let config = AppConfig maxDepth
       state = AppState 0
-  in runWriterT (runStateT (runReaderT k config) state)
+  in do
+      tell "Running AppW which is a RWST"
+      runWriterT (runStateT (runReaderT k config) state)
 
 -- Track our current depth and record the maximum depth we reach
 constrainedCount :: Int -> FilePath -> App [(FilePath, Int)]
@@ -127,4 +134,21 @@ constrainedCount curDepth path = do
           constrainedCount newDepth newPath
         else return []
   return $ (path, length contents ) : concat rest
+
+-- Hiding Our Work
+-- we can use the "newtype" technique to erect a solid barrier between the
+-- implementation of our custom monad and its interface:
+--
+     
+newtype MyApp a = MyA {
+  runA :: ReaderT AppConfig (StateT AppState IO) a 
+} deriving (Functor, Applicative, Monad, MonadIO, MonadReader AppConfig, MonadState AppState)
+
+runMyApp :: MyApp a -> Int -> IO (a, AppState)
+runMyApp k maxDepth = 
+  let config = AppConfig maxDepth
+      state = AppState 0
+  in runStateT (runReaderT (runA k) config) state
+
+
 
