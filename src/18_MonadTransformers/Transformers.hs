@@ -235,3 +235,172 @@ eval3 (App e1 e2) = do val1 <- eval3 e1
                            _ -> throwError "type error in application"
 
 
+{-
+  Adding State
+  Another important application of monads is to provide mutable state to otherwise purely functional code.
+  This can be done using a State Monad, which provides operations for specifying an initial state, querying 
+  the current state and changing it.
+
+-}
+
+type Eval4 α = ReaderT Env (ExceptT String (StateT Integer Identity)) α
+
+-- The return type of the function `runEval4` changes, because the final state
+-- is returned together with the evaluation result (error or value).
+-- Additionally, we give the initial state as an additional parameter so that
+-- we gain some flexibility (this can be used, for example, to start a
+-- computation in the final state of another one).
+--
+--
+-- Note: When you study the declaration of type versus the types of extracting
+-- the monad transformer, you would realize its the reversed of one another.
+--
+runEval4 :: Env -> Integer -> Eval4 α -> (Either String α, Integer)
+runEval4 env st ev = runIdentity (runStateT (runExceptT (runReaderT ev env)) st)
+
+tick :: (Num s, MonadState s m) => m ()
+tick = do st <- get
+          put (st + 1)
+
+-- As before, to run this: runStateT tick 4 should return you ((), 5)
+-- By adding a call to the "tick" function in each case, we can count the
+-- number of applications.
+
+eval4 :: Exp -> Eval4 Value
+eval4 (Lit i) = do tick
+                   return (IntVal i)
+eval4 (Var n) = do env <- ask
+                   tick
+                   case Map.lookup n env of
+                       Nothing -> throwError ("unbound variable: " ++ show n)
+                       Just val -> return val
+eval4 (Plus e1 e2) = do e1' <- eval4 e1
+                        e2' <- eval4 e2
+                        tick
+                        case (e1', e2') of
+                            (IntVal i1, IntVal i2) -> return (IntVal $ i2 + i1)
+                            _ -> throwError "type error in addition"
+eval4 (Abs n e) = do env <- ask
+                     tick
+                     return (FunVal env n e)
+                     
+eval4 (App e1 e2) = do val1 <- eval4 e1
+                       val2 <- eval4 e2
+                       tick
+                       case val1 of
+                           FunVal env' n body -> local (const (Map.insert n val2 env')) (eval4 body)
+                           _ -> throwError "type error in application"
+
+tick' :: (Num s, MonadState s m) => m ()
+tick' = do st <- get
+           modify(\s -> s+2)
+
+tick'' :: (Num s, MonadState s m) => m ()
+tick'' = do tick -- ← reuses/combines "tick" here, pretty nifty isn't it?
+            modify(\s -> s+2)
+-- As what happened to "tick'": runStateT tick' 4 should return you ((), 6)
+-- As what happened to "tick''": runStateT tick' 4 should return you ((), 7)
+--
+
+
+-- Adding Logging
+--
+-- The last monad transformer in the toolbox is WriterT. It is ain some sense
+-- dual to ReaderT because the functions it provides let you add values to the
+-- result of the computation istead of using some values passed in.
+--
+type Eval5 α = ReaderT Env (ExceptT String (WriterT [String] (StateT Integer Identity))) α
+
+-- Similar to StateT, WriterT interacts with ExceptT because it produces
+-- output. So depending on the order of ExceptT and WriterT, the result will
+-- include the values written out or not when an error occurs. The values to be
+-- written out will be lists of strings. When you read the documentation for
+-- the WriterT monad transformer, you will notice that the type of the output
+-- values is restricted to be a member of the type class Monoid. This is
+-- necessary because the methods of this class are used internally to construct
+-- the initial value and to combine several values written out.
+--
+
+runEval5 :: Env -> Integer -> Eval5 α -> ((Either String α, [String]), Integer)
+runEval5 env st ev = runIdentity (runStateT (runWriterT(runExceptT (runReaderT ev env))) st)
+
+-- Here's how we can leverage the WriterT in the "eval" function.
+--
+
+eval5 :: Exp -> Eval5 Value
+eval5 (Lit i) = do tick
+                   return (IntVal i)
+eval5 (Var n) = do env <- ask
+                   tick
+                   tell [n]
+                   case Map.lookup n env of
+                       Nothing -> throwError ("unbound variable: " ++ show n)
+                       Just val -> return val
+eval5 (Plus e1 e2) = do e1' <- eval5 e1
+                        e2' <- eval5 e2
+                        tick
+                        case (e1', e2') of
+                            (IntVal i1, IntVal i2) -> return (IntVal $ i2 + i1)
+                            _ -> throwError "type error in addition"
+eval5 (Abs n e) = do env <- ask
+                     tick
+                     return (FunVal env n e)
+                     
+eval5 (App e1 e2) = do val1 <- eval5 e1
+                       val2 <- eval5 e2
+                       tick
+                       case val1 of
+                           FunVal env' n body -> local (const (Map.insert n val2 env')) (eval5 body)
+                           _ -> throwError "type error in application"
+
+-- What about I/O ?
+--
+-- How do we integrate I/o into the monadic definitions we have developed so
+-- far? It's not possible to define an I/O monad transformer, because in the
+-- execution of the I/O operations in Haskell cannot be arbitrarily nested into
+-- other nested functions or monads, they are only allowed in the monad IO.
+-- Fortunately, the monad transformer library provides us with the
+-- infrastructure to easily integrate I/O operations into our framework: simply
+-- substitute IO where we have used Identity. 
+--
+-- This is possible because Identity is the base monad, the function
+-- runIdentity for evaluating actions in this monad is always applied last.
+--
+
+type Eval6 α = ReaderT Env (ExceptT String (WriterT [String] (StateT Integer IO))) α
+
+-- the return type of runEval6 is wrapped in an IO constructor, which means
+-- that the running an Eval6 computation does not directly yield a result, but
+-- an i/o computation which must be run in order to get at the result. 
+--
+
+runEval6 :: Env -> Integer -> Eval6 α -> IO ((Either String α, [String]), Integer)
+runEval6 env st ev = runStateT (runWriterT (runExceptT (runReaderT ev env))) st
+
+eval6 :: Exp -> Eval6 Value
+eval6 (Lit i) = do tick
+                   liftIO (print i) -- escape hatch !
+                   return (IntVal i)
+eval6 (Var n) = do env <- ask
+                   tick
+                   tell [n]
+                   case Map.lookup n env of
+                       Nothing -> throwError ("unbound variable: " ++ show n)
+                       Just val -> return val
+eval6 (Plus e1 e2) = do e1' <- eval6 e1
+                        e2' <- eval6 e2
+                        tick
+                        case (e1', e2') of
+                            (IntVal i1, IntVal i2) -> return (IntVal $ i2 + i1)
+                            _ -> throwError "type error in addition"
+eval6 (Abs n e) = do env <- ask
+                     tick
+                     return (FunVal env n e)
+                     
+eval6 (App e1 e2) = do val1 <- eval6 e1
+                       val2 <- eval6 e2
+                       tick
+                       case val1 of
+                           FunVal env' n body -> local (const (Map.insert n val2 env')) (eval6 body)
+                           _ -> throwError "type error in application"
+
