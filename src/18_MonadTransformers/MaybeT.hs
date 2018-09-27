@@ -13,6 +13,7 @@ module MaybeT where
 import Control.Monad        (liftM)
 import Control.Monad.Reader
 import Control.Monad.State
+import Control.Monad.Writer
 import Control.Monad.Trans
 
 newtype MaybeT m a = MaybeT { runMaybeT :: m (Maybe a) }
@@ -31,6 +32,9 @@ instance Monad m => Monad (MaybeT m) where
   return  :: a -> MaybeT m a
   return a = MaybeT (return (return a))
   -- return = pure -- this works too and less verbose then the previous.
+
+  fail :: String -> MaybeT m a -- a good idea to provide an interpretation of what to do here.
+  fail _ = MaybeT $ return Nothing
 
   (>>=) :: MaybeT m a -> (a -> MaybeT m b) -> MaybeT m b
   (MaybeT f) >>= g = MaybeT $ do h <- f
@@ -64,12 +68,38 @@ instance (MonadState s m) => MonadState s (MaybeT m) where
 -- yourself into the perspective of the underlying monad, whatever it is.
 -- It can be frustrating from time to time to have to remind yourself of this.
 --
-instance (MonadReader r m) => MonadReader r (MaybeT m) where
-  ask :: MaybeT m r
-  ask = ask
-  local :: (r -> r) -> MaybeT m a -> MaybeT m a
-  local = local
-  reader :: (r -> a) -> MaybeT m a
-  reader = reader
+-- instance (MonadReader r m) => MonadReader r (MaybeT m) where
+--   ask :: MaybeT m r
+--   ask = ask
+--   local :: (r -> r) -> MaybeT m a -> MaybeT m a
+--   local = local
+--   reader :: (r -> a) -> MaybeT m a
+--   reader = reader
 
+-- Adding this instance of MonadWriter over here so that the compilation for
+-- [[StackingOrderMatters.hs]] for "b" will pass.
+-- Consult https://github.com/bos/rwh/blob/master/examples/ch18/MaybeT.hs if
+-- 
+--
+instance (Monoid w, MonadWriter w m) => MonadWriter w (MaybeT m) where
+  -- shouts to the monad
+  tell = lift . tell -- "lift" here will lift the inner m to this level
+  -- listens to the monad acting, and returns what the monad "said" according
+  -- to the source for MonadWriter. Seems like the idea is for me to evaluate
+  -- all the way "in" and return what is going on
+  listen :: MaybeT m a -> MaybeT m (a , w)
+  listen m = MaybeT $ do
+    (result, logs) <- listen (runMaybeT m) -- run the inner monad and then listen to it
+    case result of
+        Nothing -> return Nothing
+        Just v -> return (Just (v, logs))
+
+  -- pass is an action that executes the monad m which returns a value and a
+  -- function, and returns the value, applying the function to the output.
+  pass :: MaybeT m (a, w -> w) -> MaybeT m a
+  pass m = MaybeT $ do
+    a <- runMaybeT m -- returns a value of this type: Maybe (a, w -> w)
+    case a of
+        Nothing -> return Nothing
+        Just (v, log) -> pass $ return (Just v, log)
 
