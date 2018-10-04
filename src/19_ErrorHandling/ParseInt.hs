@@ -49,3 +49,18 @@ satisfy p = do
 optional :: Parser a -> Parser (Maybe a)
 optional p = liftM Just p `catchError` \_ -> return Nothing -- when in error, return Nothing.
 
+-- To execute this, we plug all these functions together 
+--
+runParser :: Parser a -> B.ByteString -> Either ParseError (a, B.ByteString)
+runParser p bs = case runState (runErrorT (runP p)) bs of
+                     (Left err, _) -> Left err
+                     (Right r, bs) -> Right(r, bs)
+
+-- `many` should apply a parser until it fails
+-- the main idea is to encapsulate the idea of accumulating the successes while walking
+-- the input and ignoring the problem.
+--
+many :: Parser a -> Parser [a]
+many p = undefined
+
+
