@@ -2,8 +2,11 @@
 --
 
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
+-- probably a bad idea but for now, seems harmless.
 {-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
 
+import Control.Applicative hiding (many)
 import Control.Monad.Error
 import Control.Monad.State
 import qualified Data.ByteString.Char8 as B
@@ -57,10 +60,31 @@ runParser p bs = case runState (runErrorT (runP p)) bs of
                      (Right r, bs) -> Right(r, bs)
 
 -- `many` should apply a parser until it fails
--- the main idea is to encapsulate the idea of accumulating the successes while walking
--- the input and ignoring the problem.
+-- Got the following idea when scanning GHC's codebase in the
+-- [[ParserCombinators]]. I cannot use [[runParser]] as defined above to
+-- compose this as that function needs the data strings to be present and the
+-- idea is not to do that just yet - i need to figure out a way to build an
+-- abstraction that represents the intention to push the parsing.
 --
+
 many :: Parser a -> Parser [a]
-many p = undefined
+many p = return [] +++ many1 p
+
+-- This is a key abstraction that represents the idea of "merging" the first
+-- parser we see i.e. "p" here, whilst intending to proceed further with the
+-- remaining of the parsing actions i.e. "(many p)" here.
+--
+many1 :: Parser a -> Parser [a]
+many1 p = liftM2 (:) p (many p)
+
+-- Now we need to define the idea of running 2 parsers and picking either one
+-- to push forth...the key understanding here is to leverage `Alternative`
+-- typeclass and to be specific its to use `<|>`.
+-- here 'a' is 
+--
+-- Reference: https://en.wikibooks.org/wiki/Haskell/Alternative_and_MonadPlus
+--
+(+++) :: Parser a -> Parser a -> Parser a
+(+++) (P a) (P b) = P (a <|> b)
 
 
