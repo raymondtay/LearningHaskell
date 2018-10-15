@@ -29,4 +29,20 @@ deadlock is to forget the order in which we must acquire locks. This kind of
 bug is so common, it has a name : lock order inversion. While Haskell does not
 provide locks, the `MVar` type is prone to the order inversion problem.
 
+# Choosing the Right Runtime
+
+The decision of which runtime to use is not completely clear cut. While the
+threaded runtime can use multiple cores, it has a cost: threads and sharing
+data between them are more expensive than with the nonthreaded runtime.
+
+Furthermore, the garbage collector used by GHC as of version 6.8.3 is
+single-threaded: it pauses all other threads while it runs and executes on one
+core. This limits the performance improvement we ca hope to see from using
+multiple cores. In many real-world concurrent programs, an individual thread
+will spend most of its time waiting for a network request or response. In these
+cases, if a single Haskell program serves tens of thousands of concurrent
+clients, the lower overhead of the nonthreaded runtime maybe helpful. for
+example, instead of having a single server program use the threaded runtime on
+four cores, we might see better performance if we design our server so that we
+can run four copies of it simultaneously and use the nonthreaded runtime.
 
