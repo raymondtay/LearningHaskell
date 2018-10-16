@@ -70,13 +70,27 @@ readBoundedChan (read, write, (a, b), canWrite) =
         putMVar a (current - 1) >>
         putMVar read new >> return val
 
-
+-- Trying to read a unpopulated channel will block.
 readWhenEmpty :: IO ()
 readWhenEmpty = do
   c <- newBoundedChan 1 :: IO (BoundedChannel Int)
   r <- readBoundedChan c
   putStrLn ("datum read from channel")
   putStrLn ("The result is: " ++ show r)
+
+-- Trying to read a unpopulated channel will block.
+readWhenEmpty2 :: IO ()
+readWhenEmpty2 = do
+  c <- newBoundedChan 1 :: IO (BoundedChannel Int)
+  _ <- writeBoundedChan c 9
+  putStrLn "Datum written."
+  r1 <- readBoundedChan c
+  putStrLn "Datum read."
+  r2 <- readBoundedChan c
+  putStrLn "Datum read." -- you won't see this
+  putStrLn ("datum read from channel")
+  putStrLn ("The result is: " ++ show r1)
+  putStrLn ("The result is: " ++ show r2)
 
 writeAllReadAll = do
   c <- newBoundedChan 3
@@ -95,6 +109,7 @@ writeAllReadAll = do
 
 main :: IO ()
 -- main = readWhenEmpty
+-- main = readWhenEmpty2
 main = writeAllReadAll
 
 

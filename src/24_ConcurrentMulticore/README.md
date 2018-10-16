@@ -46,3 +46,9 @@ example, instead of having a single server program use the threaded runtime on
 four cores, we might see better performance if we design our server so that we
 can run four copies of it simultaneously and use the nonthreaded runtime.
 
+# Knowing What to Evaluate in Parallel
+
+The key to getting decent performance out of parallel Haskell code is to find
+meaningful chunks of work to perform in parallel. Nonstrict evaluation can get
+in the way of this, which is why we use the "force" function in our parallel
+sort.

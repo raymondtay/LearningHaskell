@@ -5,6 +5,15 @@ import Data.Time.Clock (diffUTCTime, getCurrentTime)
 import System.Environment (getArgs)
 import System.Random (StdGen, getStdGen, randoms)
 
+-- Sequential sorting aka QuickSort but it doesn't work very well with Haskell
+-- in general but MergeSort works better in practice.
+sort :: (Ord a) => [a] -> [a]
+sort (x:xs) = lesser ++ x:greater
+  where lesser = sort [y | y <- xs, y < x]
+        greater = sort [y | y <- xs, y >= x]
+sort _ = []
+
+-- parallel sorting leveraging multiple cores in the machine
 parSort :: (Ord a) => [a] -> [a]
 parSort (x:xs) = force greater `par` (force lesser `pseq` (lesser ++ x:greater))
   where lesser = parSort [y | y <- xs, y < x]
