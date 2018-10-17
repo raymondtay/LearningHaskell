@@ -23,5 +23,5 @@ result3 = do {forkIO (newEmptyMVar >>= \new_hole -> do { (sleepFor 5) >> putMVar
 
 main :: IO ()
 main = do
-  result3
+  result
 
