@@ -1,3 +1,4 @@
+{-# LANGUAGE ForeignFunctionInterface #-}
 
 import Foreign
 import Foreign.C.Types
@@ -11,4 +12,9 @@ import Foreign.C.Types
 foreign import ccall "math.h sin"
   c_sin :: CDouble -> CDouble
 
+-- now we wrap the C types back to Haskell's typesystem
+fastsin :: Double -> Double
+fastsin x = realToFrac (c_sin (realToFrac x))
+
+main = mapM_ (print . fastsin) [0/10, 1/10 .. 10/10]
 
