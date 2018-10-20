@@ -33,14 +33,22 @@ newtype PCREOption = PCREOption { unPCREOption :: CInt }
 combineOptions :: [PCREOption] -> PCREOption
 combineOptions = PCREOption . foldr ((.|.) . unPCREOption) 0
 
-caseless       :: PCREOption
-caseless       = PCREOption 1
-
-dollar_endonly :: PCREOption
-dollar_endonly = PCREOption 32
-
-dotall         :: PCREOption
-dotall         = PCREOption 4
+#{enum PCREOption, PCREOption
+  , caseless        = PCRE_CASELESS
+  , dollar_endonly  = PCRE_DOLLAR_ENDONLY
+  , dotall          = PCRE_DOTALL
+  , dupnames        = PCRE_DUPNAMES
+  , extended        = PCRE_EXTENDED
+  , extra           = PCRE_EXTRA
+  , firstline       = PCRE_FIRSTLINE
+  , multiline       = PCRE_MULTILINE
+  , newline_cr      = PCRE_NEWLINE_CR
+  , newline_crlf    = PCRE_NEWLINE_CRLF
+  , newline_lf      = PCRE_NEWLINE_LF
+  , no_auto_capture = PCRE_NO_AUTO_CAPTURE
+  , ungreedy        = PCRE_UNGREEDY
+ 
+ }
 
 {-- snippet pcre_compile --}
 foreign import ccall unsafe "pcre.h pcre_compile"
