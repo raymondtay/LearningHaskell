@@ -18,3 +18,11 @@ through the program. We can declare a new strict pair type.
 data Pair a b = Pair !a !b
 ```
 
+# Fusion
+
+The final bottleneck in our program is the lazy list itself. While we can avoid
+allocating it all at once, there is still memory traffic each time around the
+loop, as we demand the next cons in the list, allocate it to the heap, operate
+on it, and continue. The list type is also polymorphic, so the elemtns of the
+list will be represented as heap-allocated `Double` values.
+

@@ -29,3 +29,15 @@ _dynamic partioning_. GHC already provides the mehcniams for dynamic
 partitioning: we just have to supply it with enough tasks by calling rpar often
 enough so that it can do its job and balance the work evently.
 
+
+
+
+The argument to `rpar` is called a _spark_. The runtime collects sparks in a
+pool and uses this as a source of work when there are spare processors
+available, using a technique called _work stealing_. Sparks may be evaluated at
+some point in the future, or they might not - it all depends on whether there
+is a spare core available. Sparks are very cheap to create: `rpar` essentially
+just writes a pointer to the expression into an array. See [[sudoku3.hs]] on
+how to use dynamic partitioning.
+
+
