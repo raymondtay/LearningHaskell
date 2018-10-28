@@ -41,3 +41,9 @@ just writes a pointer to the expression into an array. See [[sudoku3.hs]] on
 how to use dynamic partitioning.
 
 
+Evaluation strategies, or simply Strategies, are a means for modularising
+parallel code by separating the algorithm from the parallelism. Sometimes, they
+require you to rewrite your algorithm, but once you do so you will be able to
+parallelise in different ways just by substituting a new Strategy.
+
+
