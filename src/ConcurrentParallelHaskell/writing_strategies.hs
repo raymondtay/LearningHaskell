@@ -62,8 +62,3 @@ parPair2 sa sb = evalPair (rparWith sa) (rparWith sb)
 
 
 
--- This strategy no longer has parallelism built in, so i've called it evalPair
--- instead of parPair. It takes 2 strategy arguments, sa and sb, applies them
--- to their respective components of the pair and subsequently returns the
--- pair.
---
