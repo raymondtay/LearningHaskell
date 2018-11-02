@@ -7,8 +7,16 @@
 -- elements. Instead, we would like each of the pipeline stages to run on a
 -- separate core, with the data streaming between them. The `Par` monad will
 -- allow us to do exactly that.
--- Before that, we need some ADTs ready.
+-- Before that, we need some ADTs ready; let's take a look at how we can do
+-- this.
 --
+module Stream (
+  Stream(..),
+  streamFromList,
+  mapS,
+  foldS,
+  parFold
+  ) where
 
 import Control.Monad.Par
 import Control.DeepSeq
