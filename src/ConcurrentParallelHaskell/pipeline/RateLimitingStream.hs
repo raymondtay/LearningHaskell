@@ -22,7 +22,6 @@ module RateLimitingStream (
                           ) where
 
 import System.Environment
-import Control.Monad (void)
 import Control.Monad.IO.Class
 import Control.Monad.Par
 import Control.DeepSeq
