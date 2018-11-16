@@ -46,4 +46,37 @@ parallel code by separating the algorithm from the parallelism. Sometimes, they
 require you to rewrite your algorithm, but once you do so you will be able to
 parallelise in different ways just by substituting a new Strategy.
 
+### Fairness
+
+Concurrent programs should be executed with some degree of _fairness_. At the
+very least, no thead should be starved of CPU time indefinitely, and ideally
+each thread should be given an equal share of the CPU.
+
+GHC uses a simple _round-robin_ scheduler. It does guarantee that no thread is
+starved indefinitely, although it does not ensure that every thread gets an
+exactly equal share of the CPU. In practice, the schedule is reasonably fair in
+this respect. The `MVar` implementation also provides an important fairness
+guarantee:
+
+```
+No thread can be blocked indefinitely on an MVar unless another thread holds
+that MVar indefinitely.
+```
+
+Take care to note that it is not enough to merely wake up the blocked thread
+because another thread might run first and take (respectively put) the `MVar`,
+causing the newly worked thread to go to the back of the queue again, which
+would invalidate the fairness guarantee.
+
+The implementation must therefore wake up the blocked thread and perform the
+blocked operation in a single atomic step, which is exactly what GHC does.
+
+A consequence of the fairness implementation is that, when multiple threads are
+blocked in `takeMVar` and another thread does a `putMVar`, only one of the
+blocked threads becomes unblocked. This "single wakeup" property is a
+particularly important performance characteristic when a largr number of
+threads are contending for a single `MVar`. As we shall see later, it is the
+fairness guarantee - together with the single wakeup property - that keeps
+MVars from being completely subsumed by software transactional memory.
+
 

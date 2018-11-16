@@ -74,6 +74,15 @@ dupC (C _ writeVar) = do
   newReadVar <- newMVar hole
   return (C newReadVar writeVar)
 
+-- This doesn't work quite exactly because it cannot account for the situation
+-- when the channel is empty
+unGetChan :: C a -> a -> IO ()
+unGetChan (C readVar _) value = do
+  newRead <- newEmptyMVar
+  currentRead <- takeMVar readVar
+  putMVar newRead (Item value currentRead)
+  putMVar readVar newRead
+
 main :: IO ()
 main = do
   c1 <- newC
@@ -101,4 +110,5 @@ main = do
   c <- readC c2
   putStrLn $ "Duplicate channel ele: " ++ show c
   putStrLn "done"
+
 
