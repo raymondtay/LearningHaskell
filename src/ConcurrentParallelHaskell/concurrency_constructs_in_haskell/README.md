@@ -25,3 +25,20 @@ which an `MVar` can be used:
   structures.
 
 
+### Masking Asynchronous Exceptions
+
+What's the purpose of masking asynchronous exceptions? The main issue here is
+that when we have _allow_ asynchronous exceptions then there's a real
+possibility that one might fire during the update of some shared state which
+obviously is not a desirable situation. Therefore, we need a way to control the
+delivery of these exception types in _critical sections_.
+
+So, the above is the real reason why we need _masking_; in Haskell, the
+combinator looks like:
+
+```haskell
+mask :: ((IO a) -> (IO a) -> IO b) -> IO b
+```
+This operation defers the delivery of asynchronous exceptions for the duration
+of its argument.
+
