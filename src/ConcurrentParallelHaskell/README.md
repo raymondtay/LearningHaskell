@@ -79,4 +79,24 @@ threads are contending for a single `MVar`. As we shall see later, it is the
 fairness guarantee - together with the single wakeup property - that keeps
 MVars from being completely subsumed by software transactional memory.
 
+# STM
+
+STM operations are _composable_ i.e. any operation of type `STM a` can be
+composed with others to form larger atomic transaction. For this reason, STM
+operations are usually provided without the `atomically` wrapper so that
+clients can compose them as necessary before finally wrapping the entire
+operation in `atomically`.
+
+```
+Why is STM a different monad from IO? The STM implementation relies on being
+able to roll back the effects of a transaction in the event of a conflict with
+another transaction. A transaction can be rolled back only if we can track
+exactly what effects it has, and this would not be possible if arbitrary I/O
+were allowed inside a transaction - we might have performed some I/O that
+cannot be undone, like making a noise or launching some missiles. For this
+reason, the STM monad permits only side effects on TVars, and the STM
+implementation tracks these effects to ensure the correct transaction
+semantics.
+```
+
 
