@@ -35,12 +35,21 @@ putTMVar (TMVar t) a = do
       Just _ -> retry
 
 
+-- if you comment either (1) or (2) and run/re-run this, you will noticed quite
+-- immediately that Ghci will terminate the transaction with a complaint:
+--
+-- " thread blocked indefinitely in an STM transaction " after about 5 seconds;
+-- 
+-- and that's proof that the documentation is correct because we know its going
+-- to be blocked eventually and GHC knows to kill it rather than keep burning
+-- CPU transistors and other circuits.
+--
 main = do
   atomically $ do
     a  <- newEmptyTMVar
     b  <- newEmptyTMVar
-    _  <- putTMVar a 1
-    _  <- putTMVar b 3
+    _  <- putTMVar a 1 -- <1>
+    _  <- putTMVar b 3 -- <2>
     _a <- takeTMVar a
     _b <- takeTMVar b
     return (_a, _b)
