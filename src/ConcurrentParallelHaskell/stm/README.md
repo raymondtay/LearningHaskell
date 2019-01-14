@@ -151,3 +151,42 @@ notActuallyAtomic = do
 
 ```
 
+# Practical Aspects of STM
+
+We have so far been quiet about the specific benefits that STM gives us. Most
+obvious is how well it composes - to add code to a transaction, we just use our
+usual monad building blocks i.e. `(>>=)` and `(>>)`.
+
+The notion of composability is critical to building modular software. If we
+take two pieces of code that work correctly individually, the composition of
+the two should also be correct. Whiel normal threaded programming makes
+composaibility impossible, STM restores it as a key assumption that we can rely
+upon.
+
+The STM monad prevents us from accidentally performing nontransactional I/O
+actions. We do not need to worry about lock ordering, since our code contains
+no locks. We can forget about lost wakeups, since we don't have condition
+variables. If an exception is thrown, we can either catch it using `catchSTM`
+or be bounced out of our transaction, leaving our state untouched. Finally, the
+`retry` and `orElse` functions give us some beautiful ways to structure our
+code.
+
+Code that uses STM will not deadlock, but its possible for threads to starve
+each other to some degree. A long-running transaction can cause another
+transaction to retry often enough that it will make comparatively little
+progress. To address a problem such as this, make your transactions as short as
+you can, while keeping your data consistent. This is good advice !
+
+## Invariants
+
+There's a function called `alwaysSucceed` which lets us define an _invariant_
+which is a property of the data that must always be __true__.
+
+What actually happens when we create an invariant is that it will immediately
+be checked. To fail, the invariant must raise an exception. More interestingly,
+the invariant will subsequently be checked automatically at the end of _every_
+transaction. If it fails at any point, the transaction will be aborted, and the
+exception raised by the invariant will be propagated. This means that we will
+get immediate feedback as soon as one of our invariants is violated.
+
+

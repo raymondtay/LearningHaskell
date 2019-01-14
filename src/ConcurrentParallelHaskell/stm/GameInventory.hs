@@ -1,7 +1,11 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, PatternGuards #-}
 
+-- There's a lot of lessons to be learnt from this code here but the main point
+-- would be about inconsistencies in STM
+--
 import Control.Concurrent.STM
 import Control.Monad
+import GHC.Conc -- importing [[alwaysSucceeds]]
 
 data Item = Scroll | Wand | Banjo deriving (Show, Ord, Eq)
 
@@ -127,5 +131,48 @@ shoppingList list buyer seller = maybeSTM . msum $ map sellOne list
 --
 maybeM :: MonadPlus m => m a -> m (Maybe a)
 maybeM m = (Just `liftM` m) `mplus` return Nothing
+
+
+-- Obviously a constructor aka factory or singleton in the familiar OOP terms.
+--
+newPlayer :: Gold -> HitPoint -> [Item] -> STM Player
+newPlayer balance health inventory = 
+  Player `liftM` newTVar balance `ap` newTVar health `ap` newTVar inventory
+
+populateWorld :: STM [Player]
+populateWorld = sequence [newPlayer 20 20 [Wand, Banjo], newPlayer 10 12 [Scroll]]
+
+-- here's an example of invariance 
+--
+consistentBalance :: [Player] -> STM (STM ())
+consistentBalance players = do
+  initialTotal <- totalBalance
+  return $ do
+    currentTotal <- totalBalance
+    when (currentTotal /= initialTotal) $ error "inconsistent global balance"
+      where totalBalance = foldM addBalance 0 players
+            addBalance a b = (a+) `liftM` readTVar (balance b)
+
+bogusTransfer :: Gold -> Balance -> Balance -> IO ()
+bogusTransfer qty fromBal toBal = do
+  fromQty <- atomically  $ readTVar fromBal
+  -- window of inconsistency
+  toQty <- atomically  $ readTVar toBal
+  atomically $ writeTVar fromBal (fromQty - qty)
+  -- window of inconsistency
+  atomically $ writeTVar toBal   (toQty + qty)
+ 
+bogusSale :: Item -> Gold -> Player -> Player -> IO ()
+bogusSale item price buyer seller = do
+  atomically $ giveItem item (inventory seller) (inventory buyer)
+  bogusTransfer price (balance buyer) (balance seller)
+
+-- this function is used to demonstrate how inconsistencies can arise in day to
+-- day programming if you/me is not careful ☺
+tryBogusSale :: IO ()
+tryBogusSale = do
+  players@(alice: bob: _) <- atomically populateWorld
+  _ <- atomically $ alwaysSucceeds =<< consistentBalance players
+  bogusSale Wand 5 alice bob
 
 
