@@ -161,7 +161,7 @@ bogusTransfer qty fromBal toBal = do
   atomically $ writeTVar fromBal (fromQty - qty)
   -- window of inconsistency
   atomically $ writeTVar toBal   (toQty + qty)
- 
+
 bogusSale :: Item -> Gold -> Player -> Player -> IO ()
 bogusSale item price buyer seller = do
   atomically $ giveItem item (inventory seller) (inventory buyer)
@@ -175,4 +175,29 @@ tryBogusSale = do
   _ <- atomically $ alwaysSucceeds =<< consistentBalance players
   bogusSale Wand 5 alice bob
 
+-- So, here's one way in which we can avoid the basic problem of data
+-- inconsistencies and the key insight here is to recognize that the reading
+-- and updating of balances occurs within 1 transaction regardless of the
+-- thread that's executing it.
+--
+notBogusTransfer :: Gold -> Balance -> Balance -> IO ()
+notBogusTransfer qty fromBal toBal = do
+  atomically $ do
+    fromQty <- readTVar fromBal
+    toQty   <- readTVar toBal
+    writeTVar fromBal (fromQty - qty)
+    writeTVar toBal   (toQty + qty)
+
+notBogusSale :: Item -> Gold -> Player -> Player -> IO ()
+notBogusSale item price buyer seller = do
+  atomically $ giveItem item (inventory seller) (inventory buyer)
+  notBogusTransfer price (balance buyer) (balance seller)
+
+-- this function uses the proper and canonical form of not creating data
+-- inconsistencies.
+tryNotBogusSale :: IO ()
+tryNotBogusSale = do
+  players@(alice: bob: _) <- atomically populateWorld
+  _ <- atomically $ alwaysSucceeds =<< consistentBalance players
+  notBogusSale Wand 5 alice bob
 
