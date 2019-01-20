@@ -39,4 +39,22 @@ sense for algorithms that are of the nature of _divide-and-conquer_.
     That should be obvious because directories on _ANY_ filesystem can have any
     number of sub-directories (recursively speaking).
 
+# The ParIO Monad
 
+There is a version of the [[Par]] monad called [[ParIO]] provided by the module
+`Control.Monad.Par.IO` with two important differences from [[Par]]:
+
+- `IO` operations are allowed inside `ParIO`. To inject an `IO` operation into
+  a `ParIO`n computation, use `liftIO` from the `MonadIO` class.
+
+- For this reason, the pure `runPar` is not available for `ParIO`. Instead, a
+  parallel computation is performed by the following:
+  ```
+  runParIO :: ParIO a -> IO a
+  ```
+
+Of course, unliked `Par`, `ParIO` computations are not guaranteed to be
+deterministic. Nevertheless, the full power of the `Par` framework is
+available: very light weight tasks, multicore scheduling, and the same dataflow
+API based on `IVar`s. `ParIO` is ideal for parallel programming in the IO
+monad, albeit with one caveat (see the code examples for this).
