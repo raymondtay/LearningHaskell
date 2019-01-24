@@ -49,3 +49,20 @@ programming models atop the `distributed-process` framework, although at the
 time of writing these projects are too experimental to include in this book.
 
 
+# Processes and the Process Monad
+
+Let's get our terminology correct. A distributed program consists of a set of
+processes that may communicate with one another by sending and receiving
+messages. A process is like a thread. Processes run concurrently with one
+another, and every process has a unique `ProcessId`. There are a couple of
+important differences between threads and processes, however:
+
+- Threads are always created on the current node, whereas a process can be
+  created on a remote node
+
+- Processes run in the `Process` monad, rather than the `IO` monad. Process is
+  an instance of `MonadIO` so you can perform IO operations in Process by
+  wrapping them in `liftIO`. All message passing operations are in Process, so
+  only processes, not threads, can engage in message passing.
+
+
