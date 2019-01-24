@@ -66,3 +66,19 @@ important differences between threads and processes, however:
   only processes, not threads, can engage in message passing.
 
 
+# Typed Channels
+
+In [[ping.hs]] and [[ping-multi.hs]], we saw messages being delivered to a
+process and the process receiving the messages by using `expect`. This scheme
+is quite convenient: we need to know only a process's `ProcessId` to send it
+messages, and we can send it messages of any type. However, all the messages
+for a process go into the same queue, which has a couple of disadvantages:
+
+- Each time we call `expect`, the implementation has to search the queue for a
+  message of the right type, which could be slow.
+
+- If we are receiving messages of the same type from multiple senders, then we
+  need to explicitly include some information in the message that lets us tell
+  them aprt (e.g. the `ProcessId` of the sender).
+
+

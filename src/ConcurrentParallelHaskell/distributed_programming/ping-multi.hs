@@ -48,9 +48,12 @@ remotable ['pingServer]
 
 master :: [NodeId] -> Process ()
 master peers = do
+  liftIO $ putStrLn $ show peers -- an additional detail to show the kinds of peers in plain sight.
+  -- you should see a printout like the following:
+  -- [nid://127.0.0.1:44445:0,nid://127.0.0.1:44446:0]
   ps <- forM peers $ \nid -> do
-    say $ printf "spawning on %s" (show nid)
-    spawn nid $(mkStaticClosure 'pingServer)
+          say $ printf "spawning on %s" (show nid)
+          spawn nid $(mkStaticClosure 'pingServer)
   mypid <- getSelfPid
 
   forM_ ps $ \pid -> do
@@ -60,7 +63,6 @@ master peers = do
   waitForPongs ps
 
   say "All pongs successfully received"
-
   terminate
 
 waitForPongs :: [ProcessId] -> Process ()
@@ -74,7 +76,22 @@ waitForPongs ps = do
 {-
 
 To build: ghc -O2 ./ping-multi.hs
-To run: ./ping-multi 
+To run: ./ping-multi [slave 127.0.0.1|0.0.0.0] 44445 &
+        ./ping-multi [slave 127.0.0.1|0.0.0.0] 44446 &
+        ./ping-multi
+
+Thu Jan 24 03:42:45 UTC 2019 pid://localhost:44444:0:8: spawning on nid://127.0.0.1:44445:0
+Thu Jan 24 03:42:45 UTC 2019 pid://localhost:44444:0:8: spawning on nid://127.0.0.1:44446:0
+Thu Jan 24 03:42:45 UTC 2019 pid://localhost:44444:0:8: pinging pid://127.0.0.1:44445:0:9
+Thu Jan 24 03:42:45 UTC 2019 pid://localhost:44444:0:8: pinging pid://127.0.0.1:44446:0:9
+Thu Jan 24 03:42:45 UTC 2019 pid://127.0.0.1:44445:0:9: ping received from pid://localhost:44444:0:8
+Thu Jan 24 03:42:45 UTC 2019 pid://127.0.0.1:44446:0:9: ping received from pid://localhost:44444:0:8
+Thu Jan 24 03:42:45 UTC 2019 pid://localhost:44444:0:8: All pongs successfully received
+ping-multi: ProcessTerminationException
+
+On my mac, this is necessary as there's some discrepancy with running as per the book 
+suggests and explicit IPv4 address was given. IPv6 address is not working on my mac - its likely
+something to do with the package here.
 
 -}
 
