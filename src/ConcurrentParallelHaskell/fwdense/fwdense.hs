@@ -91,6 +91,6 @@ main :: IO ()
 main = do
    [n] <- fmap (fmap read) getArgs
    let g = fromListUnboxed (Z:.n:.n) [0..n^(2::Int)-1] :: Graph U
-   print (sumAllS (shortestPaths g))
+   print (sumAllS (shortestPathsP g))
 
 

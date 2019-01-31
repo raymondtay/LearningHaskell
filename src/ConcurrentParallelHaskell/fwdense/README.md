@@ -10,3 +10,9 @@ floating point addition is not , due to rounding errors. However, we tend to
 ignore this detail when using foldP because a small amount of nondeterminism in
 the floating point result is normally acceptable.
 
+Folds are an important class of operations over arrays; they are the operations
+that perform a collective operation over all the elements of an array to
+produce a single result, such as summing the array or finding its maximum
+element. For example, the funciton `sumAllS` calculates the sum of all the
+elements in an array.
+
