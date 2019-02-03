@@ -99,4 +99,45 @@ implementation tracks these effects to ensure the correct transaction
 semantics.
 ```
 
+# Debugging notes
+
+### Detecting Deadlock
+
+The GHC runtime system can detect when a thread has become deadlocked and send
+it the `BlockedIndefinitelyOnMVar` exception. How exactly does this work? In
+GHC both threads and `MVar`s are objects on the heap, just like other data
+values. As MVar that has blocked threads is represented by a heap object that
+points to a list of the blocked thread. Heap objects are managed by the garbage
+collector, which traverses the heap starting from the _roots_ to discover all
+the live objects. The set of roots consists of the running threads and the
+stack associated with teach of these threads. Any thread that is not reachable
+from the roots is definitely deadlocked. The runtime system cannot ever find
+these threads by following pointers, so they can never become runnable again.
+
+
+Deadlock detection works using garbage collection, which is necessarily a
+conservative approximation to the true future behavior of the program.
+
+
+### Tuning Concurrent and Parallel Programs
+
+- Avoid premature optimizations. Don't overoptimize code till you know that
+  there's a problem. That said, this is not an excuse for writing awful code.
+  For example, don't use wildly inappropriate data structures if using the
+  right one is just a matter of importing a library. I like to "write code
+  using efficiency in mind" : know the complexity of your algorithms, and if
+  you find yourself using something worse than O(n log n), think about whether
+  it might present a problem down the road. The mroe of this you do, the better
+  your code will copy with larger and larger problems.
+
+- Don't waste time optimizing code that doesn't contribute much to overall
+  runtime. Profile your program so that you can focus your efforts on the
+  important parts. GHC has a reasonable space and time profiler that should
+  pointer at least where the inner loops of your code are. In concurrent
+  programs, the problem can often be I/O or contention in which case using
+  _ThreadScope_ together with _labelThread_ and _traceEvent_ can help track
+  down the culprits.
+
+### Thread Creation and MVar operations
+
 
