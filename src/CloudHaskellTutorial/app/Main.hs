@@ -6,11 +6,12 @@ import Control.Concurrent (threadDelay)
 
 import Chat -- see the exported functions
 import Spawn -- see the exported functions
-
+import STMSendRecv -- see the exported functions
 
 main :: IO ()
 main = do
   [h, p] <- getArgs
   -- launchChat h p -- <1>
-  launchSpawnExample h p -- <2>
+  -- launchSpawnExample h p -- <2>
+  launchSTM h p -- <3>
   

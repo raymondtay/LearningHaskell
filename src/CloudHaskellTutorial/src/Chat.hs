@@ -30,7 +30,7 @@ launchChat h p = do
     echoPid <- P.spawnLocal $ forever $ do
       P.receiveWait [P.match logMessage, P.match replyBack]
     P.say "Send some messages!"
-    P.send echoPid "hello"
+    P.send echoPid "++ HELLO ++"
     self <- P.getSelfPid
     P.send echoPid (self, "hello")
     m <- P.expectTimeout 1000000
