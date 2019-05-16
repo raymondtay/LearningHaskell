@@ -140,4 +140,39 @@ conservative approximation to the true future behavior of the program.
 
 ### Thread Creation and MVar operations
 
+# The Par Monad Compared to Strategies
+
+As a general rule of thumb, if your algorithm naturally produces a lazy data
+structure then writing a `Strategy` to evaluate it in parallel will probably
+work well. If not then it can be more straightforward to use the `Par` monad to
+express the parallelism.
+
+The `runPar` funciton itself is relatively expensive, whereas `runEval` is
+free. So when using the `Par` monad, you should usually try to thread the `Par`
+monad around to all the places that need parallelism to avoid needing multiple
+`runPar` calls. If this is inconvenient, then `Eval` or `Strategies` might be a
+better choice. In particular, nested calls to `runPar` (Where a runPar is
+evaluated during the course of executing another `Par` computation) usually
+gives poor results.
+
+Strategies allow a separation between algorithm and parallelism, which can
+allow more reuse and a cleaner specification of parallelism. However, using a
+parallel skeleton works with both approaches.
+
+The `Par` monad has more overhead than the `Eval` monad. At the present time,
+`Eval` tends to perform better at finer granularities, due to direct runtime
+system support for sparks. At larger granularities, `Par` and `Eval` perform
+approximately the same.
+
+The `Par` monad is implemented entirely in a Haskell library (the monad-par
+package) and is thus easily modified. There is a choice of scheduling
+strategies.
+
+The `Eval` monad has more diagnostics in _ThreadScope_. There are graphs that
+show different aspects of sparks:
+- creation rate
+- conversion rate
+- etc
+The `Par` Monad is not currentlky integrated with _ThreadScope_.
+
 

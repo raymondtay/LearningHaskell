@@ -60,5 +60,38 @@ parPair2 sa sb = evalPair (rparWith sa) (rparWith sb)
 -- Example run: runEval $ parPair2 rdeepseq rdeepseq (fib 44, fib 555)
 --
 
+-- 1. We define what we want to accomplish ... you should not worry about
+-- whether there's an existing function or functions that will fill the "hole";
+-- we can always stub it.
+--
+parMap :: (a -> b) -> [a] -> [b]
+parMap f xs = map f xs `using` parList rseq
+
+-- 2. This is our stub
+parList :: Strategy a -> Strategy [a]
+parList = undefined
+
+-- 3. `parList` is undefined at this point at this point in time but we can leave
+-- it empty for now and continue plotting our way to the ultimate goal of
+-- defining `parList`. Next, we start with how we want to deal with processing
+-- a single element of the list.
+--
+evalList :: Strategy a -> Strategy [a]
+evalList strat [] = return []
+evalList strat (x:xs) = do
+  x'  <- strat x
+  xs' <- evalList strat xs
+  return (x':xs')
+
+-- now that we have a strategy to evaluate an element of ANY list, we are
+-- ready to try more ambitious stuff
+--
+parList' :: Strategy a -> Strategy [a]
+parList' strat = evalList (rparWith strat)
+
+-- 4. Now i am quite comfortable to replace the previous stub with this one.
+--
+parMap' :: (a -> b) -> [a] -> [b]
+parMap' f xs = map f xs `using` parList' rseq
 
 
