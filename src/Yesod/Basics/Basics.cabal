@@ -42,7 +42,7 @@ library
   default-language: Haskell2010
 
 executable Basics-exe
-  main-is: Main.hs
+  main-is: Main2.hs
   other-modules:
       Paths_Basics
   hs-source-dirs:
@@ -53,6 +53,9 @@ executable Basics-exe
     , base >=4.7 && <5
     , containers
     , yesod
+    , text
+    , shakespeare
+    , blaze-html
   default-language: Haskell2010
 
 test-suite Basics-test
