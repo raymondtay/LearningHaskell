@@ -4,13 +4,13 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a939592d6d8ddec4b36ee364f1d857b87798ee5368477c32eeab1276bba1f8d4
+-- hash: caac4152059386e1cb2119468d8c515b498dca9a7d8776d6aecb1a5096785c71
 
-name:           Basics
+name:           Widgets
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/Basics#readme>
-homepage:       https://github.com/raymondtay/LearningHaskell/src/Yesod/Basics#readme
-bug-reports:    https://github.com/raymondtay/LearningHaskell/src/Yesod/Basics/issues
+description:    Please see the README on GitHub at <https://github.com/githubuser/Widgets#readme>
+homepage:       https://github.com/raymondtay/LearningHaskell/src/Yesod/Widgets#readme
+bug-reports:    https://github.com/raymondtay/LearningHaskell/src/Yesod/Widgets/issues
 author:         Raymond Tay
 maintainer:     raymondtay1974@gmail.com
 copyright:      2019 Raymond Tay
@@ -23,52 +23,42 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/raymondtay/LearningHaskell/src/Yesod/Basics
+  location: https://github.com/raymondtay/LearningHaskell/src/Yesod/Widgets
 
 library
   exposed-modules:
       Lib
   other-modules:
-      Paths_Basics
+      Paths_Widgets
   hs-source-dirs:
       src
   build-depends:
       base >=4.7 && <5
-    , containers
-    , yesod
-    , shakespeare
-    , blaze-html
-    , text
   default-language: Haskell2010
 
-executable Basics-exe
-  main-is: Main2.hs
+executable Widgets-exe
+  main-is: Main.hs
   other-modules:
-      Paths_Basics
+      Paths_Widgets
   hs-source-dirs:
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -ddump-splices
   build-depends:
-      Basics
+      Widgets
     , base >=4.7 && <5
-    , containers
     , yesod
-    , text
-    , shakespeare
-    , blaze-html
   default-language: Haskell2010
 
-test-suite Basics-test
+test-suite Widgets-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Paths_Basics
+      Paths_Widgets
   hs-source-dirs:
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      Basics
+      Widgets
     , base >=4.7 && <5
-    , containers
     , yesod
   default-language: Haskell2010
