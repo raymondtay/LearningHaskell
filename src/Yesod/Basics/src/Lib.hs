@@ -2,7 +2,8 @@
 
 module Lib
     ( someFunc     ,
-      renderPerson
+      renderPerson ,
+      MyRoute (..)
     ) where
 
 import Text.Hamlet (shamlet, hamlet, HtmlUrl)
@@ -10,10 +11,20 @@ import Text.Blaze.Html.Renderer.String (renderHtml)
 import Data.Char (toLower)
 import Data.List (sort)
 import Data.Text (Text)
+import Data.Monoid hiding ((<>))
 
 
+data MyRoute = SpecialRoute | Home | Time | Stylesheet deriving (Eq, Show)
 
-data MyRoute = SpecialRoute
+instance Monoid MyRoute where
+  mempty = Home -- default route is always "Home".
+
+instance Semigroup MyRoute where
+  (<>) SpecialRoute SpecialRoute = SpecialRoute
+  (<>) Home Home = Home
+  (<>) Time Time = Time
+  (<>) Stylesheet Stylesheet = Stylesheet
+  (<>) _ _ = Home -- any other route is something we don't understand, we go back to "Home"
 
 data Person = Person { name :: String, age :: Int }
 
