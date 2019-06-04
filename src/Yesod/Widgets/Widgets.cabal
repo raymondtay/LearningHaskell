@@ -1,0 +1,64 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.1.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: caac4152059386e1cb2119468d8c515b498dca9a7d8776d6aecb1a5096785c71
+
+name:           Widgets
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/Widgets#readme>
+homepage:       https://github.com/raymondtay/LearningHaskell/src/Yesod/Widgets#readme
+bug-reports:    https://github.com/raymondtay/LearningHaskell/src/Yesod/Widgets/issues
+author:         Raymond Tay
+maintainer:     raymondtay1974@gmail.com
+copyright:      2019 Raymond Tay
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/raymondtay/LearningHaskell/src/Yesod/Widgets
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_Widgets
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010
+
+executable Widgets-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_Widgets
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -ddump-splices
+  build-depends:
+      Widgets
+    , base >=4.7 && <5
+    , yesod
+  default-language: Haskell2010
+
+test-suite Widgets-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_Widgets
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      Widgets
+    , base >=4.7 && <5
+    , yesod
+  default-language: Haskell2010
