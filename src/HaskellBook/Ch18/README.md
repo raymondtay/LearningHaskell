@@ -1,5 +1,11 @@
 # Monad
 
+A functor maps a function over some structure; an applicative maps a function
+that is contained in some structure over some other structure and then combines
+the two layers of structure like `mappend`.
+
+
+
 Finally we come to one of the most talked about structures in Haskell: the monad. Monads are not, strictly speaking, necessary to Haskell.
 Although the current standard for Haskell does use monad for constructing and transforming `IO` actions, older implementations of
 Haskell did not. Monads are powerful and fun, but they do not define Haskell. Rather, monads are defined in terms of Haskell.
@@ -148,4 +154,5 @@ askForAge :: IO Int
 askForAge = getAge "Hello! How old are you?"
 
 ```
+
 

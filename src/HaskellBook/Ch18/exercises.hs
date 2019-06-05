@@ -3,6 +3,7 @@
 module Chapter_18 where
 
 import Data.Monoid ((<>))
+import Data.Semigroup ((<>))
 import Control.Monad
 
 data Sum a b = First a | Second b deriving (Eq, Show)
@@ -39,6 +40,9 @@ instance Monad (Sum a) where
   (Second a) >>= f = f a
   
 data List a = Nil | Cons a (List a)
+
+instance Semigroup (List a) where
+  (<>) l r = (<>) l r
 
 instance Monoid (List a) where
   mempty = Nil
