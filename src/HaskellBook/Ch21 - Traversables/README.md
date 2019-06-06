@@ -1,5 +1,15 @@
 # Traversable
 
+## Basic motivation
+
+Traversables allows you to transform elements inside the structure like a
+Functor, producing Applicative effects along the way, and lift those
+potentially multiple instances of Applicative structure outside of the
+Traversable structure. It is commonly descirbed as a way to traverse a data
+structure, mapping a function inside a structure while accumulating the
+applicative contexts along the way.
+
+
 The interesting thing about `Traversable` is this, what it does is 
 actually quite interesting. In order to understand what it is that `Traversable` does, it helps when i can 
 actually observe what it does and from my observation, what it seems to do is the following
@@ -25,6 +35,11 @@ Prelude Data.Functor.Identity> runIdentity $ traverse (Identity . (+1))
 
 ```
 
+### Traversables - a quick recap
+
+Traversable is stronger than Functor and Foldable; because of this, we can
+recover the Functor and Foldable sinstance for a type from the Traversable,
+just as we can recover the Functor and Applicative from the Monad.
 Let's visit some laws of the Traversables
 
 # Traversable Laws
