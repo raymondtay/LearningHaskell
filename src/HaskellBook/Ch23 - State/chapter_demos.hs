@@ -38,3 +38,34 @@ infiniteDie = repeat <$> rollDie
 nDie :: Int -> State StdGen [Die]
 nDie n = replicateM n rollDie
 
+rollsToGetTwenty :: StdGen -> Int
+rollsToGetTwenty g = go 0 0 g
+  where go :: Int -> Int -> StdGen -> Int
+        go sum count gen
+          | sum >= 20 = count
+          | otherwise =
+            let (die, nextGen) = randomR (1, 6) gen
+            in go (sum + die) (count + 1) nextGen
+
+-- Slight re-factoring.
+rollsToGetN :: Int -> StdGen -> Int
+rollsToGetN n g = go 0 0 g
+  where go :: Int -> Int -> StdGen -> Int
+        go sum count gen
+          | sum >= n = count
+          | otherwise =
+            let (die, nextGen) = randomR (1, 6) gen
+            in go (sum + die) (count + 1) nextGen
+
+-- Record the series of "die" that occurred in addition to the count.
+--
+rollsCountLogged :: Int -> StdGen -> (Int, [Die])
+rollsCountLogged n g = go 0 0 g []
+  where go :: Int -> Int -> StdGen -> [Die] -> (Int, [Die])
+        go sum count gen ds
+          | sum >= n = (count, ds)
+          | otherwise =
+            let (die, nextGen) = randomR (1, 6) gen
+            in go (sum + die) (count + 1) nextGen ((intToDie die) : ds)
+
+
