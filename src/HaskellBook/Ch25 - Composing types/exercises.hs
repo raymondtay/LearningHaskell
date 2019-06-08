@@ -109,7 +109,7 @@ instance (Functor f, Functor g) =>  Functor (Compose f g) where
 --
 instance (Applicative f, Applicative g) => Applicative (Compose f g) where
   pure :: a -> Compose f g a
-  pure a = Compose (pure (pure a))
+  pure a = Compose (pure (pure a)) -- key insight here is that each application of `pure` adds a structure around its argument and in our case, there are two (i.e. 2) applications which makes sense since there are two (2) type constructors in the definition of `Compose`.
 
   (<*>) :: Compose f g (a -> b) -> Compose f g a -> Compose f g b
   (Compose f) <*> (Compose a) = Compose ((<*>) <$> f <*> a)
