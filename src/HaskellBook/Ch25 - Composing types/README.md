@@ -20,6 +20,11 @@ structure. This allows us to compose monads and combine their effects. Getting
 comfortable with monad transformers is important to becoming proficient in
 Haskell, so we are going to take it pretty slowly and go step by step.
 
+The important thing is that monad transformers are never sum or product types;
+they are always just a means of wrapping one extra layer of structure around a
+type; so there is never a reason they could not be newtypes.
+
+
 # Monadic Stacking
 
 Applicative allows us to apply functions of more than one argument in the
@@ -156,4 +161,5 @@ only write a transformer once for each type.
 
 We can see this pattern with `IdentityT` as well. You may recall this step in
 our process of writing `IdentityT`'s Monad.
+
 
