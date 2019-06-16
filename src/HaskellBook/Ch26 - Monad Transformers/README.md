@@ -106,3 +106,17 @@ innerMost:: [Maybe (Identity (a -> b))] -> [Maybe (Identity a -> Identity b)]
 innerMost = (fmap . fmap)(<*>)
 
 ```
+
+# Motivation
+
+Monads provide a powerful to build computations with effects. Each of the
+standard monads is specialized to do exactly one thing. In real code, we often
+to be able to use several effects at once.
+
+It would be ideal if we could somehow take the standard `State` monad and add
+failure handling to it, without resorting to the wholesale construction of
+custom monads by hand. The standard monads in the `mtl` library do not allow us
+to combine thme. Instead, the library provides a set of monad transformers to
+achieve the same result.
+
+
