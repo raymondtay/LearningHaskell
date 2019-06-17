@@ -36,6 +36,12 @@ newtype MyApp a =
     runA :: ReaderT AppConfig (StateT AppState IO) a
   } deriving (Monad, MonadIO, MonadReader AppConfig, Functor, Applicative, MonadState AppState)
 
+runApp :: App a -> Int -> IO (a, AppState)
+runApp k maxDepth =
+  let config = AppConfig maxDepth
+      state = AppState 0
+   in runStateT (runReaderT k config) state
+
 
 runMyApp :: MyApp a -> Int -> IO (a, AppState)
 runMyApp k maxDepth =

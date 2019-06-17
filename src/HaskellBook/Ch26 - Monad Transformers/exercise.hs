@@ -7,6 +7,7 @@ import Control.Monad.Trans.Maybe
 import Control.Monad.Trans.Reader
 import Control.Monad.Identity
 import Control.Monad.State
+import System.IO
 
 -- we only need to use return once because it's one big Monad
 --
@@ -105,4 +106,24 @@ sPrintIncAccum = StateT (\s ->
 -- Hello there input: 4
 -- [("1",2),("2",3),("3",4),("4",5)]
 -- *Chapter26 Control.Monad.Identity Control.Monad.State>
+
+isValid :: String -> Bool
+isValid v = '!' `elem` v
+
+maybeExcite :: MaybeT IO String
+maybeExcite = MaybeT $ do
+  v <- getLine
+  guard $ isValid v
+  return (Just v)
+
+
+doExcite :: IO ()
+doExcite = do
+  putStrLn "say something excite!"
+  excite <- runMaybeT maybeExcite
+  case excite of 
+    Nothing -> putStrLn "MOAR EXCITE"
+    Just e -> putStrLn ("cool, was very excite: " ++ e)
+
+
 
