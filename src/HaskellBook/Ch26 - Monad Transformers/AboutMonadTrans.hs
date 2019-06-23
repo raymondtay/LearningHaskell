@@ -1,12 +1,14 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, DeriveFunctor #-}
 
 module AboutMonadTrans where
 
-import Control.Monad.State
+import Control.Monad.Except
+import Control.Monad.Trans.State
 
 {-
- MonadTrans is a typeclass with one core method: lift. Speaking generally, it is about lifting actions
- in some Monad over a transformer type which wraps itself in the original Monad. Fancy ! 
+  MonadTrans is a typeclass with one core method: `lift`. Speaking generally,
+  it is about lifting actions in some Monad over a transformer type which wraps
+  itself in the original Monad. Fancy ! 
 -}
 
 class MonadTrans t where
@@ -14,10 +16,21 @@ class MonadTrans t where
   --   constructed monad ('t' is the constructed monad.)
   lift :: (Monad m) => m a -> t m a 
 
-newtype ScottyT e m a = ScottyT { runS :: State (ScottyState e m) a } deriving (Functor, Applicative, Monad)
 
-newtype ActionT e m a = ActionT { runAM :: ExceptT (ActionError e ) (ReaderT ActionEnv (StateT ScottyResponse m)) a } deriving (Applicative, Functor)
+data TickTok a = TickTok { numbers :: [a] } deriving (Eq, Show, Functor)
 
-type ScottyM = ScottyT Text IO
-type ActionM = ActionT Text IO
+ticktok :: State (TickTok Int) Int
+ticktok = do
+  tt <- get
+  put . TickTok $ (numbers tt) ++ [(((last . numbers) $ tt) + 1)]
+  tt' <- get
+  return (last . numbers $ tt')
+
+data ErrorMessage e = CompleteFailure e | NotATotalFailure deriving (Show, Eq)
+
+newtype TickTokT a = TickTokT { runS :: State (TickTok a) a }
+
+newtype ActionT e a =
+  ActionT { runIt :: ExceptT (ErrorMessage e) (State (TickTok Int) ) a}
+
 
