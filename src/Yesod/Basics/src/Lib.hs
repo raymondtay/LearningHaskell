@@ -12,7 +12,7 @@ import Data.Char (toLower)
 import Data.List (sort)
 import Data.Text (Text)
 import Data.Monoid hiding ((<>))
-
+import Data.Aeson
 
 data MyRoute = SpecialRoute | Home | Time | Stylesheet deriving (Eq, Show)
 
@@ -29,6 +29,14 @@ instance Semigroup MyRoute where
 data Person = Person { name :: String, age :: Int }
 
 person = Person { name = "Ray", age = 44 }
+
+-- Aeson would like me to provide instances on how to encode and decode
+-- JSON to/fro the value objects.
+instance ToJSON Person where
+  toJSON (Person name age) = object ["name" .= name, "age" .= age]
+
+instance FromJSON Person where
+  parseJSON = withObject "Person" $ \v -> Person <$> v .: "name" <*> v .: "age"
 
 renderPerson = renderHtml [shamlet|
 <p>Hello, my name is #{name person} and I am #{show $ age person}.

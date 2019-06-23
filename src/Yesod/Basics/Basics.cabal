@@ -39,6 +39,7 @@ library
     , shakespeare
     , blaze-html
     , text
+    , aeson
   default-language: Haskell2010
 
 executable Basics-exe
