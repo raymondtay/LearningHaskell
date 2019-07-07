@@ -4,6 +4,8 @@ import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Except
 import Control.Monad.State
+import Control.Monad.Reader
+import Control.Monad.Writer
 import Data.Char
 
 import Control.Monad.Trans.Class -- class of transformers
@@ -76,15 +78,20 @@ main = do
       otherwise -> do {putStrLn "Not gonna work";return (0, init)}
   
 
+-- This expression represents something i did not knew before...
+-- what it is saying is that i know that 
 type Parser = StateT String []
 
 runParser :: Parser a -> String -> [a]
-runParser p s = [x | (x, "") <- runStateT p s]
+runParser p s = [x | (x, _) <- runStateT p s]
 
 item :: Parser Char
 item = do
   c : cs <- get
   put cs
   return c
+
+experiment1 :: ReaderT String [] Char
+experiment1 = ReaderT (\x -> runParser item x)
 
 
