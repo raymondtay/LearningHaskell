@@ -2,6 +2,7 @@
 
 module AboutMonadTrans where
 
+import Control.Monad.Trans
 import Control.Monad.Except
 import Control.Monad.Trans.State
 
@@ -9,13 +10,13 @@ import Control.Monad.Trans.State
   MonadTrans is a typeclass with one core method: `lift`. Speaking generally,
   it is about lifting actions in some Monad over a transformer type which wraps
   itself in the original Monad. Fancy ! 
--}
 
 class MonadTrans t where
   -- | lift a computation from the argument monad to the 
   --   constructed monad ('t' is the constructed monad.)
   lift :: (Monad m) => m a -> t m a 
 
+-}
 
 data TickTok a = TickTok { numbers :: [a] } deriving (Eq, Show, Functor)
 
@@ -32,5 +33,19 @@ newtype TickTokT a = TickTokT { runS :: State (TickTok a) a }
 
 newtype ActionT e a =
   ActionT { runIt :: ExceptT (ErrorMessage e) (State (TickTok Int) ) a}
+
+
+-- When is explicit lifting necessary ???
+-- 
+-- One case in which we must use `lift` is when we create a monad transformer
+-- stack in which instances of the same typeclass appear at multiple levels:
+--
+type Foo = StateT Int (State String)
+
+outerPut :: Int -> Foo ()
+outerPut = put
+
+innerPut :: String -> Foo ()
+innerPut = lift . put
 
 
