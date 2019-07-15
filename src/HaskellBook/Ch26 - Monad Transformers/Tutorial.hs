@@ -94,4 +94,10 @@ item = do
 experiment1 :: ReaderT String [] Char
 experiment1 = ReaderT (\x -> runParser item x)
 
+writeMessage :: String -> Writer [String] Int
+writeMessage msg = do
+  tell ["wrote something simple..."]
+  a <- writer (length msg, [msg])
+  return a
+
 
