@@ -15,7 +15,7 @@ data E4
 instance HasResolution E4 where
   resolution _ = 10000
 
-type Fixed4 = Fixed E4
+type Fixed4 = Fixed E4 -- values are truncated instead of rounded
 
 data QuoteData = QuoteData {
   day :: Day,

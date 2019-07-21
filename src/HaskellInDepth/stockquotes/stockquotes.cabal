@@ -16,23 +16,24 @@ maintainer:          raymondtay1974@gmail.com
 category:            System
 extra-source-files:  CHANGELOG.md
 
-library
-  exposed-modules: QuoteData, BoundedEnum, Statistics, StatReport
+library stockquotes-lib
+  exposed-modules: QuoteData, BoundedEnum, Statistics, StatReport, Charts, Params
   -- other-modules:
   -- other-extensions:
   build-depends:       base ^>=4.12.0.0, time, text, cassava, safe, bytestring,
-                       fmt
+                       Chart, fmt, Chart-diagrams, optparse-applicative
   hs-source-dirs:      src
   default-language:    Haskell2010
 
 executable stockquotes
   main-is:             Main.hs
-  -- other-modules:
+  other-modules:       QuoteData, BoundedEnum, Statistics, StatReport, Charts, Params
   -- other-extensions:
   build-depends:       base ^>=4.12.0.0,
                        time,
                        text,
                        optparse-applicative,
-                       cassava
+                       cassava,
+                       stockquotes-lib
   hs-source-dirs:      src
   default-language:    Haskell2010

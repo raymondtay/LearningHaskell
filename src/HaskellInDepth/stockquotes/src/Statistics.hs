@@ -24,24 +24,6 @@ instance Buildable Statistic where
   build Min = "Minimum"
   build Days = "Days Between Min/Max"
 
-
-
-
-
-
-
-
-
-
-
-
-
-instance Buildable StatQFieldData where
-  build (qf, stats) = nameF ("Statistics for " +||qf||+"") $ unlinesF stats
-
-instance Buildable StatEntry where
-  build se@StatEntry {..} = ""+|stat|+": "+|showStatEntryValue se|+""
-
 mean xs = sum xs / fromIntegral (length xs)
 
 daysBetween qf quotes = fromIntegral $ abs $ diffDays dMinQuote dMaxQuote
