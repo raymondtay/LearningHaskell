@@ -30,22 +30,18 @@ work params = do
     Left err -> putStrLn err
     Right (_, quotes) -> generateReports params quotes
 
--- main :: IO ()
--- main = do
---   [fname] <- getArgs
---   ds <- TIO.readFile fname
---   forM_ (text2Quotes ds) (\rec -> Prelude.putStrLn $ show rec)
---   return ()
+generateReports :: (Functor t, Foldable t) => Params -> t QuoteData -> IO ()
+generateReports Params {..} quotes = do
+  TIO.putStr $ statReport statInfo'
+  when prices $ plotChart title quotes [Open, Close, High, Low] fname_prices
+  when prices $ plotChart title quotes [Volume] fname_volumes
+    where 
+      statInfo' = statInfo quotes
+      withCompany pref = if company /= "" then pref ++ company else ""
+      img_suffix = withCompany "_" ++ ".svg"
+      fname_prices = "prices" ++ img_suffix
+      fname_volumes = "volumes" ++ img_suffix
+      title = "historical quotes" ++ withCompany " for "
 
--- Text data to Quote data
--- 
--- text2Quotes :: T.Text -> [QuoteData]
--- text2Quotes = Prelude.map (mkQuote . toComponents) . Prelude.tail . T.lines
---   where
---     toComponents = Prelude.map T.unpack . T.splitOn ","
---     mkQuote (d : rest @ [_, _, _, _, _]) = 
---       let day = parseTimeOrError False defaultTimeLocale "%Y/%m/%d" d
---           [close, volume, open, high, low] = Prelude.map read rest in QuoteData {..}
---     mkQuote _ = error "Was not expecting this other format"
 
 
