@@ -10,24 +10,25 @@ import Data.Fixed
 import Data.Text as T
 import Data.Text.IO as TIO
 import System.Environment
-import qualified Data.ByteString.Lazy as BL (readFile)
+import qualified Data.ByteString.Lazy as BL (readFile, writeFile)
 import Data.Csv (decodeByName)
 
 
 import QuoteData
 import Statistics
 import StatReport
+import HtmlReport
 import Charts
 import Params
 
 main :: IO ()
-main = cmdLineParser >> work
+main = cmdLineParser >>= work
 
 work :: Params -> IO ()
 work params = do
   csvData <- BL.readFile (fname params)
   case decodeByName csvData of
-    Left err -> putStrLn err
+    Left err -> Prelude.putStrLn err
     Right (_, quotes) -> generateReports params quotes
 
 generateReports :: (Functor t, Foldable t) => Params -> t QuoteData -> IO ()
