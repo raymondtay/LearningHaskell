@@ -1,0 +1,61 @@
+{-# LANGUAGE FlexibleContexts #-}
+
+module Main where
+
+import MonadsAreFun
+import Control.Monad.Reader
+import Control.Monad.IO.Class
+
+work :: ConfigM ()
+work = do
+  c <- ask
+  -- liftIO $ fictiousWork c
+  -- liftIO . putStrLn $ "[work] is given this configuration: " ++ (show c)
+  pure ()
+
+fictiousWork :: Config -> IO ()
+fictiousWork c = do
+  _ <- consume c
+  liftIO . putStrLn $ "[work] is given this configuration: " ++ (show c)
+    where
+      consume cfg = do
+        putStrLn $ "[work] key " ++ (show . key $ cfg)
+        putStrLn $ "[work] flag " ++ (show $ asks flag cfg)
+        putStrLn $ "[work] value " ++ (show . value $ cfg)
+
+g :: ConfigM ()
+g = do
+  c <- ask
+  local (\x -> x { flag = False }) f
+
+f :: Reader Config ()
+f = do
+  f1 <- asks flag
+  -- void $  putStrLn . show $ f1
+  pure ()
+
+-- pretty generic
+getKey :: MonadReader String m => m String
+getKey = do
+  k <- ask
+  return k
+
+-- pretty generic
+getFlag :: MonadReader b m => m b
+getFlag = do
+  k <- ask
+  return k
+
+-- pretty generic
+getValue :: MonadReader b m => m b
+getValue = do
+  k <- ask
+  return k
+
+main :: IO ()
+main = do
+  putStrLn "Hello, Haskell!"
+  putStrLn $ "One way to do it: " ++ (show ((Config <$> getValue . getFlag . getKey) "name" True "value"))
+  pure $ runReader work (Config "name" False "45")
+  fictiousWork (Config "name" False "45")
+  pure $ runReader g (Config "name" True "45")
