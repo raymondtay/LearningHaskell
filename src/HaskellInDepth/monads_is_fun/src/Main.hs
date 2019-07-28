@@ -4,11 +4,26 @@ module Main where
 
 import MonadsAreFun
 import Control.Monad.Reader
-import Control.Monad.IO.Class
+import Control.Monad.RWS
+
+type Spewer =
+  RWS 
+    Config
+    [String]
+    ()
+
+spewDetails :: Spewer ()
+spewDetails = do
+  cfg <- ask
+  tell ["A configuration object landed."]
+  tell [spewFlag cfg, spewKey cfg, spewValue cfg]
+    where
+      spewFlag cfg  = "Param: [Flag]: " ++ (show . flag $ cfg) ++ ","
+      spewKey cfg   = "Param: [Key]: " ++ (show . key $ cfg) ++ ","
+      spewValue cfg = "Param: [Value]: " ++ (show . value $ cfg)
 
 work :: ConfigM ()
 work = do
-  c <- ask
   -- liftIO $ fictiousWork c
   -- liftIO . putStrLn $ "[work] is given this configuration: " ++ (show c)
   pure ()
@@ -57,5 +72,6 @@ main = do
   putStrLn "Hello, Haskell!"
   putStrLn $ "One way to do it: " ++ (show ((Config <$> getValue . getFlag . getKey) "name" True "value"))
   pure $ runReader work (Config "name" False "45")
+  putStrLn . join . snd $ evalRWS spewDetails (Config "KAK" True "KAKAKAKA") ()
   fictiousWork (Config "name" False "45")
   pure $ runReader g (Config "name" True "45")

@@ -26,4 +26,3 @@ locByName pnumbers locs name = lookup name pnumbers >>= flip lookup locs
 data Config = Config { key :: String, flag :: Bool, value :: String } deriving Show
 
 type ConfigM = Reader Config
-
