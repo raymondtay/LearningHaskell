@@ -20,6 +20,20 @@ calc_isCountCorrect = do
 lookupVar :: String -> Bindings -> Int
 lookupVar name bindings = maybe 0 id (Map.lookup name bindings)
 
+-- mapReader is handy when the result of a reader-run might need to be
+-- transformed to another representation
+convertIt :: Reader Bindings Integer
+convertIt = mapReader (\boolValue ->
+  case boolValue of
+    True -> 1
+    False -> 0
+  ) calc_isCountCorrect
+
+-- withReader is handy when it comes to modifying the environment whereas
+-- mapReader is useful when it comes to modifying the result
+convertReader :: Reader Bindings Bool
+convertReader = withReader (\r -> Map.fromList [("count",0), ("b",1)]) calc_isCountCorrect
+
 sampleBindings = Map.fromList [("count",3), ("1",1), ("b",2)]
 
 calculateContentLen :: Reader String Int
