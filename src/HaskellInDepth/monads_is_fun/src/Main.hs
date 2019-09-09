@@ -5,6 +5,7 @@ module Main where
 import MonadsAreFun
 import Control.Monad.Reader
 import Control.Monad.RWS
+import Numerals
 
 type Spewer =
   RWS 
@@ -69,6 +70,7 @@ getValue = do
 
 main :: IO ()
 main = do
+  putStrLn $ show $ convertToExpr "(4*2) + (2+8*7)" -- demonstration of `Numerals` module
   putStrLn "Hello, Haskell!"
   putStrLn $ "One way to do it: " ++ (show ((Config <$> getValue . getFlag . getKey) "name" True "value"))
   pure $ runReader work (Config "name" False "45")
