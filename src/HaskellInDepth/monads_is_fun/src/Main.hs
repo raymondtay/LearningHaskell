@@ -7,6 +7,7 @@ import Control.Monad.Reader
 import Control.Monad.RWS
 import Numerals
 import GameOfDice
+import Mutability
 import System.Random        (randomR, newStdGen)
 
 type Spewer =

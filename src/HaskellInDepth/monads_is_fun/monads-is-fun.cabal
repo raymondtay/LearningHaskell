@@ -21,6 +21,13 @@ library trace-lib
   hs-source-dirs: trace-lib
   default-language:    Haskell2010
 
+library mutability-lib
+  exposed-modules: Mutability
+  build-depends:       base >=4.12 && <4.13,
+                       mtl
+  hs-source-dirs:      lib
+  default-language:    Haskell2010
+
 library numerals-lib
   exposed-modules: Numerals
   build-depends:       base >=4.12 && <4.13,
@@ -56,6 +63,7 @@ executable monads-is-fun
                        trace-lib,
                        numerals-lib,
                        dice-lib,
+                       mutability-lib,
                        mtl,
                        random,
                        transformers
