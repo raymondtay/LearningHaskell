@@ -18,8 +18,14 @@ module Mutability where
 
 -}
 
-import Data.IORef
 import Control.Monad
+import Control.Monad.ST
+import Data.Foldable          (traverse_)
+import Data.IORef             (newIORef, modifyIORef', readIORef)
+import System.Environment     (getArgs)
+import System.Directory.Extra (listContents, doesDirectoryExist)
+import Control.Monad.Extra (whenM, ifM, zipWithM)
+import Data.STRef
 
 sumNumbers :: IO Int
 sumNumbers = do
@@ -34,4 +40,62 @@ sumNumbers = do
           let num = read n
           modifyIORef' s (+ num)
           go s
+-- `ifM` evaluates a predicate and if True, evaluates the LHS otherwise 
+-- goes for the RHS ; you can see this from its type signature =>
+-- ifM : Monad m => m Bool -> m a -> m a -> m a
+--
+fileCount :: FilePath -> IO Int
+fileCount fp = do
+  cnt <- newIORef 0
+  whenM (doesDirectoryExist fp) $ go cnt fp
+  readIORef cnt
+    where
+      go cnt fp = listContents fp >>= traverse_ (processEntry cnt)
+      processEntry cnt fp = ifM (doesDirectoryExist fp) (go cnt fp) (inc cnt)
+      inc cnt = modifyIORef' cnt (+ 1)
+
+
+-- Data.STRef refers to mutable references in the ST monad (Control.Monad.ST
+-- monad that is)
+-- A value of type STRef s a is a mutable variable in state thread s,
+-- containing a value of type a.
+
+helloWorld :: ST s String
+helloWorld = do
+  ref <- newSTRef "hello" -- build a new STRef in the current state thread
+  x   <- readSTRef ref
+  writeSTRef ref (x ++ "world")
+  readSTRef ref
+
+helloWorld_ :: ST s String
+helloWorld_ = do
+  ref <- newSTRef ""
+  modifySTRef ref (const "world")
+  modifySTRef ref (++ "!")
+  modifySTRef ref ("Hello, " ++)
+  readSTRef ref
+
+countZeroesST :: [Int] -> Int
+countZeroesST xs = runST $ do
+  c <- newSTRef 0
+  traverse_ (\x -> when (x == 0) $ inc c) xs
+  readSTRef c
+    where inc c = modifySTRef' c (+1)
+
+
+comp1 :: ST s (STRef s Int)
+comp1 = do
+  newSTRef 0
+comp2 :: STRef s Int -> ST s Int
+comp2 ref = do
+  readSTRef ref
+
+-- the type inference algorithm will infer the same type 's' for them
+-- and if we try somehow to run them independently, but use the reference
+-- returned from comp1 in comp2; now the inferred types s and s1 are considered
+-- by the type checker to be different and hence the compilation failed. This
+-- is one example of the type checker controlling the logic behind our code by
+-- preventing parts of different ST computations to mixed in one.
+-- result = runST (comp2 (runST comp1)) -- NOK
+result' = runST (comp1 >>= comp2)
 

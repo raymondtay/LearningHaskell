@@ -24,7 +24,7 @@ library trace-lib
 library mutability-lib
   exposed-modules: Mutability
   build-depends:       base >=4.12 && <4.13,
-                       mtl
+                       mtl, extra
   hs-source-dirs:      lib
   default-language:    Haskell2010
 
