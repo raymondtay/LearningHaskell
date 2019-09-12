@@ -9,6 +9,7 @@ import Numerals
 import GameOfDice
 import Mutability
 import System.Random        (randomR, newStdGen)
+import Polish2
 
 type Spewer =
   RWS 
@@ -73,6 +74,9 @@ getValue = do
 
 main :: IO ()
 main = do
+  case evalRPN "2 3 + 3 5 * +" of
+    Nothing -> putStrLn "=> Could not evaluate the expression"
+    Just v ->  putStrLn . show $ v
   newStdGen >>= print . evalRWS diceGame (1, 6)
   putStrLn $ (++) "=> " (show $ convertToExpr "(4*2) + (2+8*7)") -- demonstration of `Numerals` module
   putStrLn $ "=> One way to do it: " ++ (show ((Config <$> getValue . getFlag . getKey) "name" True "value"))
