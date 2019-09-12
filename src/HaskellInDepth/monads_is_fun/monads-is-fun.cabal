@@ -21,6 +21,13 @@ library trace-lib
   hs-source-dirs: trace-lib
   default-language:    Haskell2010
 
+library dir-explorer-lib
+  exposed-modules: DirectoryExplorer
+  build-depends:       base >=4.12 && <4.13,
+                       mtl, safe, directory, filepath
+  hs-source-dirs:      lib
+  default-language:    Haskell2010
+
 library polish-calc-lib
   exposed-modules: Polish
   build-depends:       base >=4.12 && <4.13,
@@ -80,6 +87,7 @@ executable monads-is-fun
                        mutability-lib,
                        polish-calc-lib,
                        polish-calc2-lib,
+                       dir-explorer-lib,
                        mtl,
                        random,
                        transformers
