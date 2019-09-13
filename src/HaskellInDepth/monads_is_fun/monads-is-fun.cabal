@@ -24,7 +24,8 @@ library trace-lib
 library dir-explorer-lib
   exposed-modules: DirectoryExplorer
   build-depends:       base >=4.12 && <4.13,
-                       mtl, safe, directory, filepath
+                       mtl, safe, directory, filepath, unix,
+                       optparse-applicative
   hs-source-dirs:      lib
   default-language:    Haskell2010
 
