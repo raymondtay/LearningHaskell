@@ -108,7 +108,10 @@ printLog = traverse_ printEntry
 
 workIt :: AppConfig -> IO ()
 workIt config = do
-  (_, xs) <- runMyApp diskUsage config 0
+  (_, xs)  <- runMyApp diskUsage config 0
+  (_, xs') <- runMyApp fileCount config 0
+  putStrLn "File counter: "
+  printLog xs'
   putStrLn "File space usage: "
   printLog xs
 
@@ -116,4 +119,20 @@ doItNow :: IO () -- see Main.hs
 doItNow = execParser opts >>= workIt
   where 
     opts = info (mkConfig <**> helper) (fullDesc <> progDesc "File space usage info")
+
+
+
+fileCount :: MyApp Int ()
+fileCount = do
+  AppState {..} <- get
+  fs <- liftIO $ getFileStatus curPath
+  when (isDirectory fs) $ do
+    AppConfig {..} <- ask
+    when (curDepth <= maxDepth) $ traverseDirectoryWith fileCount 
+    files <- liftIO $ listDirectory curPath
+    tell [(curPath, length $ filterFiles ext files)]
+  where
+    filterFiles Nothing = id
+    filterFiles (Just ext) = filter (isExtensionOf ext)
+
 
