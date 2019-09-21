@@ -5,6 +5,12 @@ module Main where
 import MonadsAreFun
 import Control.Monad.Reader
 import Control.Monad.RWS
+import Numerals
+import GameOfDice
+import Mutability
+import System.Random        (randomR, newStdGen)
+import Polish2
+import DirectoryExplorer
 
 type Spewer =
   RWS 
@@ -68,10 +74,18 @@ getValue = do
   return k
 
 main :: IO ()
-main = do
-  putStrLn "Hello, Haskell!"
-  putStrLn $ "One way to do it: " ++ (show ((Config <$> getValue . getFlag . getKey) "name" True "value"))
+main = doItNow
+
+main2 :: IO ()
+main2 = do
+  case evalRPN "2 3 + 3 5 * +" of
+    Nothing -> putStrLn "=> Could not evaluate the expression"
+    Just v ->  putStrLn . show $ v
+  newStdGen >>= print . evalRWS diceGame (1, 6)
+  putStrLn $ (++) "=> " (show $ convertToExpr "(4*2) + (2+8*7)") -- demonstration of `Numerals` module
+  putStrLn $ "=> One way to do it: " ++ (show ((Config <$> getValue . getFlag . getKey) "name" True "value"))
   pure $ runReader work (Config "name" False "45")
   putStrLn . join . snd $ evalRWS spewDetails (Config "KAK" True "KAKAKAKA") ()
   fictiousWork (Config "name" False "45")
   pure $ runReader g (Config "name" True "45")
+
