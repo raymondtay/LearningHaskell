@@ -21,7 +21,7 @@ library my-lib
   exposed-modules: Parse
   -- other-modules:
   -- other-extensions:
-  build-depends:       base ^>=4.12.0.0, attoparsec, bytestring
+  build-depends:       base ^>=4.12.0.0, attoparsec, bytestring, time
   hs-source-dirs:      lib
   default-language:    Haskell2010
 
@@ -29,7 +29,12 @@ executable parsing-example
   main-is:             Main.hs
   -- other-modules:
   -- other-extensions:
-  build-depends:       base ^>=4.12.0.0, my-lib, text-format, bytestring
+  build-depends:       base ^>=4.12.0.0,
+                       my-lib,
+                       text-format,
+                       bytestring,
+                       attoparsec,
+                       text
   hs-source-dirs:      src
   default-language:    Haskell2010
 
