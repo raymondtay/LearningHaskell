@@ -1,4 +1,6 @@
 import Control.Concurrent
+import Control.Monad
+
 type CVar a = (MVar a, -- producer -> consumer
                MVar () -- consumer -> producer
               )
@@ -120,6 +122,37 @@ unGetChan (read, write) val =
       putMVar new_hole (Item val cts) >>
       putMVar read new_hole 
 
+--
+-- The skip-channel abstraction as detailed in the paper "Concurrent Haskell"
+--
+data SkipChan a = SkipChan (MVar (a, [MVar ()])) (MVar ())
+
+newSkipChan :: IO (SkipChan a)
+newSkipChan = do
+    sem <- newEmptyMVar
+    datum <- newMVar (undefined, [sem])
+    return (SkipChan datum sem)
+
+putSkipChan :: SkipChan a -> a -> IO ()
+putSkipChan (SkipChan datum _) v = do
+    (_, sems) <- takeMVar datum
+    putMVar datum (v, [])
+    mapM_ (\sem -> putMVar sem ()) sems
+
+getSkipChan :: SkipChan a -> IO a
+getSkipChan (SkipChan datum sem) = do
+    takeMVar sem
+    (v, sems) <- takeMVar datum
+    putMVar datum (v, sem:sems)
+    return v
+
+dupSkipChan :: SkipChan a -> IO (SkipChan a)
+dupSkipChan (SkipChan datum _) =
+  newEmptyMVar >>= \sem ->
+    takeMVar datum >>= \(v,sems) ->
+      putMVar datum (v, sem:sems) >>
+      return (SkipChan datum sem)
+ 
 
 {- |
   Concurrent Haskell runs as a single Unix process, performing its own scheduling internally.
