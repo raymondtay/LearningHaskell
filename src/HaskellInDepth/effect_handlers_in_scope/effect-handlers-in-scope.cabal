@@ -1,0 +1,34 @@
+cabal-version:       2.4
+-- Initial package description 'effect-handlers-in-scope.cabal' generated
+-- by 'cabal init'.  For further documentation, see
+-- http://haskell.org/cabal/users-guide/
+
+name:                effect-handlers-in-scope
+version:             0.1.0.0
+-- synopsis:
+-- description:
+-- bug-reports:
+license:             BSD-3-Clause
+license-file:        LICENSE
+author:              Raymond Tay
+maintainer:          raymondtay1974@gmail.com
+-- copyright:
+category:            System
+extra-source-files:  CHANGELOG.md
+
+library
+  -- exposed-modules:
+  -- other-modules:
+  -- other-extensions:
+  build-depends:       base ^>=4.12.0.0
+  hs-source-dirs:      src
+  default-language:    Haskell2010
+
+executable effect-handlers-in-scope
+  main-is:             Main.hs
+  -- other-modules:
+  -- other-extensions:
+  build-depends:       base ^>=4.12.0.0,
+                       fused-effects
+  hs-source-dirs:      src
+  default-language:    Haskell2010
