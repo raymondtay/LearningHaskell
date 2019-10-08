@@ -39,5 +39,14 @@ knapsack w vs | w < 0 = Fail
 select :: [a] -> Backtr a
 select = foldr (:|) Fail . map Return
 
+-- Discover all solutions to the "knapsack problem"
+allsolutions :: Backtr a -> [a]
+allsolutions (Return a) = [a]
+allsolutions Fail       = []
+allsolutions (p :| q) = allsolutions p ++ allsolutions q
+
 main :: IO ()
-main = putStrLn "Hello, Haskell!"
+main = do
+  putStrLn . show $ allsolutions (knapsack 3 [3,2,1])
+
+
