@@ -109,7 +109,7 @@ instance Applicative (Nondet + Void) -- likely to be incorrect
 -- Program compiles but doesn't work as expected.
 knapsack2 :: Int -> [Int] -> Prog (Nondet + Void) [Int]
 knapsack2 w vs | w < 0  = Prog.fail
-               | w == 0 = Prog.fail
+               | w == 0 = Return []
                | w > 0  = select2 vs >>= (\e -> knapsack2 (w - e) vs >>= (\es -> return (e:es)))
 
 select2 :: [Int] -> Prog (Nondet + Void) Int
