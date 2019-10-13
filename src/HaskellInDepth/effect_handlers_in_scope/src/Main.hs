@@ -5,6 +5,8 @@
 --
 module Main where
 
+import Prog     (allsolutions2, knapsack2) 
+
 data Backtr a =
   Return a |
   Fail     |
@@ -48,5 +50,6 @@ allsolutions (p :| q) = allsolutions p ++ allsolutions q
 main :: IO ()
 main = do
   putStrLn . show $ allsolutions (knapsack 3 [3,2,1])
+  putStrLn . show $ allsolutions2 (knapsack2 3 [3,2,1])
 
 
