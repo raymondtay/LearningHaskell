@@ -18,7 +18,7 @@
 --     implementations which means a runtime error will be thrown if you are
 --     not careful !
 --
-module Prog where
+module EffectHandler where
 
 import Control.Monad      (join, liftM2)
 
@@ -107,11 +107,78 @@ allsolutions2 = run . solutions
 instance Applicative (Nondet + Void) -- which allows the program to compile but what is it equivalent to ?? Compiler complains that of empty implementations ... 
 
 knapsack2 :: Int -> [Int] -> Prog (Nondet + Void) [Int]
-knapsack2 w vs | w < 0  = Prog.fail
-               | w == 0 = Return [] -- Fixed it by removing "Prog.fail".
+knapsack2 w vs | w < 0  = EffectHandler.fail
+               | w == 0 = Return [] -- Fixed it by removing "EffectHandler.fail".
                | w > 0  = select2 vs >>= (\e -> knapsack2 (w - e) vs >>= (\es -> return (e:es)))
 
 select2 :: [Int] -> Prog (Nondet + Void) Int
-select2 = foldr (Prog.||) Prog.fail . map Return
+select2 = foldr (EffectHandler.||) EffectHandler.fail . map Return
 
+
+{--
+       State Effects
+--}
+
+
+-- Stateful operations are modelled with the assumption that there exists some
+-- underlying state "s", which can be updated with the operation "put s", and
+-- retrieved with "get". The corresponding syntax is as follows:
+--
+data State s cnt = Get' (s -> cnt) | Put' s cnt deriving Functor
+
+pattern Get k <- (project -> Just (Get' k))
+get :: (Applicative sig, State s ⊂ sig) => Prog sig s
+get = inject (Get' return)
+
+pattern Put s k <- (project -> Just (Put' s k))
+put :: (Applicative sig, State s ⊂ sig) => s -> Prog sig ()
+put s = inject (Put' s (return ()))
+
+runState :: (Applicative sig) => s -> Prog (State s + sig) a -> Prog sig (s, a)
+runState s (Return a) = return (s, a)
+runState s (Get k)    = runState s (k s)
+runState s (Put s' k) = runState s' k
+runState s (Other op) = Op (fmap (runState s) op)
+
+-- combines nondeterminism and state by providing the semantics for both
+-- effects separately: we compose both handlers. How so? The first handler
+-- tackles one effect in the initial program while the second handler tackles
+-- the other in the residual program.
+--
+
+runLocal :: (Applicative (Nondet + sig), Applicative sig) => s -> Prog (State s + (Nondet + sig)) a -> Prog sig [(s, a)]
+runLocal s = solutions . runState s
+
+runGlobal :: (Applicative (State s + sig), Applicative sig) => s -> Prog (Nondet + (State s + sig)) a -> Prog sig (s, [a])
+runGlobal s = runState s . solutions
+
+-- It is interesting to me that these two composite semantics are not
+-- equivalent; they differ in how the two effects interact. In runLocal, each
+-- branch of the nondeterministic computation has its own local copy of the
+-- state, while in runGlobal there is one state shared by all branches.
+--
+-- You can see this on the type level: that is "runLocal" returns a list of
+-- solutions where each pair contains the local state and corresponding
+-- solution; in "runGlobal" there's a single global state associated with a
+-- list of solutions.
+--
+
+choices :: (Applicative sig, Nondet ⊂ sig, State Int ⊂ sig) => Prog sig a -> Prog sig a
+choices (Return a) = return a
+choices (Fail)     = EffectHandler.fail
+choices (p :|| q)  = incr >> (choices p EffectHandler.|| choices q)
+choices (Op op)    = Op (fmap choices op)
+
+incr :: (Applicative sig, State Int ⊂ sig) => Prog sig ()
+incr = get >>= put . (succ :: Int -> Int)
+
+-- Given this, how would the knapsack problem look like now?
+--
+knapsack3 :: Int -> [Int] -> Prog (Nondet + Void) [Int]
+knapsack3 w vs | w < 0  = EffectHandler.fail
+               | w == 0 = Return [] -- Fixed it by removing "EffectHandler.fail".
+               | w > 0  = select3 vs >>= (\e -> knapsack3 (w - e) vs >>= (\es -> return (e:es)))
+
+select3 :: [Int] -> Prog (Nondet + Void) Int
+select3 = foldr (EffectHandler.||) EffectHandler.fail . map Return
 

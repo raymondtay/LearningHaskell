@@ -5,7 +5,7 @@
 --
 module Main where
 
-import Prog     (allsolutions2, knapsack2) 
+import EffectHandler     (allsolutions2, knapsack2) 
 
 data Backtr a =
   Return a |
