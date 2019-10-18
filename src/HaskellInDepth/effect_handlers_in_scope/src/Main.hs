@@ -5,7 +5,8 @@
 --
 module Main where
 
-import EffectHandler     (allsolutions2, knapsack2) 
+import EffectHandler    (allsolutions2, knapsack2) 
+import DataALarteCarte  (eval, addExample, addExample', addExample2)
 
 data Backtr a =
   Return a |
@@ -51,5 +52,7 @@ main :: IO ()
 main = do
   putStrLn . show $ allsolutions (knapsack 3 [3,2,1])
   putStrLn . show $ allsolutions2 (knapsack2 3 [3,2,1])
-
+  putStrLn . show $ eval addExample  -- straightforward, easy to read.
+  putStrLn . show $ eval addExample'  -- straightforward, easy to read.
+  putStrLn . show $ eval addExample2 -- insightful
 
