@@ -6,7 +6,9 @@
 module Main where
 
 import EffectHandler    (allsolutions2, knapsack2) 
-import DataALarteCarte  (eval, addExample, addExample', addExample2)
+import DataALarteCarte  (eval, addExample, addExample',
+                         addExample2, complexExample1, complexExample2,
+                         pretty, distributeExample1, distributeExample2 )
 
 data Backtr a =
   Return a |
@@ -55,4 +57,10 @@ main = do
   putStrLn . show $ eval addExample  -- straightforward, easy to read.
   putStrLn . show $ eval addExample'  -- straightforward, easy to read.
   putStrLn . show $ eval addExample2 -- insightful
+  putStrLn . show $ eval complexExample1
+  putStrLn . show $ eval complexExample2
+  putStrLn . show $ pretty complexExample1
+  putStrLn . show $ pretty complexExample2
+  putStrLn . show $ distributeExample1
+  putStrLn . show $ distributeExample2
 

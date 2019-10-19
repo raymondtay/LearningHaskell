@@ -2,6 +2,7 @@
             MultiParamTypeClasses,
             FlexibleInstances,
             FlexibleContexts,
+            InstanceSigs,
             OverlappingInstances #-}
 
 -- NOTE: you will run into Overlapping instances problem. Use the corresponding
@@ -42,7 +43,6 @@ type AddExpr = Expr Add
 -- is very similar to the Either data type; the only difference is that it does
 -- not combine two base types, but two type constructors.
 infixr 6 :+:
-infixl 6 ⊕
 data (f :+: g) e = Inl (f e) | Inr (g e)
 
 addExample :: Expr (Val :+: Add)
@@ -98,13 +98,21 @@ eval expr = foldExpr evalAlgebra expr
 --
 class (Functor sub, Functor sup) => sub :<: sup where
   inj :: sub a -> sup a
+  prj :: sup a -> Maybe (sub a)
 
 instance Functor f => f :<: f where -- identity is reflexive
   inj = id
+  prj = Just
+
 instance (Functor f, Functor g) => f :<: (f :+: g) where
-  inj = Inl
+  inj         = Inl
+  prj (Inl e) = Just e
+  prj _       = Nothing
+
 instance (Functor f, Functor g, Functor h, f :<: g) => f :<: (h :+: g) where
-  inj = Inr . inj
+  inj          = Inr . inj
+  prj (Inr ga) = prj ga
+  prj _        = Nothing
 
 inject :: (g :<: f) => g (Expr f) -> Expr f
 inject = In . inj
@@ -112,8 +120,7 @@ inject = In . inj
 val :: (Val :<: f) => Int -> Expr f
 val x = inject (Val x)
 
---infixl 6 ⊕ -- u+2295
-
+infixl 6 ⊕ -- u+2295
 (⊕) :: (Add :<: f) => Expr f -> Expr f -> Expr f
 x ⊕ y = inject (Add x y)
 
@@ -125,4 +132,114 @@ x ⊕ y = inject (Add x y)
 --
 addExample2 :: Expr (Add :+: Val)
 addExample2 = val 30000 ⊕ val 1778 ⊕ val 4
+
+data Mul x = Mul x x
+instance Functor Mul where
+  fmap f (Mul x y) = Mul (f x) (f y)
+
+instance Eval Mul where
+  evalAlgebra (Mul x y) = x * y
+
+infixl 7 ⊗  -- its important to know that the multiplication operations precedes addition.
+(⊗) :: (Mul :<: f) => Expr f -> Expr f -> Expr f
+x ⊗ y = inject (Mul x y)
+
+complexExample1 :: Expr (Val :+: Add :+: Mul)
+complexExample1 = val 80 ⊗ val 4 ⊕ val 4 -- returns 324
+complexExample2 :: Expr (Mul :+: Val :+: Add)
+complexExample2 = val 80 ⊕ val 4 ⊗ val 4 ⊕ val 3 -- returns 99
+
+
+{-
+  Introduce a class, corresponding to the function we want to write. An obvious candidate for this 
+  class is:
+
+  class Render f where
+    render :: f (Expr f) -> String
+
+  The type of `render` is not general enough. To see this, consider the instance definition for `Add`.
+  We would like to make recursive calls to the subtrees, which themselves might be values, for instance.
+  The above type for render, however, requires that all subtrees of `Add` are themselves additions. 
+  Clearly this is undesirable. A better choice is as follows:
+-}
+class Render f where
+  render :: Render g => f (Expr g) -> String
+
+-- This more general type allows us to make recursive calls to any
+-- subexpressions of an addition, even if these subexpressions are not
+-- additions themselves.
+--
+pretty :: Render f => Expr f -> String
+pretty (In e) = render e
+
+instance Render Val where
+  render (Val i) = show i
+
+instance Render Add where
+  render (Add i j) = "(" ++ pretty i ++ " + " ++ pretty j ++ ")"
+
+instance Render Mul where
+  render (Mul i j) = "(" ++ pretty i ++ " * " ++ pretty j ++ ")"
+
+instance (Render f, Render g) => Render (f :+: g) where
+  render (Inl x) = render x
+  render (Inr x) = render x
+
+match :: (g :<: f) => Expr f -> Maybe (g (Expr f))
+match (In e) = prj e
+
+distribute :: (Add :<: f, Mul :<: f) => Expr f -> Maybe (Expr f)
+distribute e = do
+  Mul a b <- match e
+  Add c d <- match b
+  return (a ⊗ c ⊕ a ⊗ d)
+
+-- if i were to write "val 80 ⊗ val 4 ⊕ val 6" then this example would not
+-- generate the right instance but if an temporary was introduced then it would
+-- generate the desired "expression". See below.
+complexExample3 :: Expr (Val :+: Add :+: Mul)
+complexExample3 = let x = val 4 ⊕ val 6
+                  in val 80 ⊗ x
+
+-- this should parse nicely
+distributeExample1 =
+  case (distribute complexExample3) of
+      Nothing -> "This computation is not eligible for distribution."
+      Just expr -> pretty expr
+
+-- this should not parse
+distributeExample2 =
+  case (distribute complexExample2) of
+      Nothing -> "This computation is not eligible for distribution."
+      Just expr -> pretty expr
+--
+-- Monads for Free (Luth & Ghani, 2002) 
+--
+
+-- In general, the coproduct of 2 monads is fairly complicated (Luth & Ghani,
+-- 2002) . No kidding !
+-- 
+data Term f a = Pure a | Impure (f (Term f a))
+
+instance Functor f => Functor (Term f) where
+  fmap f (Pure x) = Pure (f x)
+  fmap f (Impure t) = Impure (fmap (fmap f) t)
+
+instance Functor f => Applicative (Term f) where
+  pure :: a -> Term f a
+  pure = Pure
+
+  (<*>) :: Term f (a -> b) -> Term f a -> Term f b
+  (Pure f) <*> (Pure a) = Pure (f a)
+  (Pure f) <*> (Impure t) = Impure (fmap (fmap f) t)
+  (Impure fab) <*> a = Impure $ fmap (\e -> e <*> a) fab
+
+instance Functor f => Monad (Term f) where
+  return :: a -> Term f a
+  return x = Pure x
+
+  (>>=) :: Term f a -> (a -> Term f b) -> Term f b
+  (Pure x) >>= f = f x
+  (Impure t) >>= f = Impure (fmap (>>= f) t)
+
 
