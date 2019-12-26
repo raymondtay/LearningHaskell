@@ -104,7 +104,7 @@ solutions (Other op) = Op (fmap solutions op)
 allsolutions2 :: Prog (Nondet + Void) a -> [a]
 allsolutions2 = run . solutions
 
-instance Applicative (Nondet + Void) -- which allows the program to compile but what is it equivalent to ?? Compiler complains that of empty implementations ... 
+instance Applicative sig => Applicative (Nondet + sig) -- which allows the program to compile but what is it equivalent to ?? Compiler complains that of empty implementations ... 
 
 knapsack2 :: Int -> [Int] -> Prog (Nondet + Void) [Int]
 knapsack2 w vs | w < 0  = EffectHandler.fail
@@ -172,13 +172,17 @@ choices (Op op)    = Op (fmap choices op)
 incr :: (Applicative sig, State Int ⊂ sig) => Prog sig ()
 incr = get >>= put . (succ :: Int -> Int)
 
+-- instance Applicative (State Int + Void)
+-- instance (Applicative sig, s) => Applicative (State s ⊂ sig)
+
 -- Given this, how would the knapsack problem look like now?
 --
-knapsack3 :: Int -> [Int] -> Prog (Nondet + Void) [Int]
+knapsack3 :: (Applicative sig, Nondet ⊂ sig) => Int -> [Int] -> Prog sig [Int]
 knapsack3 w vs | w < 0  = EffectHandler.fail
                | w == 0 = Return [] -- Fixed it by removing "EffectHandler.fail".
                | w > 0  = select3 vs >>= (\e -> knapsack3 (w - e) vs >>= (\es -> return (e:es)))
 
-select3 :: [Int] -> Prog (Nondet + Void) Int
+select3 :: (Applicative sig, Nondet ⊂ sig) => [a] -> Prog sig a
 select3 = foldr (EffectHandler.||) EffectHandler.fail . map Return
+
 
