@@ -73,10 +73,10 @@ test3 = do
 -- *> runStateT (runReaderT test3 True) 4
 -- Identity (4,5)
 
-innerAddTwo :: (Int -> Int) -> Barr ()
-innerAddTwo = lift . modify
+innerMod :: (Int -> Int) -> Barr ()
+innerMod = lift . modify
 
--- Something interesting happened here. The definition of this function
+-- Something interesting happened here during my experimentation. The definition of this function
 -- "innerAddTwo" forced the types to be consistent with its signature. Do you
 -- see it?
 -- Its easy to confirm this observation when you noticed that the
@@ -90,15 +90,31 @@ innerAddTwo = lift . modify
 --
 --
 
-test4 :: (Int -> Int) -> Barr ()
+-- Qn: Given a user defined state function (e.g. addOne), how does one use it in
+--     a function (e.g. test4) where we modify it?
+--
+test4 :: (Int -> Int) -> Barr Int
 test4 f = do
   b <- ask
   case b of
-      -- True -> (lift . modify) f 
-      True -> lift (modify f) . lift addOne
-      -- False -> state (\_ -> (42, ()))
--- *> runStateT (runReaderT (test4 id) True) 44
--- Identity ((),44)
--- *> runStateT (runReaderT (test4 id) False) 44
--- Identity *** Exception: MtlIntuition.hs:(96,3)-(97,31): Non-exhaustive patterns in case
+      True -> lift $ withState f addOne
+      False -> state (\s -> (3, s))
+
+-- *> runStateT (runReaderT (test4 (+1)) False) 21
+-- Identity (3,21)
+-- *> runStateT (runReaderT (test4 (+1)) True) 21
+-- Identity (22,23)
+
+-- Qn: Given a user defined state function (e.g. addOne), how does one use it in
+--     a function (e.g. test4) where we modify it and the twist here is that i
+--     wished for the result to be suppressed i.e. () and i've found 1 way to
+--     solve this by application of "mapState".
+--
+test5 :: (Int -> Int) -> Barr ()
+test5 f = do
+  b <- ask
+  case b of
+      True -> lift $ withState f $ mapState ((\(a, s) -> ((), s)) :: (Int, Int) -> ((), Int)) addOne
+      False -> state (\s -> ((), s))
+
 
