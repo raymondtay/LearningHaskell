@@ -32,6 +32,12 @@ mulTwoPlusOne = do i <- ask
 -- > runReader mulTwoPlusOne 2
 -- > 5
 
+{-
+ - This resource on MTL (https://wiki.haskell.org/Monad_Transformers_Tutorial) is actually 
+ - important in the respect that beginners often wonder how the design of the monad transformers
+ - actually came about; to the absolute beginner it is important to understand how it started
+ - , what drove it to the state it is today etc. Recommended reading.
+ -}
 
 newtype MaybeIO a = MaybeIO { 
   runMaybeIO :: IO (Maybe a)
@@ -52,5 +58,10 @@ instance Monad MaybeIO where
     case result of
         Just v -> runMaybeIO (f v)
         Nothing -> return Nothing
+
+transformIOtoMaybeIO :: IO a -> MaybeIO a
+transformIOtoMaybeIO action = MaybeIO $ do
+  result <- action
+  return (Just result)
 
 
