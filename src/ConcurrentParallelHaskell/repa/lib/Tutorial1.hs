@@ -1,5 +1,5 @@
 
-module Tutorial1 () where
+module Tutorial1 (construct2D, reify2D) where
 
 import Data.Array.Repa as Repa
 
