@@ -2,6 +2,7 @@
 import Control.Monad
 import Control.Monad.Reader
 import Control.Monad.Writer
+import Control.Monad.State
 
 pathsWriter :: [(Int, Int)] -> Int -> Int -> [[Int]]
 pathsWriter edges start end = map execWriter (pathsWriter' edges start end)
@@ -51,5 +52,11 @@ readerWriterExample = do x <- ask
 -- is to keep the state as a tuple, but for this exercise i want you to
 -- implement  the state using a StateT Integer (State Integer) monad. Thus you
 -- must use lift to acces one of the internal states. The final code to run the
--- cmonad computation should be similar to seimilar to execStateT (execState
--- factorial x 1 )
+-- monad computation should be similar to similar to `execStateT (execState factorial x) 1`
+--
+
+-- this function uses 1 state to store 
+factorial x = do
+  y <- get
+  if x == 0 then put 1
+            else put (x*y) >> factorial (x-1)
