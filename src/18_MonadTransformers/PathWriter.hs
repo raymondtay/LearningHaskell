@@ -55,8 +55,13 @@ readerWriterExample = do x <- ask
 -- monad computation should be similar to similar to `execStateT (execState factorial x) 1`
 --
 
--- this function uses 1 state to store 
-factorial x = do
-  y <- get
-  if x == 0 then put 1
-            else put (x*y) >> factorial (x-1)
+-- *Main> execState (runStateT factorial $ 10) 1
+-- 3628800
+-- *Main> execState (runStateT factorial $ 4) 1
+-- 24
+factorial :: StateT Integer (State Integer) ()
+factorial = do
+  s <- get
+  if s == 0 then lift . put $ 1 else put (s-1) ; lift . put $ foldl (*) 1 [1..s]
+
+
