@@ -21,3 +21,11 @@ transformer on top of our combined monad, in order to get a new monad and in
 fact, this is a common thing to do. Under what circumstances might we want to
 create such a stack?
 
+Note: You have just seen another way in which you can get a definition of
+`fmap` using the monad functions, apart from using `liftM` as explained in the
+previous chapter. Every type that belongs to the `Monad` type class can also be
+made an inhabitant of the `Functor` type class in a uniform way. As i have
+already explained, this is reflected in the actual definition of the `Monad`
+type class, but for the time being we look at those two classes in isolation.
+
+
