@@ -28,4 +28,13 @@ made an inhabitant of the `Functor` type class in a uniform way. As i have
 already explained, this is reflected in the actual definition of the `Monad`
 type class, but for the time being we look at those two classes in isolation.
 
+A monad transformer takes some base monad and transforms it into a new monad
+with some extra computational effects. Formally, a monad transformer is a data
+type with the following structure:
+
+```haskell
+MonadT e₁ ... eₙ m a 
+```
+
+include(Composing_Types.md)
 
