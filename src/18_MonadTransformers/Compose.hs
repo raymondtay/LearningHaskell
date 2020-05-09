@@ -186,4 +186,78 @@ instance (Monad m) => Monad (IdentityT m) where
 -- combine it with any other type that has a Monad instance. In general, in
 -- order to make the types fit.
 
+newtype MaybeT m a = MaybeT { runMaybeT :: m (Maybe a) }
+
+instance (Functor m) => Functor (MaybeT m) where
+  fmap f (MaybeT ma) = MaybeT $ (fmap . fmap) f ma
+
+instance Applicative m => Applicative (MaybeT m) where
+  pure :: a -> MaybeT m a
+  pure a = MaybeT (pure (pure a))
+  (MaybeT fab) <*> (MaybeT mma) = MaybeT ((<*>) <$> fab <*> mma)
+
+-- Take notice that the monad transformer >>= operator will unpack the outer
+-- monad, perform some computation and if the outcome is another value its
+-- being unpacked again before coming back to being packed.
+--
+-- Unpacking is the lingo for saying "runMaybeT" or anything that is like
+-- "runXXXT" ... and packing is the reverse
+--
+instance Monad m => Monad (MaybeT m) where
+  return :: a -> MaybeT m a
+  return = pure
+  (>>=) :: MaybeT m a -> (a -> MaybeT m b) -> MaybeT m b
+  (MaybeT ma) >>= f = MaybeT $ do
+    mma <- ma -- "extract" the (Maybe a)
+    case mma of
+      Nothing -> return Nothing
+      Just v -> runMaybeT (f v)  -- if there was a value, we map "f" over "v" and then unpack the MaybeT
+
+newtype EitherT e m a = EitherT { runEitherT :: m (Either e a) }
+
+instance Functor m => Functor (EitherT e m) where
+  fmap :: (a -> b) -> EitherT e m a -> EitherT e m b
+  fmap f (EitherT ema) = EitherT $ (fmap . fmap) f ema
+
+-- provided a functor instance for my custom-Either datatype.
+instance Functor (Either e) where
+  fmap f (Left e) = Left e
+  fmap f (Right a) = Right (f a)
+instance Applicative (Either e) where
+  pure = pure
+  (Left f) <*> _ = Left f
+  (Right f) <*> (Right a) = Right (f a)
+
+instance Applicative m => Applicative (EitherT e m) where
+  pure :: a -> EitherT e m a
+  pure a = EitherT (pure (pure a))
+  (EitherT f) <*> (EitherT ema) = EitherT $ ((<*>) <$> f <*> ema)
+
+instance Monad m => Monad (EitherT e m) where
+  return :: a -> EitherT e m a
+  return = pure
+  (>>=) :: EitherT e m a -> (a -> EitherT e m b) -> EitherT e m b
+  (EitherT ema) >>= f = EitherT $ do
+    emma <- ema
+    case emma of
+      Left l -> return (Left l)
+      Right v -> runEitherT (f v)
+
+
+-- transformer variant of the `either` catamorphism; recall that catamorphism
+-- is the same as folding (i.e. "walking" over a structure)
+eitherT :: Monad m =>
+     (a -> m c)
+  -> (b -> m c)
+  -> EitherT a m b
+  -> m c
+eitherT f g (EitherT amb) = do
+  amb_ <- amb
+  case amb_ of
+    Left a -> f a
+    Right b -> g b
+
+swapEitherT :: Functor m => EitherT e m a -> EitherT a m e
+swapEitherT ema = EitherT $ fmap (\x -> case x of (Left l) -> Right l; (Right r) -> Left r) (runEitherT ema)
+
 
