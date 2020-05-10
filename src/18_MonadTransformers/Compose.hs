@@ -1,6 +1,7 @@
 {-# LANGUAGE InstanceSigs #-}
 
 import Prelude hiding (Either(..)) -- hid this explicitly
+import Data.Tuple (swap)
 
 -- In this case, the f and g represent type constructors, not term-level
 -- functions. So, we have a type constructor that takes three type arguments: f
@@ -259,5 +260,35 @@ eitherT f g (EitherT amb) = do
 
 swapEitherT :: Functor m => EitherT e m a -> EitherT a m e
 swapEitherT ema = EitherT $ fmap (\x -> case x of (Left l) -> Right l; (Right r) -> Left r) (runEitherT ema)
+
+-- This newtype is special in the sense that it carries a function as its
+-- payload.
+newtype ReaderT r m a = ReaderT { runReaderT :: r -> m a }
+
+instance Functor m => Functor (ReaderT r m) where
+  fmap :: (a -> b) -> ReaderT r m a -> ReaderT r m b
+  fmap f (ReaderT g) = ReaderT $ \r -> fmap f (g r)
+
+instance Applicative m => Applicative (ReaderT r m) where
+  pure :: a -> ReaderT r m a
+  pure a = ReaderT (\r -> pure a)
+  (ReaderT rma) <*> (ReaderT ma) = ReaderT (\r -> (rma r) <*> (ma r))
+
+instance Monad m => Monad (ReaderT r m) where
+  return = pure
+  (ReaderT rma) >>= f = ReaderT $ (\r -> do
+    a <- rma r
+    runReaderT (f a) r)
+
+-- let us push on ...
+--
+
+newtype StateT s m a = StateT { runStateT :: s -> m (a,s ) } 
+
+-- i'm using Data.Tuple.swap
+instance Functor m => Functor (StateT s m) where
+  fmap :: (a -> b) -> StateT s m a -> StateT s m b
+  fmap f (StateT sma) =
+    StateT $ (\s -> fmap (\pair -> (,) ((f . fst) pair) (snd pair)) (sma s))
 
 
