@@ -2,6 +2,8 @@
 
 import Prelude hiding (Either(..)) -- hid this explicitly
 import Data.Tuple (swap)
+import Control.Monad       (liftM)
+import Control.Monad.Trans
 
 -- In this case, the f and g represent type constructors, not term-level
 -- functions. So, we have a type constructor that takes three type arguments: f
@@ -290,5 +292,41 @@ instance Functor m => Functor (StateT s m) where
   fmap :: (a -> b) -> StateT s m a -> StateT s m b
   fmap f (StateT sma) =
     StateT $ (\s -> fmap (\pair -> (,) ((f . fst) pair) (snd pair)) (sma s))
+
+-- The reason why we don't really need the Writer Monad is because this
+-- particular monad allows us to deal with values by combining them (but not
+-- reading) which is alot like State Monad because it lets us both read and
+-- write values in any manner we desire.
+-- It's a bit too easy to get into a situation where Writer is either too lazy
+-- or too strict for the problem you're solving, and then it'll use more memory
+-- that you'd like.
+--
+-- Writer can accumulate unevaluated thunks, causing memory leaks. It's also
+-- inappropriate for logging long-running or going programs due to the fact
+-- that you cannot retrieve any of the logged values until the computation is
+-- complete.
+--
+
+-- Instructive to study and derive insights
+--
+instance MonadTrans (StateT s) where
+  lift m = StateT $ \s -> do
+    a <- m
+    return (a, s)
+
+instance MonadTrans (ReaderT r) where
+  lift m = ReaderT $ \r -> do
+    a <- m
+    return a
+
+instance MonadTrans (EitherT e) where
+  lift m = EitherT $ do
+    a <- m
+    return (Right a) -- "e" is already bound to the MT which means we don't have to consider "Left" values.
+
+instance MonadTrans MaybeT where
+  -- lift = MaybeT . liftM Just
+  lift m = MaybeT $ m >>= (\r -> case r of (Nothing :: Maybe a) -> return Nothing)
+
 
 
