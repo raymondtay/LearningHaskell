@@ -4,6 +4,8 @@ import Prelude hiding (Either(..)) -- hid this explicitly
 import Data.Tuple (swap)
 import Control.Monad       (liftM)
 import Control.Monad.Trans
+import Control.Monad.IO.Class
+
 
 -- In this case, the f and g represent type constructors, not term-level
 -- functions. So, we have a type constructor that takes three type arguments: f
@@ -335,6 +337,41 @@ instance MonadTrans (EitherT e) where
 instance MonadTrans MaybeT where
   lift = MaybeT . liftM Just
 
+-- The idea of the MonadIO is to keep lifting your IO action until it is lifted
+-- over all structure embedded in the outermost type; below are examples of how
+-- this can be accomplished.
+
+-- the default implementation for liftIO is `id` and this seemingly simple
+-- function is incredibly deceptive
+instance (MonadIO m) => MonadIO (EitherT e m) where
+  liftIO = lift . liftIO
+
+instance (MonadIO m) => MonadIO (MaybeT m) where
+  liftIO = lift . liftIO
+
+instance (MonadIO m) => MonadIO (ReaderT r m) where
+  liftIO = lift . liftIO
+
+-- The definition of the MonadIO for StateT sort of forced me to derive the
+-- Applicative and Monad instances
+--
+instance (Applicative m, Monad m) => Applicative (StateT s m) where
+  pure a = StateT $ (\s -> pure (a, s))
+  (StateT smf) <*> (StateT sma) = StateT (\s -> 
+    smf s >>= \(g, s1) ->
+      let mapper = \(z,u) -> (g z, u)
+       in mapper <$> (sma s1))
+
+instance (Monad m) => Monad (StateT s m) where
+  return a = StateT (\s -> pure (a, s))
+  (StateT sma) >>= f = StateT $ (\s -> do
+    ma <- sma s
+    (runStateT (f (fst ma))) s)
+
+-- To reach here ... i had to implement the 2 instances above (↑)
+-- 
+instance (MonadIO m) => MonadIO (StateT s m) where
+  liftIO = lift . liftIO
 
 
 
