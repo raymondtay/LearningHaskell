@@ -307,8 +307,16 @@ instance Functor m => Functor (StateT s m) where
 -- complete.
 --
 
--- Instructive to study and derive insights
---
+-- Instructive to study and derive insights and the general pattern with
+-- MonadTrans instances demonstrated by the code below is that you are usually
+-- going to lift the injection of the know structure (e.g. MaybeT, StateT it
+-- would be Maybe and State respectively etc) over some Monad. Injection of
+-- structure usually means `return`, but since with MaybeT we know we want
+-- Maybe structure, we choose to not be obfuscatory and use Just. That
+-- transforms an `m a` into `m (T a)` where capital T is some concrete tyupe
+-- you are lifting the `m a` into. Then to cap it all off, you use the data
+-- constructor for your monad transformer, and the value is not lifted into the
+-- larger context.
 instance MonadTrans (StateT s) where
   lift m = StateT $ \s -> do
     a <- m
@@ -325,8 +333,8 @@ instance MonadTrans (EitherT e) where
     return (Right a) -- "e" is already bound to the MT which means we don't have to consider "Left" values.
 
 instance MonadTrans MaybeT where
-  -- lift = MaybeT . liftM Just
-  lift m = MaybeT $ m >>= (\r -> case r of (Nothing :: Maybe a) -> return Nothing)
+  lift = MaybeT . liftM Just
+
 
 
 
