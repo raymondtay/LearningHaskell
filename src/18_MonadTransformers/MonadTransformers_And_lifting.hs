@@ -5,7 +5,7 @@ import Data.Tuple (swap)
 import Control.Monad       (liftM)
 import Control.Monad.Trans
 import Control.Monad.IO.Class
-
+import Control.Monad.Reader (MonadReader(..))
 
 -- In this case, the f and g represent type constructors, not term-level
 -- functions. So, we have a type constructor that takes three type arguments: f
@@ -372,6 +372,15 @@ instance (Monad m) => Monad (StateT s m) where
 -- 
 instance (MonadIO m) => MonadIO (StateT s m) where
   liftIO = lift . liftIO
+
+rDec :: (Num a, MonadReader a m) => m a
+rDec = reader (\x -> x -1)
+
+rShow :: Show a => ReaderT a Identity String
+rShow = ReaderT (\r -> Identity . show $ r)
+
+rPrintAndInc :: (Num a, Show a) => ReaderT a IO a
+rPrintAndInc = ReaderT (\r -> do {putStrLn $ "Hi: " ++ (show r) ; return (r+1)})
 
 
 
