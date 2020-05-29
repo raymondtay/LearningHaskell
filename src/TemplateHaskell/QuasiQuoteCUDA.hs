@@ -46,8 +46,32 @@ cuda_driver fn n =
 
 
 makeKernel :: String -> Float -> Int -> [C.Func]
-makeKernel fn a n = [cuda_fn fn n a, cuda_driver fn n]
+makeKernel fn a n = [cuda_fun fn n a, cuda_driver fn n]
 
+{-
+ -  Example of a run
+ -  *Main> main
+ -  __global__ void saxpy(float *x, float *y)
+ -  {
+ -      int i = blockIdx.x * blockDim.x + threadIdx.x;
+ -  
+ -      if (i < 65536)
+ -          y[i] = 2.0F * x[i] + y[i];
+ -  }
+ -  void driver(float *x, float *y)
+ -  {
+ -      float *d_x, *d_y;
+ -  
+ -      cudaMalloc(&d_x, 65536 * sizeof(float));
+ -      cudaMalloc(&d_y, 65536 * sizeof(float));
+ -      cudaMemcpy(d_x, x, 65536, cudaMemcpyHostToDevice);
+ -      cudaMemcpy(d_y, y, 65536, cudaMemcpyHostToDevice);
+ -      saxpy<<<(65536 + 255) / 256, 256>>>(d_x, d_y);
+ -      cudaFree(d_x);
+ -      cudaFree(d_y);
+ -      return 0;
+ -  }
+-}
 
 main :: IO ()
 main = do
