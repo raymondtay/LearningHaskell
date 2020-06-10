@@ -2,7 +2,11 @@
 
 import GHC.Generics (Generic)
 import Control.DeepSeq
+import Control.Monad           (liftM)
+import Control.Monad.IO.Class
+import Control.Concurrent
 import Control.Monad.Par
+import Control.Monad.Par.IO -- introducing the ParIO
 import Data.Set (Set)
 import qualified Data.Set as S
 
@@ -112,5 +116,48 @@ filterLk minSupp transactions ck =
                      rVar <- spawn $ filterLk minSupp transactions r
                      rFiltered <- get rVar
                      return $ lFiltered ++ rFiltered
+
+--
+-- Unlike Control.Parallel, in Control.Monad.Par parallelism is not combined
+-- with laziness, so sharing and granularity are completely under the control
+-- of the programmer. New units of parallel work are only created by fork and a
+-- few other combinators
+--
+
+action = runPar $ do
+  abcd <- sequence [new, new, new, new]
+  case abcd of
+    [a,b,c,d] -> do
+      fork $ do x <- get a; put b (x + 1)
+      fork $ do x <- get a; put c (x + 2)
+      fork $ do x <- get c; y <- get d; put d (x + y)
+      fork $ do put a (4 :: Int)
+      get d
+
+--
+-- In Haskell, a method to create a thread of execution is via the "forkIO"
+-- function which is from the Control.Concurrent module, this fujnction takes
+-- an argument an action of type IO () and starts executing that code in
+-- parallel.
+--
+updateAccount :: IO () 
+updateAccount = do v <- newMVar 10000
+                   forkIO $ updateMoney v
+                   forkIO $ updateMoney v
+                   forkIO $ readMoney v -- the value it "sees" is not what you expect.
+                   forkIO $ updateMoney v
+                   forkIO $ updateMoney v
+                   _ <- getLine
+                   return ()
+
+updateMoney :: MVar Integer -> IO ()
+updateMoney v = do m <- takeMVar v
+                   putStrLn $ "Updating value, which is " ++ show m
+                   putMVar v (m + 400) -- a constant prince
+
+readMoney :: MVar Integer -> IO ()
+readMoney v = do m <- readMVar v
+                 putStrLn $ "The current value is " ++ show m
+
 
 
