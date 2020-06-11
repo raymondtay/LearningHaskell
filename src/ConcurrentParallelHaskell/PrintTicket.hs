@@ -2,13 +2,14 @@
 
 import GHC.Generics (Generic)
 import Control.DeepSeq
-import Control.Monad           (liftM)
+import Control.Monad           (liftM, replicateM_)
 import Control.Monad.IO.Class
 import Control.Concurrent
 import Control.Monad.Par
 import Control.Monad.Par.IO -- introducing the ParIO
 import Data.Set (Set)
 import qualified Data.Set as S
+import System.Random
 
 data Client = GovOrg { clientName :: String }
             | Company { clientName :: String, person :: Person, duty :: String }
@@ -159,5 +160,27 @@ readMoney :: MVar Integer -> IO ()
 readMoney v = do m <- readMVar v
                  putStrLn $ "The current value is " ++ show m
 
+randomDelay :: IO ()
+randomDelay = do r <- randomRIO (3, 15)
+                 threadDelay (r * 1000000)
+
+forkDelay :: Int -> IO () -> IO ()
+forkDelay n f = replicateM_ n $ forkIO (randomDelay >> f)
+
+updateAccount' :: IO () 
+updateAccount' = do v <- newMVar 10000
+                    forkDelay 4 $ updateMoney v
+                    forkDelay 4 $ updateMoney v
+                    forkDelay 4 $ updateMoney v
+                    forkDelay 4 $ updateMoney v
+                    _ <- getLine
+                    return ()
+
+-- None of the MVar-related functions forces the evaluation of the data
+-- inserted in them. This may cause problems becasue the prices of executing
+-- some code may be paid much later, in the context of another computation. You
+-- may want to look at the strict-concurrency package to obtain a strict
+-- version of MVar.
+--
 
 
