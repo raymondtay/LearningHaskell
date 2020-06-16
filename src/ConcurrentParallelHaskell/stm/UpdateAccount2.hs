@@ -108,6 +108,7 @@ main :: IO ()
 main = do v <- newTVarIO 10000
           s <- newTVarIO [("a", 8)]
           forkDelay 4 $ atomically $ updateMoneyAndStockStm "a" 1000 v s
+          forkDelay 4 $ atomically $ pay "a" 800 v s
           forkDelay 4 $ printMoneyAndStockStm v s
           _ <- getLine -- wait for completion
           return ()
