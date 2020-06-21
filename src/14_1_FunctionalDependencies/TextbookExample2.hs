@@ -4,6 +4,7 @@
 
 import Data.Foldable (forM_)
 import Data.IORef
+import Control.Monad
 
 --
 -- Article of inspiration: http://wiki.haskell.org/Functional_dependencies
@@ -79,4 +80,18 @@ ex ps = do
   store <- storePresents ps
   get (store :: IORef [Present])
 
+class Container e c | c -> e where
+  empty  :: c
+  insert :: e -> c -> c
+  member :: e -> c -> Bool
+  toList :: c -> [e]
+
+instance Eq e => Container e [e] where
+  empty           = []
+  insert e l      = (e:l)
+  member e []     = False
+  member e (x:xs) 
+    | e == x      = True
+    | otherwise   = member e xs
+  toList l        = l
 
