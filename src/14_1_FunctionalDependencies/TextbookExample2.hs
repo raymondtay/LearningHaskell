@@ -86,7 +86,7 @@ class Container e c | c -> e where
   member :: e -> c -> Bool
   toList :: c -> [e]
 
-instance Eq e => Container e [e] where
+instance (Num e, Eq e) => Container e [e] where
   empty           = []
   insert e l      = (e:l)
   member e []     = False
@@ -94,4 +94,12 @@ instance Eq e => Container e [e] where
     | e == x      = True
     | otherwise   = member e xs
   toList l        = l
+
+--
+-- Sample of how it can be used.
+--
+foldC :: (Container e b, Foldable t) => t e -> b
+foldC xs = foldr insert empty xs
+-- 
+-- foldC [1..10] :: [Integer]
 

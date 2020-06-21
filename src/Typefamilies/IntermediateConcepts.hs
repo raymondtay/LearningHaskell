@@ -65,51 +65,50 @@ instance Logger3 ListWrapper where
 function :: p -> p -- nobody writes stuff like this
 function input = input
 
--- runComputation :: (Monad (LoggerMonad logger), Logger3 logger) => b -> LoggerMonad logger b
 runComputation input = do
   logStringM "Starting computation"
   let y = function input
   logStringM "Ending computation"
   return y
 
--- newtype StampedMessages = StampedMessages (Data.Map.Map UTCTime String)
--- instance Logger3 StampedMessages where
---   type (LoggerMonad StampedMessages) = StateT StampedMessages IO
---   prevMessagesM (StampedMessages msgs) = Data.Map.elems msgs
---   logStringM s = do 
---     (StampedMessages msgs) <- get
---     currentTime <- lift getCurrentTime
---     put $ StampedMessages (Data.Map.insert currentTime s msgs)
--- 
--- newtype ConsoleLogger = ConsoleLogger [String]
--- instance Logger3 ConsoleLogger where
---   type (LoggerMonad ConsoleLogger) = StateT ConsoleLogger IO
---   prevMessagesM (ConsoleLogger msgs) = reverse msgs
---   logStringM s = do
---     (ConsoleLogger msgs) <- get
---     lift $ putStrLn s
---     put $ ConsoleLogger (s : msgs)
+newtype StampedMessages = StampedMessages (Data.Map.Map UTCTime String)
+instance Logger3 StampedMessages where
+  type (LoggerMonad StampedMessages) = StateT StampedMessages IO
+  prevMessagesM (StampedMessages msgs) = Data.Map.elems msgs
+  logStringM s = do 
+    (StampedMessages msgs) <- get
+    currentTime <- lift getCurrentTime
+    put $ StampedMessages (Data.Map.insert currentTime s msgs)
+
+newtype ConsoleLogger = ConsoleLogger [String]
+instance Logger3 ConsoleLogger where
+  type (LoggerMonad ConsoleLogger) = StateT ConsoleLogger IO
+  prevMessagesM (ConsoleLogger msgs) = reverse msgs
+  logStringM s = do
+    (ConsoleLogger msgs) <- get
+    lift $ putStrLn s
+    put $ ConsoleLogger (s : msgs)
 
 
 --
 -- Thinking out loud: Can i actually even abstract the message type ? ie.
 -- allowing other data types as messages instead of just plain strings?
 --
--- class SUPERLOGGER logger message where
---   type LoggerS logger :: * -> *
---   type MessageS message :: * -> *
---   prevMessagesS :: logger -> [message]
---   logStringS :: message -> (LoggerS logger) ()
--- 
--- newtype MessageType = MessageType String deriving (Eq, Show)
--- newtype ListMessageWrapper = ListMessageWrapper [MessageType] deriving (Eq, Show)
--- 
--- instance SUPERLOGGER ListMessageWrapper MessageType where
---   type (LoggerS ListMessageWrapper) = State ListMessageWrapper
---   type (MessageS MessageType) = Identity
---   prevMessagesS (ListMessageWrapper msgs) = reverse msgs
---   logStringS s = do
---     (ListMessageWrapper msgs) <- get
---     put $ ListMessageWrapper (s : msgs)
+class SUPERLOGGER logger message where
+  type LoggerS logger :: * -> *
+  type MessageS message :: * -> *
+  prevMessagesS :: logger -> [message]
+  logStringS :: message -> (LoggerS logger) ()
+
+newtype MessageType = MessageType String deriving (Eq, Show)
+newtype ListMessageWrapper = ListMessageWrapper [MessageType] deriving (Eq, Show)
+
+instance SUPERLOGGER ListMessageWrapper MessageType where
+  type (LoggerS ListMessageWrapper) = State ListMessageWrapper
+  type (MessageS MessageType) = Identity
+  prevMessagesS (ListMessageWrapper msgs) = reverse msgs
+  logStringS s = do
+    (ListMessageWrapper msgs) <- get
+    put $ ListMessageWrapper (s : msgs)
 
 
