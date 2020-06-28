@@ -14,3 +14,7 @@ Two major problems of the Haskell kind system are solved by these extensions:
   * **Solution:** Promote data types to kinds to simulate a type-system on the
     kind-level (**DataKinds**)
 
+__Kind signatures__ signify the arity of parameterization of a type, that is,
+the number and position of type parameters in a type. However, arity says
+nothing about type and the Haskell kind system is __untyped__.
+

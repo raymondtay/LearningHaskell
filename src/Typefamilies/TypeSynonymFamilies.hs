@@ -22,9 +22,15 @@ data Combo a b = Combo a b   -- this is a combination
 
 type RList a = Choice U (Combo a (List' a)) -- this basically means that we want to construct a list that consists of "right" lists hence the name
 
+-- top-level type-families that are not associated with a type-class. As with
+-- type-classes, type families are open in the sense that we can add new
+-- instances at any time.
 type family RepF d
 type instance RepF (List' a) = (RList a)
 
+-- Note: You should know that data-type families can be associated to a
+-- type-class or defined top-level. See [[GMap.hs]] for details.
+--
 -- The type family RepF represents a type function, with each instance
 -- declaring a value. Put in another way, a type family represents a set of
 -- types , and each instance represents a set member.

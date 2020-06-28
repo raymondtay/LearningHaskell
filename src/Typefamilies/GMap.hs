@@ -17,7 +17,9 @@ u = undefined -- the laziness in me made me do it
 
 
 --
--- Flavour 1 : top-level declaration
+-- Flavour 1 : top-level declaration and notice the kind signature (* -> *)
+-- which implies that i have to decide what the 3rd parameter should be so that
+-- i can complete the definition of the instances.
 --
 data family MyMap k :: * -> *
 

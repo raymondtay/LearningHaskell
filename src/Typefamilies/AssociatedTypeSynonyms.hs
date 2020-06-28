@@ -35,10 +35,15 @@ instance GenericFD (List' a) (RList a) where -- here is how to declare how the t
 -- (↑) using Associated Type Synonyms 
 --
 class GenericA d where
-  type Rep d :: * -- Rep is a type function
+  type Rep d :: * -- Rep is a type function (or "type family" or "associated type")
   fromA :: d -> (Rep d)
   toA   :: (Rep d) -> d
-
+-- The generic functions fromA and toA are indexed against types that are
+-- themselves indexed by types! In this way, associated type synonyms extend
+-- type-classes by allowing for type-indexed behavior.
+-- The type-class instance (which you will see below) needs to specify a value
+-- for the type function Rep, that is hte instance mixes type functions with
+-- type-class functions.
 instance GenericA (List' a) where
   type Rep (List' a) = (RList a) -- Rep type params must match the class params
   
