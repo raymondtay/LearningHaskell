@@ -63,4 +63,21 @@ main = do
 -- As with type-classes, type families are "open" in the sense that we can add
 -- new instances at any time.
 --
+-- If, for whatever reason, we are sure that we do not wish the type-families
+-- to be "open" then we can define the instances of the type-families straight
+-- away and that "close"s the type-families
+--
+type family F a :: * -> * where
+  F Int = Maybe
+  F Char = Maybe
+type family G a where
+  G Int = Maybe Int
+  G Char = Maybe Char
+
+-- below are 4 function definitions leveraging the type families 
+f x = Just x :: F Int Int
+g x = Nothing :: F Char Char
+h x = Just x :: G Int
+j x = Just x :: G Char
+
 
