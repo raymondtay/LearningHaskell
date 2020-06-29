@@ -39,8 +39,17 @@ instance T1 Maybe where
   f1 _ = "T1 Maybe"
   f2 _ = "What?"
 
--- This declaration allows only Maybe values i.e. Just X or Nothing
+-- The instance definition does not work for the fact that m :: * -> *
+-- and not m :: *; if you like the latter approach then you have to craft
+-- type-classes like `T0` instead of `T1`.
+-- What can be done to have best of both worlds? You need the `PolyKinds`
+-- extension which allows you to combine these two (2) approaches.
 --
+-- instance T1 Int where
+--   f1 x = undefined
+--   f2 x = undefined
+
+
 --
 -- With the Polykinds extension, 'k' would be polymorphic by default.
 -- Conversely, without the Polykinds extension, the compiler would be
