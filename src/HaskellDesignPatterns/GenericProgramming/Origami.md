@@ -197,3 +197,36 @@ putStrLn . showListF $ genericUnfoldL (toList' (< (-10))) 10
 -- 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, Nil_
 ```
 
+## Put them all together (i.e. (fold . unfold)[+1] == hylomorphism)
+The term hylomorphism was used to describe the process of unfolding and then folding. A useful to illustrate this is 
+```
+fold . unfold (fold . unfold ( fold . unfold …) )
+```
+and concretely, in code (of course), as follows
+```haskell
+-- fold . unfold
+genericFold addL (genericUnfold toList 100) -- 5050
+-- fold . unfold (fold . unfold)
+genericFold addL (genericUnfold toList (genericFold addL (genericUnfold toList 100))) -- 12753775
+-- fold . unfold (fold . unfold)
+genericFold addL \
+  (genericUnfold (toList' (< (-10))) \
+  (genericFold addL (genericUnfold (toList' (< (-10))) 100)
+)) -- 12477455
+-- just keeps folding and unfolding etc 
+-- ...
+```
+The above code snippet illustrates a general idea and that is folding and unfolding is theoretically infinite like the Turing Machine.
+As it turns out, the term hylomorphism was mentioned in the paper Datatype-Generic Programming by Jeremy Gibbons.
+The wikipedia says that it is basically a composition between a cata-morphism (i.e. folding) and a ana-morphism (i.e. unfolding).
+There are other patterns described in that paper but my personal favourite is hylomorphism as its quite intuitive.
+
+
+## Conclusion
+
+I definitely think that this origami pattern (that's what some Haskellers are calling it and having done some basics of it,
+i can appreciate why) of writing code is helpful and it does reduce boilerplate code in my own projects; admittedly you
+get this kind of productivity only after realising how the code can be structured and when it'll take time to gain mastery.
+A point along the "journey to mastery" is that it definitely needs time and practice to get it right and i'll argue that
+it reduces readability (when you don't get it right) but it's certainly very clever to write code this way.
+

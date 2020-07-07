@@ -145,8 +145,8 @@ unfoldL stopF nextF value =
 -- here is an example of what it looks like
 j = unfoldL (< (-10)) (\x -> x - 1) 10
 
-genericUnfoldL :: Bifunctor s => (b -> s a b) -> b -> Fix s a
-genericUnfoldL f = FixT . bimap id (genericUnfoldL f) . f
+genericUnfold :: Bifunctor s => (b -> s a b) -> b -> Fix s a
+genericUnfold f = FixT . bimap id (genericUnfold f) . f
 
 toList :: (Eq r, Num r) => r -> List_ r r
 toList 0 = Nil_ 
@@ -164,6 +164,6 @@ main = do
   putStrLn . show $ f -- map + add list
   putStrLn . show $ g -- add list
   putStrLn . show $ h -- add tree
-  putStrLn . showListF $ genericUnfoldL toList 10
-  putStrLn . showListF $ genericUnfoldL (toList' (< (-10))) 10
+  putStrLn . showListF $ genericUnfold toList 10
+  putStrLn . showListF $ genericUnfold (toList' (< (-10))) 10
 
