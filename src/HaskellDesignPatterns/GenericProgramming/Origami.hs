@@ -63,6 +63,30 @@ showTreeF :: (Show a) => TreeF a -> String
 showTreeF (FixT (Node_ x l r)) = (show x) ++ ", " ++ (showTreeF l) ++ ", " ++ (showTreeF r)
 showTreeF (FixT (Leaf_ x)) = "Leaf_ " ++ (show x)
 
+-- Now, let's make two unfold functions which re-constructs a List of numbers
+-- and a Tree of numbers.
+unfoldList :: (Num a, Eq a) => a -> Fix List_ a
+unfoldList 0 = FixT Nil_
+unfoldList n = FixT (Cons_ n (unfoldList (n-1)))
+
+-- Right-leaning tree.
+unfoldRTree :: Num a => [a] -> Fix Tree_ a
+unfoldRTree []       = FixT (Leaf_ (-1))
+unfoldRTree [x]      = FixT (Leaf_ x)
+unfoldRTree (x:y:xs) = FixT (Node_ x (unfoldRTree [y]) (unfoldRTree xs))
+
+-- Left-leaning tree.
+unfoldLTree :: Num a => [a] -> Fix Tree_ a
+unfoldLTree []       = FixT (Leaf_ (-1))
+unfoldLTree [x]      = FixT (Leaf_ x)
+unfoldLTree (x:y:xs) = FixT (Node_ x (unfoldLTree xs) (unfoldLTree [y]))
+
+-- Builds a "balanced" tree and assumes that elts is sorted
+unfoldBalancedTree []   = FixT (Leaf_ (-1))
+unfoldBalancedTree elts = FixT (Node_ (elts !! half)
+                           (unfoldBalancedTree $ take half elts) 
+                           (unfoldBalancedTree $ drop (half+1) elts))
+    where half = length elts `quot` 2
 
 -- Now, we are ready to attempt to write a more generic `map` with the purpose
 -- that we can make another step to eliminating boilerplate code. First, we
@@ -96,9 +120,11 @@ addL :: Num a => List_ a a -> a
 addL (Cons_ x r) = x + r
 addL Nil_        = 0
 
-addT :: Num a => Tree_ a a -> a
+addT :: (Eq a, Num a) => Tree_ a a -> a
 addT (Node_ x l r) = x + l + r
-addT (Leaf_ x)   = x
+addT (Leaf_ x)
+  | x == (-1) = 0
+  | otherwise = x
 
 f = genericFold addL $ genericFold (mapL' (+1)) aListF
 g = genericFold addL aListF
