@@ -156,6 +156,19 @@ toList n = (Cons_ n (n - 1))
 toList' :: (Eq r, Num r) => (r -> Bool) -> r -> List_ r r
 toList' f n = if f n then Nil_ else (Cons_ n (n - 1))
 
+
+-- `genericFold` and `genericUnfold` are mirror images of one another and the way i
+-- like to see it is this:
+--
+-- genericUnfold = FixT . bimap id (genericUnfold f) . f
+-- genericFold f = f    . bimap id (genericFold f)   . getFix
+--
+-- Hylo is another way to say hylomorphism ; which is a fancy way of combining
+-- both catamorphism and anamorphism into 1 transformation.
+--
+hylo :: Bifunctor p => (c -> p b c) -> (p b d -> d) -> c -> d
+hylo f g = g . bimap id (hylo f g) . f
+
 main :: IO ()
 main = do
   putStrLn . showListF $ mapL (+1) aListF
@@ -166,4 +179,7 @@ main = do
   putStrLn . show $ h -- add tree
   putStrLn . showListF $ genericUnfold toList 10
   putStrLn . showListF $ genericUnfold (toList' (< (-10))) 10
+  putStrLn . show $ hylo (toList' (< (-10))) addL 10
+  putStrLn . show $ hylo toList addL $ hylo (toList' (< (-10))) addL 10 -- superfluous, can you see why?
+
 
