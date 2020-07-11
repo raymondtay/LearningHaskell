@@ -1,6 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE AllowAmbiguousTypes #-}
 
 --
 -- Source of motivation for this exercise : https://ocharles.org.uk/posts/2014-12-12-type-families.html
@@ -9,7 +8,6 @@ import Control.Concurrent.STM
 import Control.Concurrent.MVar
 import Data.Foldable (forM_)
 import Data.IORef
-import Control.Monad.IO.Class
 
 class IOStore store where
   newIO :: a -> IO (store a)
