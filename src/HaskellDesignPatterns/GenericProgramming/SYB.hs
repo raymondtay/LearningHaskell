@@ -198,7 +198,8 @@ mkQ :: (Typeable a, Typeable b) => r -> (b -> r) -> a -> r
   Just a' -> q a'
   Nothing -> r
 
-
+-- mkM represents a monadic query and its not that different from mkQ or even
+-- mkT. 
 mkM :: (Typeable a, Typeable b,
         Monad m, Typeable (m a) ,
         Typeable (m b)) => (b -> m b) -> a -> m a
