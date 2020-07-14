@@ -1,27 +1,34 @@
 LearningHaskell
 ===============
 
-This is my journey for learning Haskell and adopting 
-it to my style of writing programs in Scala. I draw
-inspirations from the book "Real World Haskell" by 
-Don Stewart, Bryan'o Sullivan and John Goerzen
+The purpose of this repository is to document my learning journey into the
+programming language, `Haskell`. The organization was originally based on the
+code examples from the book [Real World Haskell](http://book.realworldhaskell.org/)
+but that organization has since changed as i read more, i learnt more.
+
+I am afraid to say this but the organization is probably more understandable to
+me than anyone else. However, there's a structure to it.
 
 Environment
 ================
-- Haskell Platform for OSX 
 
-```
-Raymonds-MacBook-Pro:LearningHaskell raymondtay$ ghci
-GHCi, version 7.8.3: http://www.haskell.org/ghc/  :? for help
-Loading package ghc-prim ... linking ... done.
-Loading package integer-gmp ... linking ... done.
-Loading package base ... linking ... done.
-Prelude>
-Leaving GHCi.
-```
+The code examples here mostly work for GHC versions 7.8.3, 8.6.5 and 8.8.3
 
-Source Code
+- I'm using the [Haskell platform](https://www.haskell.org/platform/) for macOS 
+
+Organization
 ===============
-Mostly from the book in their original form, if there are 
-others, i'll indicate them as we move along
+
+The organization started around the RWH code examples and i've organized them
+in such a way that :
+
+At the __top-level__ directory i.e. `src`
+
+* You will see various directories and they can be categorized into two things:
+  * Named after books i've read or reading
+  * Interesting topics i found which is not a book e.g. `Yesod` 
+* When you see a directory prefix that starts with digits, e.g. `01_...`, it
+  correlates with the chapter in the RWH [book](https://book.realworldhaskell.org)
+
+
 
