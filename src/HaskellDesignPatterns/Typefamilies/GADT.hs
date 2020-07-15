@@ -1,5 +1,6 @@
 
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE KindSignatures #-}
 
 import Control.Monad
 
@@ -10,12 +11,39 @@ import Control.Monad
 -- * https://wiki.haskell.org/Generalised_algebraic_datatype
 --
 
-data Term a where
-  Lit :: Int -> Term Int
-  Succ :: Term Int -> Term Int
-  IsZero :: Term Int -> Term Bool
-  If :: Term Bool -> Term a -> Term a -> Term a
-  Pair :: Term a -> Term b -> Term (a, b)
+
+--
+-- The following form is accepted in addition to the following, they're one and
+-- the same. If you do decide to use this form, you need `KindSignatures` GHC
+-- extension.
+--
+-- {-# LANGUAGE KindSignatures #-}
+-- data Term :: * -> * where
+--   Lit    :: Int -> Term Int
+--   Succ   :: Term Int -> Term Int
+--   IsZero :: Term Int -> Term Bool
+--   If     :: Term Bool -> Term a -> Term a -> Term a
+--   Pair   :: Term a -> Term b -> Term (a, b)
+
+-- data Term a where
+--   Lit    :: Int -> Term Int
+--   Succ   :: Term Int -> Term Int
+--   IsZero :: Term Int -> Term Bool
+--   If     :: Term Bool -> Term a -> Term a -> Term a
+--   Pair   :: Term a -> Term b -> Term (a, b)
+
+data Term :: * -> * where
+    Lit    :: { val  :: !Int }      -> Term Int
+    Succ   :: { num  :: !(Term Int) } -> Term Int
+    Pred   :: { num  :: !(Term Int) } -> Term Int
+    IsZero :: { arg  :: !(Term Int) } -> Term Bool
+    Pair   :: { arg1 :: !(Term a)
+              , arg2 :: !(Term b)
+              }                    -> Term (a,b)
+    If     :: { cnd  :: !(Term Bool)
+              , tru  :: !(Term a)
+              , fls  :: !(Term a)
+              }                    -> Term a
 
 -- Here is a interpreter of how these expressions can be evaluated
 eval :: Term a -> a
@@ -51,33 +79,37 @@ data T a where
   D3 :: (a, a) -> T [a]
 
 evalT :: T a -> a
-evalT (D1 i) = show i
-evalT D2 = False
+evalT (D1 i)     = show i
+evalT D2         = False
 evalT (D3 (x,y)) = x : y : []
 
+-- data Parser :: * -> * -> * where -- this form is equivalent to the
+-- 'Parser tok a'.
+-- data Parser (tok :: *) (a :: *) where -- this form is also correct but
+-- slightly odder than the two forms.
 data Parser tok a where
-  Zero :: Parser tok ()
-  One :: Parser tok ()
-  Check :: (tok -> Bool) -> Parser tok tok 
+  Zero    :: Parser tok ()
+  One     :: Parser tok ()
+  Check   :: (tok -> Bool) -> Parser tok tok 
   Satisfy :: ([tok] -> Bool) -> Parser tok [tok]
-  Push :: tok -> Parser tok a -> Parser tok a
-  Plus :: Parser tok a -> Parser tok b -> Parser tok (Either a b)
-  Times :: Parser tok a -> Parser tok b -> Parser tok (a, b)
-  Star :: Parser tok a -> Parser tok [a]
+  Push    :: tok -> Parser tok a -> Parser tok a
+  Plus    :: Parser tok a -> Parser tok b -> Parser tok (Either a b)
+  Times   :: Parser tok a -> Parser tok b -> Parser tok (a, b)
+  Star    :: Parser tok a -> Parser tok [a]
 
 parse :: Parser tok a -> [tok] -> Maybe a
-parse Zero ts = mzero
-parse One []  = return ()
-parse One _   = mzero
-parse (Check p) [t] = if p t then return t else mzero
-parse (Check p) _   = mzero
+parse Zero ts        = mzero
+parse One []         = return ()
+parse One _          = mzero
+parse (Check p) [t]  = if p t then return t else mzero
+parse (Check p) _    = mzero
 parse (Satisfy p) xs = if p xs then return xs else mzero
-parse (Push t x) ts = parse x (t:ts)
-parse (Plus x y) ts = liftM Left (parse x ts) `mplus` liftM Right (parse y ts)
+parse (Push t x) ts  = parse x (t:ts)
+parse (Plus x y) ts  = liftM Left (parse x ts) `mplus` liftM Right (parse y ts)
 parse (Times x y) [] = liftM2 (,) (parse x []) (parse y [])
 parse (Times x y) (t:ts) =
   parse (Times (Push t x) y) ts `mplus` liftM2 (,) (parse x []) (parse y (t:ts))
-parse (Star x) [] = return []
+parse (Star x) []     = return []
 parse (Star x) (t:ts) = do
   (v,vs) <- parse (Times x (Star x)) (t:ts)
   return (v:vs)
@@ -86,7 +118,7 @@ parse (Star x) (t:ts) = do
 token x = Check (== x)
 string xs = Satisfy (== xs)
 
-p = Times (token 'a') (token 'b')
+p  = Times (token 'a') (token 'b')
 p1 = Times (Star (token 'a')) (Star (token 'b'))
 p2 = Star p1
 

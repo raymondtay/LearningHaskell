@@ -165,8 +165,8 @@ compress RUnit U = [Z]
 compress (RChoice rA rB) (L a) = compress rA a 
 compress (RChoice rA rB) (R b) = compress rB b
 compress (RCombo rA rB) (Combo a b) = (compress rA a) ++ (compress rB b)
-compress RInt  x = foldr (\e -> \acc -> if e == '1' then O:acc else Z:acc) [] $ showIntAtBase 2 ("01" !!) x ""
-compress RChar x = foldr (\e -> \acc -> if e == '1' then O:acc else Z:acc) [] $ showIntAtBase 2 ("01" !!) (ord x) ""
+compress RInt  x = foldl (\acc -> \e -> if e == '1' then O:acc else Z:acc) [] $ showIntAtBase 2 ("01" !!) x ""
+compress RChar x = foldl (\acc -> \e -> if e == '1' then O:acc else Z:acc) [] $ showIntAtBase 2 ("01" !!) (ord x) ""
 compress (RType ep tr) t = compress tr (from ep t)
 
 

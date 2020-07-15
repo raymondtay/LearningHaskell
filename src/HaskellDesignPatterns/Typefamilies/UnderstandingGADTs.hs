@@ -43,20 +43,21 @@ import Prelude hiding (Maybe(..))
 --    3.2/ Support capture of integers
 --    3.3/ Support nonsensical expressions
 -- The following is how it might work
--- eval :: Expr -> Maybe (Either Int Bool)
--- eval (I n) = Just (Left n)
--- eval (B n) = Just (Right n)
--- eval (Add (I e1) (I e2)) = Just . Left $ (e1 + e2)
--- eval (Add (B e1) (B e2)) = Just . Right $ (e1 && e2) -- my interpretation
--- eval (Mul (I e1) (I e2)) = Just . Left $ (e1 * e2)
--- eval (Mul (B e1) (B e2)) = Just . Right $ (e1 && e2) -- my interpretation
--- eval (Add (B _) _) = Nothing -- nonsensical expression
--- eval (Add _ (B _)) = Nothing -- nonsensical expression
--- eval (Add _ _)     = Nothing
--- eval (Mul (B _) _) = Nothing -- nonsensical expression
--- eval (Mul _ (B _)) = Nothing -- nonsensical expression
--- eval (Mul _ _)     = Nothing
--- If i am NOT thinking correctly, the above expressions are prone to errors
+-- eval :: Expr -> Maybe (Either Bool Int)
+-- eval (I n) = Just (Right n)
+-- eval (B n) = Just (Left n)
+-- eval (Add (I e1) (I e2)) = Just . Right $ (e1 + e2)
+-- eval (Add (B e1) (B e2)) = Just . Left  $ (e1 && e2)
+-- eval (Mul (I e1) (I e2)) = Just . Right $ (e1 * e2)
+-- eval (Mul (B e1) (B e2)) = Just . Left  $ (e1 && e2)
+-- eval (Add e1 e2) = (<*>) (fmap (liftA2 (+)) (eval e1)) (eval e2)
+-- eval (Mul e1 e2) = (<*>) (fmap (liftA2 (*)) (eval e1)) (eval e2)
+-- eval (Eq e1 e2)  = let a = fmap (fromLeft False) (eval e1)
+--                        b = fmap (fromLeft False) (eval e2)
+--                     in liftM Left ((<*>) (fmap (==) a) b)
+
+
+-- Caveat: If i am NOT thinking correctly, the above expressions are prone to errors
 -- and you can imagine the complexity grows as the DSL grows in complexity.
 
 -- 
