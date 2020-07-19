@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wall #-}
+{-# OPTIONS_GHC -fwarn-incomplete-patterns #-}
 
 --
 -- Phantom Types and its applications
@@ -17,6 +19,7 @@ data Unvalidated
 formData :: String -> FormData Unvalidated
 formData str = FormData str
 
+sampleData :: String
 sampleData = "this is a really cool datum which has absolutely no use"
 
 validate :: FormData Unvalidated -> Maybe (FormData Validated)

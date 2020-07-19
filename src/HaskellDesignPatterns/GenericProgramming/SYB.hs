@@ -4,6 +4,9 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 
+{-# OPTIONS_GHC -Wall #-}
+{-# OPTIONS_GHC -fwarn-incomplete-patterns #-}
+
 module SYB where
 
 import Data.Typeable
