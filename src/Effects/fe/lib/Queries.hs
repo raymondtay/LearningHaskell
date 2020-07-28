@@ -10,16 +10,32 @@ import           Control.Monad                 (liftM)
 import           Control.Monad.IO.Class
 import           Data.Bifunctor
 import           Database.PostgreSQL.Simple
+import           Database.PostgreSQL.Simple.Time
+import           Data.Time
+import           GHC.Generics (Generic)
+import qualified Data.Text                     as T
+
+data Company = Company { coyid :: Int,
+                         name :: T.Text,
+                         age :: Int,
+                         address :: Maybe T.Text,
+                         salary :: Maybe Double,
+                         join_date :: Maybe Date } deriving (Show, Generic, FromRow, ToRow)
 
 --
 -- quickStart illustrates how to connect to a running PostgreSQL database
 -- instance running locally; using a connection string
 --
-quickStart :: IO Int
-quickStart = do
+queryString :: Query
+queryString = "select * from company where name = ?"
+
+quickStart :: String -> IO Int
+quickStart uname = do
   conn <- connectPostgreSQL "host=localhost dbname=postgres password=postgres user=postgres"
-  [Only i] <- query_ conn "select 2 + 2"
-  return i
+  mapM_ print =<< (query_ conn "select * from company" :: IO [Company] ) -- all records
+  mapM_ print =<< (query conn queryString (Only uname) :: IO [Company] )-- one record
+  [Only i] <- query_ conn "select 2 + 2" :: IO [Only Int]
+  return 1
 
 --
 -- quickStart' illustrates how to connect to a running PostgreSQL database
@@ -150,6 +166,17 @@ queryDatabase = do
   [Only result] <- liftIO $ query_ conn "select count(*) from company"
   FW.tell "[Query] completed. "
   return result
+
+
+queryUser :: (MonadIO m,
+              MonadFail m,
+              Has (FW.Writer String) sig m,
+              Has (FR.Reader Connection) sig m) => String -> m Company
+queryUser uname = do
+  conn <- FR.ask
+  [record] <- liftIO $ (query conn "select * from company where name = ?" (Only uname) :: IO [Company])
+  FW.tell "[Query] record found and returned."
+  return record
 
 --
 -- The small difference is that there's a State effect to store logs
