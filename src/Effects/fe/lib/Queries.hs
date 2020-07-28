@@ -173,8 +173,8 @@ queryUser :: (MonadIO m,
               Has (FW.Writer String) sig m,
               Has (FR.Reader Connection) sig m) => String -> m Company
 queryUser uname = do
-  conn <- FR.ask
-  [record] <- liftIO $ (query conn "select * from company where name = ?" (Only uname) :: IO [Company])
+  conn     <- FR.ask
+  [record] <- liftIO $ query conn "select * from company where name = ?" (Only uname)
   FW.tell "[Query] record found and returned."
   return record
 
