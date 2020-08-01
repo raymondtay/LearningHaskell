@@ -18,7 +18,13 @@ extra-source-files:  CHANGELOG.md
 
 library PostgreSQL
   exposed-modules: Queries
-  default-extensions: OverloadedStrings, FlexibleInstances, FlexibleContexts, DeriveAnyClass, DeriveGeneric
+  default-extensions: OverloadedStrings,
+                      FlexibleInstances,
+                      FlexibleContexts,
+                      DeriveAnyClass,
+                      DeriveGeneric,
+                      RecordWildCards,
+                      ScopedTypeVariables
   build-depends:    base ^>=4.13.0.0, 
                     postgresql-simple,
                     mtl,

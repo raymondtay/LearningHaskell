@@ -1,25 +1,27 @@
 module Queries where
 
 import           Control.Algebra
-import qualified Control.Carrier.Lift          as FL
-import qualified Control.Carrier.Reader        as FR
-import qualified Control.Carrier.Writer.Strict as FW
-import qualified Control.Carrier.State.Strict  as FS
-import qualified Control.Effect.Exception      as Ex
-import           Control.Monad                 (liftM)
+import qualified Control.Carrier.Lift            as FL
+import qualified Control.Carrier.Reader          as FR
+import qualified Control.Carrier.State.Strict    as FS
+import qualified Control.Carrier.Writer.Strict   as FW
+import qualified Control.Effect.Exception        as Ex
+import           Control.Monad                   (liftM)
 import           Control.Monad.IO.Class
 import           Data.Bifunctor
+import qualified Data.Text                       as T
+import           Data.Time
 import           Database.PostgreSQL.Simple
 import           Database.PostgreSQL.Simple.Time
-import           Data.Time
-import           GHC.Generics (Generic)
-import qualified Data.Text                     as T
+import           GHC.Generics                    (Generic)
 
-data Company = Company { coyid :: Int,
-                         name :: T.Text,
-                         age :: Int,
-                         address :: Maybe T.Text,
-                         salary :: Maybe Double,
+
+
+data Company = Company { coyid     :: Int,
+                         name      :: T.Text,
+                         age       :: Int,
+                         address   :: Maybe T.Text,
+                         salary    :: Maybe Double,
                          join_date :: Maybe Date } deriving (Show, Generic, FromRow, ToRow)
 
 --
@@ -193,7 +195,7 @@ queryDatabase' = do
   FW.tell msg
   FS.put (logs ++ msg)
   return result
-  
+
 
 -- On-demand queries, to me, means that when a connection is created for the
 -- purpose of servicing a query and release immediately thereafter. Compared to
@@ -216,4 +218,10 @@ queryOnDemand = do
 runQueryOnDemand :: IO ([String], Int)
 runQueryOnDemand = FL.runM (FR.runReader defaultConnectInfo { connectPassword = "postgres" } . FW.runWriter $ queryOnDemand)
 
+
+runQueryUser :: String -> IO (String, Company)
+runQueryUser n = Ex.catch (do
+  (_, c) <- runGetConnection
+  FL.runM $ FR.runReader c . FW.runWriter $ (queryUser n))
+  (\(e::Ex.SomeException) -> putStrLn "Error" >> return ("crap", Company{..}))
 
