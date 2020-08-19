@@ -225,3 +225,12 @@ runQueryUser n = Ex.catch (do
   FL.runM $ FR.runReader c . FW.runWriter $ (queryUser n))
   (\(e::Ex.SomeException) -> putStrLn "Error" >> return ("crap", Company{..}))
 
+example2 :: Algebra sig m => m (Int, ())
+example2 = FR.runReader "hello" . FS.runState 0 $ do
+  list <- FR.ask
+  FS.put (length (list :: String))
+
+example3 :: Algebra sig m => m Int
+example3 = FR.runReader "hello" . FS.execState 0 $ do
+  list <- FR.ask
+  FS.put (length (list :: String))
