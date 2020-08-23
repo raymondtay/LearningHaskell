@@ -1,12 +1,14 @@
 module Main where
 
+import           B
+
 -- What i want to do is to use polysemy to implement an demonstration of
 -- outputing the results of a random number to the console.
 --
 
-import Polysemy
-import Polysemy.Input
-import Polysemy.Output
+import           Polysemy
+import           Polysemy.Input
+import           Polysemy.Output
 
 data Teletype m a where
   ReadTTY :: Teletype m String
