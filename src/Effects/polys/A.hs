@@ -11,7 +11,8 @@ import           Polysemy.Reader
 import           Polysemy.State
 
 data DataStore m a where
-  ReadFromStore :: DataStore m Int
+  LoadFromEnv :: DataStore m Int
+  ReadFromCLI :: DataStore m Int
   WriteToStore :: Int -> DataStore m Int
 
 makeSem ''DataStore
@@ -21,15 +22,18 @@ store' :: Member DataStore r => Int -> Sem r Int
 store' x = P.send (WriteToStore x :: DataStore (Sem r) Int)
 
 read' :: Member DataStore r => Sem r Int
-read' = P.send (ReadFromStore)
+read' = P.send (ReadFromCLI)
 
 addToStore :: Member DataStore r => Sem r Int
 addToStore = read' >>= store'
 
-runI :: Member (Embed IO) r => Sem (DataStore ': r) a -> Sem r a
+runI :: (Member (Reader Int) r, Member (Embed IO) r) => Sem (DataStore ': r) a -> Sem r a
 runI = interpret \case
-  ReadFromStore  -> embed $ print "Please enter: " >> getLine >>= \x -> return $ read @Int x
+  LoadFromEnv    -> do
+    r <- ask @Int
+    return (r+2)
+  ReadFromCLI    -> embed $ print "Please enter: " >> getLine >>= \x -> return $ read @Int x
   WriteToStore x -> embed $ (putStrLn $ "You gave me: " ++ (show x)) >> return x
 
-execIt = runM . runI $ addToStore
+execIt = runM . runReader 9 . runI $ addToStore
 
