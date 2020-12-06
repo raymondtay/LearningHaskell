@@ -1,9 +1,9 @@
-{-#LANGUAGE TypeOperators,
-            MultiParamTypeClasses,
-            FlexibleInstances,
-            FlexibleContexts,
-            InstanceSigs,
-            OverlappingInstances #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE InstanceSigs          #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverlappingInstances  #-}
+{-# LANGUAGE TypeOperators         #-}
 
 -- NOTE: you will run into Overlapping instances problem. Use the corresponding
 -- GHC extension to resolve it. See
@@ -19,11 +19,11 @@ module DataALarteCarte where
 -- the data structure to perform all kinds of computations. It quickly becomes
 -- a sticky wicket:
 --
--- data Expr = Val Int | Add Expr Expr 
+-- data Expr = Val Int | Add Expr Expr
 -- eval :: Expr -> Int
 -- eval (Val x) = x
 -- eval (Add x y) = (+) (eval x) (eval y)
--- 
+--
 -- render :: Expr -> String
 -- render (Val x) = show x
 -- render (Add x y) = "(" ++ render x ++ " + " ++ render y ++ ")"
@@ -37,8 +37,8 @@ data Add e = Add e e
 type AddExpr = Expr Add
 
 -- question: How do we combine both "IntExpr" and "AddExpr" ??
--- answer: we take the coproduct of their signatures. 
--- 
+-- answer: we take the coproduct of their signatures.
+--
 -- The coproduct of two signatures is straightforward to define in Haskell. It
 -- is very similar to the Either data type; the only difference is that it does
 -- not combine two base types, but two type constructors.
@@ -127,7 +127,7 @@ x ⊕ y = inject (Add x y)
 -- Its important to contrast the approach here versus the one in "addExample"
 -- which is more straightforward and there is a problem with the Overlapping
 -- instances problem in this approach
--- see https://www.reddit.com/r/haskellquestions/comments/3nc55l/data_types_a_la_carte/ 
+-- see https://www.reddit.com/r/haskellquestions/comments/3nc55l/data_types_a_la_carte/
 -- for the discussion and potential solution.
 --
 addExample2 :: Expr (Add :+: Val)
@@ -140,7 +140,7 @@ instance Functor Mul where
 instance Eval Mul where
   evalAlgebra (Mul x y) = x * y
 
-infixl 7 ⊗  -- its important to know that the multiplication operations precedes addition.
+infixl 7 ⊗  -- its important to know that the multiplication operations precedes addition. u+2297
 (⊗) :: (Mul :<: f) => Expr f -> Expr f -> Expr f
 x ⊗ y = inject (Mul x y)
 
@@ -151,7 +151,7 @@ complexExample2 = val 80 ⊕ val 4 ⊗ val 4 ⊕ val 3 -- returns 99
 
 
 {-
-  Introduce a class, corresponding to the function we want to write. An obvious candidate for this 
+  Introduce a class, corresponding to the function we want to write. An obvious candidate for this
   class is:
 
   class Render f where
@@ -159,7 +159,7 @@ complexExample2 = val 80 ⊕ val 4 ⊗ val 4 ⊕ val 3 -- returns 99
 
   The type of `render` is not general enough. To see this, consider the instance definition for `Add`.
   We would like to make recursive calls to the subtrees, which themselves might be values, for instance.
-  The above type for render, however, requires that all subtrees of `Add` are themselves additions. 
+  The above type for render, however, requires that all subtrees of `Add` are themselves additions.
   Clearly this is undesirable. A better choice is as follows:
 -}
 class Render f where
@@ -204,25 +204,25 @@ complexExample3 = let x = val 4 ⊕ val 6
 -- this should parse nicely
 distributeExample1 =
   case (distribute complexExample3) of
-      Nothing -> "This computation is not eligible for distribution."
+      Nothing   -> "This computation is not eligible for distribution."
       Just expr -> pretty expr
 
 -- this should not parse
 distributeExample2 =
   case (distribute complexExample2) of
-      Nothing -> "This computation is not eligible for distribution."
+      Nothing   -> "This computation is not eligible for distribution."
       Just expr -> pretty expr
 --
--- Monads for Free (Luth & Ghani, 2002) 
+-- Monads for Free (Luth & Ghani, 2002)
 --
 
 -- In general, the coproduct of 2 monads is fairly complicated (Luth & Ghani,
 -- 2002) . No kidding !
--- 
+--
 data Term f a = Pure a | Impure (f (Term f a))
 
 instance Functor f => Functor (Term f) where
-  fmap f (Pure x) = Pure (f x)
+  fmap f (Pure x)   = Pure (f x)
   fmap f (Impure t) = Impure (fmap (fmap f) t)
 
 instance Functor f => Applicative (Term f) where
