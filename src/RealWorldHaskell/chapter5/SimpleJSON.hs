@@ -12,9 +12,9 @@ module SimpleJSON(
 ) where
 
 data JValue = JString String
-            | JNumber Double 
+            | JNumber Double
             | JBool Bool
-            | JNull 
+            | JNull
             | JObject [(String, JValue)]
             | JArray [JValue]
             deriving (Eq, Ord, Show)
@@ -22,27 +22,27 @@ data JValue = JString String
 -- Extracts the string from the given JSON value
 getString :: JValue -> Maybe String
 getString (JString s) = Just s
-getString _ = Nothing
+getString _           = Nothing
 
 getInt :: JValue -> Maybe Int
 getInt (JNumber n) = Just (truncate n)
-getInt _ = Nothing
+getInt _           = Nothing
 
 getDouble :: JValue -> Maybe Double
 getDouble (JNumber n) = Just n
-getDouble _ = Nothing
+getDouble _           = Nothing
 
 getBool :: JValue -> Maybe Bool
 getBool (JBool b) = Just b
-getBool _ = Nothing
+getBool _         = Nothing
 
 getObject :: JValue -> Maybe [(String, JValue)]
 getObject (JObject o) = Just o
-getObject _ = Nothing
+getObject _           = Nothing
 
 getArray :: JValue -> Maybe [JValue]
 getArray (JArray xs) = Just xs
-getArray _ = Nothing
+getArray _           = Nothing
 
 isNull :: JValue -> Bool
 isNull v = v == JNull

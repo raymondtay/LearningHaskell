@@ -1,13 +1,24 @@
+{-# LANGUAGE FlexibleInstances #-}
+
+
 module JSONClass where
+
+import           Control.Arrow (second)
+
 
 data JValue = JString String
             | JNumber Double
             | JBool Bool
             | JNull
-            | JObject [(String, JValue)]
-            | JArray [JValue]
+            | JObject (JObj JValue)
+            | JArray (JAry JValue)
             deriving (Eq, Ord, Show)
 
+newtype JAry a = JAry {
+  fromJAry :: [a]
+} deriving (Eq, Ord, Show)
+
+newtype JObj a = JObj { fromJObj :: [(String, a)] } deriving (Eq, Ord, Show)
 
 type JSONError = String
 
@@ -55,6 +66,43 @@ instance Borked (Int, Int) where
 instance (Borked a, Borked b) => Borked (a, b) where
   bork (a, b) = ">>" ++ bork a ++ " " ++ bork b ++ "<<"
 
+instance (JSON a) => JSON (JAry a) where
+  toJValue = jaryToJValue
+  fromJValue = jaryFromJValue
 
+listToJValues :: (JSON a) => [a] -> [JValue]
+listToJValues = map toJValue
+
+jvaluesToJAry :: [JValue] -> JAry JValue
+jvaluesToJAry = JAry
+
+jaryFromJValue :: (JSON a) => JValue -> Either JSONError (JAry a)
+jaryFromJValue (JArray (JAry a)) =
+  whenRight JAry (mapEithers fromJValue a)
+jaryFromJValue _ = Left "not a JSON array"
+
+jaryToJValue :: (JSON a) => JAry a -> JValue
+jaryToJValue = JArray . JAry . map toJValue . fromJAry
+
+jaryOfJValuesToJValue :: JAry JValue -> JValue
+jaryOfJValuesToJValue = JArray
+
+whenRight :: (b -> c) -> Either a b -> Either a c
+whenRight _ (Left err) = Left err
+whenRight f (Right a)  = Right (f a)
+
+mapEithers :: (a -> Either b c) -> [a] -> Either b [c]
+mapEithers f (x:xs) = case mapEithers f xs of
+                 Left err -> Left err
+                 Right ys -> case f x of
+                               Left err -> Left err
+                               Right y  -> Right (y:ys)
+mapEithers _ _ = Right []
+
+instance (JSON a) => JSON (JObj a) where
+  toJValue = JObject . JObj . map (second toJValue) . fromJObj
+  fromJValue (JObject (JObj o)) = whenRight JObj (mapEithers unwrap o)
+    where unwrap (k, v) = whenRight ((,) k) (fromJValue v)
+  fromJValue _ = Left "not a JSON object"
 
 

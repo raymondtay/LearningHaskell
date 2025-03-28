@@ -1,8 +1,8 @@
 module Main where
-import InteractWith (runInteractWith)
-import FoldingWonders (asInt_fold)
-import SimpleJSON
-import PutJSON (putJValue)
+import           FoldingWonders (asInt_fold)
+import           InteractWith   (runInteractWith)
+import           PutJSON        (putJValue)
+import           SimpleJSON
 
 main :: IO ()
 main = do

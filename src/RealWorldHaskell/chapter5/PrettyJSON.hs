@@ -1,16 +1,17 @@
-
 module PrettyJSON (
   renderJValue
                   ) where
 
-import Prelude hiding ((<>))
-import SimpleJSON (JValue(..)) -- all constructors are imported
-import Prettify (Doc, (<>), char, double, fsep, hcat, punctuate, text, compact, pretty)
-import Numeric (showHex)
-import Data.Char (ord)
-import Data.Bits (shiftR, (.&.))
-import Data.List (intercalate)
-import SimpleJSON
+import           Data.Bits  (shiftR, (.&.))
+import           Data.Char  (ord)
+import           Data.List  (intercalate)
+import           JSONClass  (JAry (..))
+import           Numeric    (showHex)
+import           Prelude    hiding ((<>))
+import           Prettify   (Doc, char, compact, double, fsep, hcat, pretty,
+                             punctuate, text, (<>))
+import           SimpleJSON (JValue (..))
+import           SimpleJSON
 
 renderJValue :: JValue -> Doc
 renderJValue (JString s) = string s
@@ -36,7 +37,7 @@ oneChar c = case lookup c simpleEscapes of
               Just r -> text r
               Nothing | mustEscape c -> hexEscape c
                       | otherwise -> char c
-   where mustEscape c = c < ' ' || c == '\x7f' || c > '\xff'
+   where mustEscape _c = _c < ' ' || _c == '\x7f' || _c > '\xff'
 
 simpleEscapes :: [(Char, String)]
 simpleEscapes = zipWith ch "\b\n\f\r\t\\\"/" "bnfrt\\\"/"
@@ -55,7 +56,7 @@ astral n = smallHex (a + 0xd800) <> smallHex (b + 0xdc00)
         b = n .&. 0x3ff
 
 hexEscape :: Char -> Doc
-hexEscape c | d < 0x10000 = smallHex d 
+hexEscape c | d < 0x10000 = smallHex d
   | otherwise = astral (d - 0x10000)
   where d = ord c
 

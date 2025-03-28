@@ -69,6 +69,8 @@ executable RealWorldHaskell
                    Prettify
                    PrettyJSON
                    SimpleJSON
+                   PutJSON
+                   JSONClass
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
