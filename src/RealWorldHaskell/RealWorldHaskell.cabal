@@ -71,6 +71,7 @@ executable RealWorldHaskell
                    SimpleJSON
                    PutJSON
                    JSONClass
+                   ClassicIO
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -79,7 +80,11 @@ executable RealWorldHaskell
     build-depends:    base ^>=4.21.0.0
 
     -- Directories containing source files.
-    hs-source-dirs:   app, chapter4, chapter5, chapter6
+    hs-source-dirs:   app,
+                      chapter4,
+                      chapter5,
+                      chapter6,
+                      chapter7
 
     -- Base language which the package is written in.
     default-language: Haskell2010
