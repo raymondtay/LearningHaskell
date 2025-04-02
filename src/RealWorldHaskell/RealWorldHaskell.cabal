@@ -72,12 +72,14 @@ executable RealWorldHaskell
                    PutJSON
                    JSONClass
                    ClassicIO
+                   TempFile
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
 
     -- Other library packages from which modules are imported.
-    build-depends:    base ^>=4.21.0.0
+    build-depends:    base ^>=4.21.0.0,
+                      directory
 
     -- Directories containing source files.
     hs-source-dirs:   app,
