@@ -73,6 +73,7 @@ executable RealWorldHaskell
                    JSONClass
                    ClassicIO
                    TempFile
+                   FamIOMonad
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:

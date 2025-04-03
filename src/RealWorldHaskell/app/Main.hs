@@ -7,6 +7,7 @@ import           PutJSON            (putJValue)
 import           SimpleJSON
 import           System.Environment
 import           TempFile           (doTempFile)
+import           FamIOMonad
 
 main :: IO ()
 main = do
@@ -15,4 +16,5 @@ main = do
   putJValue (JObject [("foo", JNumber 1), ("bar", JBool False)]) -- chapter6
   doUpper -- chapter7
   doTempFile $ head args -- chapter7
+  doStrAction
 
