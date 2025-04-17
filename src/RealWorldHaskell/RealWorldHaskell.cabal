@@ -45,7 +45,7 @@ build-type:         Simple
 extra-doc-files:    CHANGELOG.md
 
 library
-    build-depends:    base ^>=4.21.0.0
+    build-depends:    base ^>=4.21.0.0, regex-posix, bytestring
     hs-source-dirs:   chapter4
     exposed-modules:  InteractWith
     default-language: Haskell2010
@@ -80,6 +80,8 @@ executable RealWorldHaskell
 
     -- Other library packages from which modules are imported.
     build-depends:    base ^>=4.21.0.0,
+                      regex-posix,
+                      bytestring,
                       directory
 
     -- Directories containing source files.
@@ -87,7 +89,8 @@ executable RealWorldHaskell
                       chapter4,
                       chapter5,
                       chapter6,
-                      chapter7
+                      chapter7,
+                      chapter8
 
     -- Base language which the package is written in.
     default-language: Haskell2010
