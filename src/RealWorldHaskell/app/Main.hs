@@ -8,6 +8,7 @@ import           SimpleJSON
 import           System.Environment
 import           TempFile           (doTempFile)
 import           FamIOMonad
+import           GlobRegex
 
 main :: IO ()
 main = do
@@ -17,4 +18,4 @@ main = do
   doUpper -- chapter7
   doTempFile $ head args -- chapter7
   doStrAction
-
+  putStrLn . globToRegex $ "f??.c"
