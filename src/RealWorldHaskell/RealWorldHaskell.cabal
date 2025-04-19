@@ -45,7 +45,7 @@ build-type:         Simple
 extra-doc-files:    CHANGELOG.md
 
 library
-    build-depends:    base ^>=4.21.0.0, regex-posix, bytestring, directory
+    build-depends:    base ^>=4.21.0.0, regex-posix, bytestring, directory, filepath
     hs-source-dirs:   chapter4
     exposed-modules:  InteractWith
     default-language: Haskell2010
@@ -75,6 +75,8 @@ executable RealWorldHaskell
                    TempFile
                    FamIOMonad
                    GlobRegex
+                   RecursiveContents
+                   BetterPredicate
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -83,7 +85,10 @@ executable RealWorldHaskell
     build-depends:    base ^>=4.21.0.0,
                       regex-posix,
                       bytestring,
-                      directory
+                      directory,
+                      time,
+                      old-time,
+                      filepath
 
     -- Directories containing source files.
     hs-source-dirs:   app,
@@ -91,7 +96,8 @@ executable RealWorldHaskell
                       chapter5,
                       chapter6,
                       chapter7,
-                      chapter8
+                      chapter8,
+                      chapter9
 
     -- Base language which the package is written in.
     default-language: Haskell2010
